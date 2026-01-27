@@ -1,6 +1,6 @@
 'use client';
 
-import { FaUser, FaHouse, FaCamera, FaSliders } from 'react-icons/fa6';
+import { FaUser, FaHouse, FaMicrochip } from 'react-icons/fa6';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -9,10 +9,9 @@ export default function SideBar() {
 
   const navItems = [
     { id: 'home', label: 'Overview', icon: <FaHouse />, path: '/main' },
-    { id: 'image', label: 'Visual DNA', icon: <FaCamera />, path: '/main/imageinput' },
-    { id: 'feature', label: 'Curation', icon: <FaSliders />, path: '/main/featureselect' },
+    { id: 'studio', label: 'Intelligence Studio', icon: <FaMicrochip />, path: '/main/studio' },
   ];
-
+  
   return (
     <aside className="w-64 h-screen bg-[#121212] text-white flex flex-col fixed left-0 top-0 border-r border-white/5 z-50">
       <Link 
@@ -36,7 +35,8 @@ export default function SideBar() {
         ))}
       </nav>
 
-      <div className="p-10 border-t border-white/5 bg-[#0a0a0a]">
+        {/* 유저 로그인 있으면 구현 */}
+      {/* <div className="p-10 border-t border-white/5 bg-[#0a0a0a]">
         <div className="flex items-center gap-4 group cursor-pointer">
           <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center group-hover:border-white transition-all overflow-hidden bg-white/5">
             <FaUser size={14} className="text-gray-500 group-hover:text-white" />
@@ -49,7 +49,7 @@ export default function SideBar() {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
     </aside>
   );
 };

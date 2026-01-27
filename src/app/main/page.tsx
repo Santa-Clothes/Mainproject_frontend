@@ -1,4 +1,4 @@
-import { FaArrowRight, FaCamera, FaSliders } from 'react-icons/fa6';
+import { FaArrowRight, FaMicrochip, FaChartLine } from 'react-icons/fa6';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -11,64 +11,62 @@ export default function MainPage() {
         <h2 className="text-6xl font-serif italic tracking-tighter text-[#121212]">Welcome to the Studio</h2>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-        {/* Visual Input Card */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        {/* Main Entry: Unified Studio */}
         <Link 
-          href="/main/imageinput"
-          className="group relative h-[450px] bg-[#121212] rounded-[3rem] overflow-hidden cursor-pointer shadow-2xl transition-all hover:scale-[1.02] block"
+          href="/main/studio"
+          className="lg:col-span-2 group relative h-[550px] bg-[#121212] rounded-[4rem] overflow-hidden cursor-pointer shadow-2xl transition-all hover:scale-[1.01] block"
         >
           <Image 
             src="https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?q=80&w=2070&auto=format&fit=crop"
-            alt="Visual DNA Scan Backdrop"
+            alt="Studio Backdrop"
             fill
             className="opacity-40 group-hover:scale-110 transition-transform duration-[5s]"
           />
-          <div className="absolute inset-0 bg-linear-to-t from-black via-transparent to-transparent" />
-          <div className="absolute bottom-12 left-12 right-12 space-y-4">
-            <div className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
-              <FaCamera className="text-white" />
+          <div className="absolute inset-0 bg-linear-to-t from-black via-black/20 to-transparent" />
+          <div className="absolute bottom-20 left-20 right-20 space-y-6">
+            <div className="w-16 h-16 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
+              <FaMicrochip className="text-white text-2xl" />
             </div>
-            <h3 className="text-3xl font-serif italic text-white tracking-tight">Visual DNA Scan</h3>
-            <p className="text-sm font-light text-gray-400">Upload and deconstruct visual markers using AI.</p>
-            <div className="pt-4 flex items-center gap-4 text-[10px] font-bold text-white uppercase tracking-[0.4em] opacity-0 group-hover:opacity-100 transition-all">
-              Initialize Module(이미지로 탐색) <FaArrowRight />
+            <div className="space-y-2">
+              <h3 className="text-5xl font-serif italic text-white tracking-tight">Intelligence Studio</h3>
+              <p className="text-lg font-light text-gray-400 max-w-xl">The complete neural archive. Search by Visual DNA or curate through deep metadata intelligence.</p>
+            </div>
+            <div className="pt-6 flex items-center gap-6 text-[11px] font-bold text-white uppercase tracking-[0.5em] group-hover:gap-10 transition-all">
+              Initialize Protocol <FaArrowRight />
             </div>
           </div>
         </Link>
 
-        {/* Feature Select Card */}
-        <Link 
-          href="/main/featureselect"
-          className="group relative h-[450px] bg-white rounded-[3rem] overflow-hidden cursor-pointer border border-[#EBEAE7] shadow-xl transition-all hover:scale-[1.02] block"
-        >
-          <Image 
-            src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop"
-            alt="Intelligence Filters Backdrop"
-            fill
-            className="opacity-10 group-hover:scale-110 transition-transform duration-[5s]"
-          />
-          <div className="absolute bottom-12 left-12 right-12 space-y-4 text-black">
-            <div className="w-12 h-12 rounded-full bg-black/5 flex items-center justify-center border border-black/10">
-              <FaSliders />
+        {/* Stats Card 여기에 전체 의류 데이터 숫자 같은거 넣기?*/}
+        <div className="bg-white rounded-[4rem] border border-black/5 p-12 flex flex-col justify-between shadow-sm">
+          <div className="space-y-8">
+            <div className="w-12 h-12 rounded-2xl bg-black flex items-center justify-center">
+              <FaChartLine className="text-white" />
             </div>
-            <h3 className="text-3xl font-serif italic tracking-tight">Intelligence Filters</h3>
-            <p className="text-sm font-light text-gray-500">Refine the archive through deep metadata parameters.</p>
-            <div className="pt-4 flex items-center gap-4 text-[10px] font-bold uppercase tracking-[0.4em] opacity-0 group-hover:opacity-100 transition-all">
-              Deploy Filters(특징 선택으로 탐색) <FaArrowRight />
+            <div className="space-y-1">
+              <h4 className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-300">Archive Scale</h4>
+              <p className="text-4xl font-serif italic text-black tracking-tighter">12.4k Items</p>
             </div>
           </div>
-        </Link>
+          <div className="space-y-6">
+            <div className="h-1px bg-gray-50 w-full" />
+            <p className="text-[10px] font-medium leading-relaxed text-gray-400 uppercase tracking-widest">
+              Last intelligence sync <br/> 4 minutes ago
+            </p>
+          </div>
+        </div>
       </div>
 
-      {/* <div className="pt-10 border-t border-black/5">
+      <div className="pt-10 border-t border-black/5">
          <div className="flex justify-between items-center">
-            <h4 className="text-[10px] font-bold uppercase tracking-[0.6em] text-gray-300">Recent Activity</h4>
-            <button className="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-black transition-colors">View All Archive</button>
+            <h4 className="text-[10px] font-bold uppercase tracking-[0.6em] text-gray-300">System Status</h4>
+            <div className="flex items-center gap-3">
+              <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-500">Neural Engine Online</span>
+            </div>
          </div>
-         <div className="mt-10 py-20 text-center border border-dashed border-[#EBEAE7] rounded-[3rem]">
-            <p className="text-[11px] font-bold text-gray-300 uppercase tracking-widest italic">No recent scans detected in current session</p>
-         </div>
-      </div> */}
+      </div>
     </div>
   );
 }

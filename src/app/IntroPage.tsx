@@ -17,7 +17,7 @@ export default function IntroPage() {
       <div className="relative z-10 h-full flex flex-col items-center justify-between py-12 px-10 text-white">
         <header className="w-full flex justify-between items-center border-b border-white/10 pb-6 max-w-7xl mx-auto">
           <div className="text-[10px] font-bold tracking-[0.5em] uppercase opacity-40">Issue No. 001</div>
-          <h1 className="text-2xl font-serif italic tracking-[0.3em]">ATELIER</h1>
+          <h1 className="text-2xl font-serif italic tracking-[0.3em]">AITELIER</h1>
           <div className="text-[10px] font-bold tracking-[0.5em] uppercase opacity-40">2025 Archive</div>
         </header>
 
