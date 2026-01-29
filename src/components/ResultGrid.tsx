@@ -10,14 +10,6 @@ interface ResultGridProps {
     products?: ProductType[] | null;
 }
 
-// // 이 데이터는 실제 API 연동 시에는 비어있는 상태로 들어오거나 props로 받아야 합니다.
-const MOCK_ARCHIVE = [
-    { id: '1', category: 'Outerwear', name: '', brand: '', price: 0, img: '#' },
-    { id: '2', category: 'Tops', name: '', brand: '', price: 0, img: '#' },
-    { id: '3', category: 'Bottoms', name: '', brand: '', price: 0, img: '#' },
-    { id: '4', category: 'Outerwear', name: '', brand: '', price: 0, img: '#' },
-];
-
 //출력된 이미지들 뿌릴 영역
 export default function ResultGrid({
     title = "Neural Match Results",
@@ -28,9 +20,9 @@ export default function ResultGrid({
     const [activeFilter, setActiveFilter] = useState('All');
     const filters = ['All', 'Outerwear', 'Tops', 'Bottoms', 'Accessories'];
 
-    const filteredItems = activeFilter === 'All'
-        ? MOCK_ARCHIVE
-        : MOCK_ARCHIVE.filter(item => item.category === activeFilter);
+    const filteredItems = products && activeFilter === 'All'
+        ? products
+        : products?.filter(item => item.category === activeFilter) || [];
 
     return (
         <div className="space-y-10 py-16">
@@ -61,20 +53,12 @@ export default function ResultGrid({
             </div>
 
             {/* Grid Content */}
-            {isActive ? (
+            {isActive && products && products.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-10 gap-y-16">
                     {filteredItems.map((item, idx) => (
                         <div key={item.id} className="group space-y-6 cursor-pointer">
                             <div className="aspect-3/4 overflow-hidden rounded-4xl bg-[#F5F4F0] relative">
-                                {/* <Image src={item.img} alt={item.name} fill className="group-hover:scale-110 transition-transform duration-1000" /> */}
-                                {/* 이미지가 '#'이면 회색 박스에 ID만 출력, 아니면 이미지 렌더링 */}
-                                {item.img !== '#' ? (
-                                    <Image src={item.img} alt={item.name} fill className="object-cover" />
-                                ) : (
-                                    <div className="text-gray-400 font-bold text-xs uppercase tracking-widest">
-                                        Item {item.id}
-                                    </div>
-                                )}
+                                <Image src={item.img} alt={item.name} fill className="object-cover group-hover:scale-110 transition-transform duration-1000" />
                                 <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-all" />
                             </div>
                             <div className="space-y-1 px-2">

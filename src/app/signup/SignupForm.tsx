@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { FaArrowRight, FaShieldHalved } from "react-icons/fa6";
-import Router from "next/router";
+import { useRouter } from "next/router";
 
 export default function SignupForm() {
-    const router = Router;
+    const router = useRouter();
     const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     router.push("/main");

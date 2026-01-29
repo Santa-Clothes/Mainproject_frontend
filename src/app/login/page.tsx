@@ -1,11 +1,9 @@
-
-
 import { FaArrowLeft, FaKey  } from 'react-icons/fa6';
 import Link from 'next/link';
 import LoginForm from './LoginForm';
 
 export default function LoginPage() {
- 
+
   return (
     <main className="relative w-full h-screen overflow-hidden bg-black flex items-center justify-center p-10">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-neutral-900/40 via-black to-black opacity-80" />
