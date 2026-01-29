@@ -55,6 +55,15 @@ export default function Studio({ serverAction }: StudioClientProps) {
     setAiAnalysis(null);
   };
 
+  //0129
+  const tempCallImgs = async () => {
+    try {
+      
+    } catch (error) {
+      console.error("error:", error);
+    }
+  }
+
   return (
     <div className="space-y-12">
       {/* Tabs */}

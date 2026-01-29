@@ -1,4 +1,4 @@
-
+"use server"
 const BASEURL = process.env.NEXT_PUBLIC_BACK_API_URL;
 
 //임시 이미지 업로드 API
@@ -25,7 +25,7 @@ export const postImage = async (file : File)=>{
 }
 
 //임시 이미지 GET 메서드
-export const getImage = async (file : File)=>{
+export const getImages = async (file : File)=>{
     const reqUrl = `${BASEURL}/api/imageupload/upload`;
     const formData = new FormData();
     formData.append('file', file);
