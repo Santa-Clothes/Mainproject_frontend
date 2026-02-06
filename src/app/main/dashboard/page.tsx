@@ -1,16 +1,23 @@
 import React from 'react';
 import Dashboard from './Dashboard';
 import { getShoppingTrends } from '@/app/api/trendService/trendapi';
+import { getSalesRanking, SalesRankItem } from '@/app/api/salesService/salesapi';
 
-// 서버 사이드에서 데이터를 먼저 가져오도록 설정 (SSR)
 export default async function DashboardPage() {
-  let initialTrends = [];
+  let initialTrends: any[] = [];
+  let initialSales: SalesRankItem[] = [];
+
   try {
-    // 서버 컴포넌트 환경에서 API 호출
-    initialTrends = await getShoppingTrends();
+    // 서버 컴포넌트 환경에서 병렬로 API 호출
+    const [trendsData, salesData] = await Promise.all([
+      getShoppingTrends().catch(() => []),
+      getSalesRanking().catch(() => [])
+    ]);
+
+    initialTrends = trendsData;
+    initialSales = salesData;
   } catch (error) {
     console.error("Server-side fetch error:", error);
-    // 에러 발생 시 빈 배열로 진행 (클라이언트에서 재시도할 수 있음)
   }
 
   return (
@@ -30,7 +37,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* 서버에서 가져온 데이터를 props로 전달 (SSR + CSR 융합) */}
-      <Dashboard initialTrends={initialTrends} />
+      <Dashboard initialTrends={initialTrends} initialSales={initialSales} />
     </div>
   );
 }

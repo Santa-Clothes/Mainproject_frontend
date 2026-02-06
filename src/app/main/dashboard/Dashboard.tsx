@@ -11,31 +11,65 @@ import {
   FaBolt
 } from 'react-icons/fa6';
 import { getShoppingTrends } from '@/app/api/trendService/trendapi';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { getSalesRanking, SalesRankItem } from '@/app/api/salesService/salesapi';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 
-export default function Dashboard({ initialTrends = [] }: { initialTrends?: { score: number, style: string }[] }) {
-  // SSR로 받은 데이터를 초기값으로 사용
+export default function Dashboard({
+  initialTrends = [],
+  initialSales = []
+}: {
+  initialTrends?: { score: number, style: string }[],
+  initialSales?: SalesRankItem[]
+}) {
+  // 트렌드 데이터 상태 관리
   const [trends, setTrends] = useState<{ score: number, style: string }[]>(
     initialTrends.length > 0 ? initialTrends.sort((a, b) => b.score - a.score) : []
   );
 
+  // 매출 랭킹 데이터 상태 관리
+  const [sales, setSales] = useState<SalesRankItem[]>(
+    initialSales.length > 0 ? initialSales.sort((a, b) => b.saleQuantity - a.saleQuantity).slice(0, 5) : []
+  );
+
   useEffect(() => {
-    // 만약 SSR 데이터가 없다면 클라이언트에서 페치 (또는 최신 데이터 업데이트용)
     if (initialTrends.length === 0) {
       const fetchTrends = async () => {
         try {
           const data = await getShoppingTrends();
           if (data) {
-            const sortedData = data.sort((a: any, b: any) => b.score - a.score);
-            setTrends(sortedData);
+            setTrends(data.sort((a: any, b: any) => b.score - a.score));
           }
         } catch (error) {
-          console.error("Failed to fetch shopping trends:", error);
+          console.error("Failed to fetch trends:", error);
         }
       };
       fetchTrends();
     }
   }, [initialTrends]);
+
+  useEffect(() => {
+    if (initialSales.length === 0) {
+      const fetchSales = async () => {
+        try {
+          const data = await getSalesRanking();
+          if (data) {
+            setSales(data.sort((a, b) => b.saleQuantity - a.saleQuantity).slice(0, 5));
+          }
+        } catch (error) {
+          console.error("Failed to fetch sales ranking:", error);
+        }
+      };
+      fetchSales();
+    }
+  }, [initialSales]);
+
+  /**
+   * 상품명 가공 함수: '-'로 연결된 이름 중 마지막 항목만 추출
+   */
+  const formatProductName = (name: string) => {
+    const parts = name.split('-');
+    return parts[parts.length - 1].trim();
+  };
   // 대시보드 상단에 표시될 주요 지표(Metric) 배열
   const mainMetrics = [
     { label: 'Inventory Growth', value: '+12.5%', trend: 'up', sub: 'vs last month', icon: <FaBolt />, color: 'violet' },
@@ -253,6 +287,88 @@ export default function Dashboard({ initialTrends = [] }: { initialTrends?: { sc
 
           {/* 장식용 배경 요소 */}
           <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-violet-500/5 rounded-full blur-3xl pointer-events-none"></div>
+        </div>
+
+        {/* 신규: 매출 랭킹 차트 및 리스트 (BarChart 사용) */}
+        <div className="lg:col-span-3 bg-white dark:bg-neutral-900/50 rounded-[3rem] border border-neutral-200 dark:border-white/5 p-12 shadow-sm transition-colors">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
+            <div className="space-y-2">
+              <span className="text-[9px] font-bold text-gray-300 dark:text-gray-600 uppercase tracking-[0.4em]">Sales Performance</span>
+              <h3 className="text-3xl font-serif italic text-black dark:text-white tracking-tight">Best Selling Products</h3>
+            </div>
+            <div className="flex items-center gap-4 px-5 py-2 bg-violet-50 dark:bg-violet-950/30 rounded-full border border-violet-100 dark:border-violet-900/40">
+              <span className="text-[9px] font-bold text-violet-600 dark:text-violet-400 uppercase tracking-widest">Quantity Normalized Analysis</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 xl:grid-cols-5 gap-12">
+            {/* Bar Chart 섹션 */}
+            <div className="xl:col-span-3 h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={sales.map(s => ({ ...s, shortName: formatProductName(s.productName) }))}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                  <XAxis
+                    dataKey="shortName"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 9, fontWeight: 'bold', fill: '#9CA3AF' }}
+                  />
+                  <YAxis hide domain={[0, 'auto']} />
+                  <Tooltip
+                    cursor={{ fill: 'transparent' }}
+                    content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        const data = payload[0].payload as SalesRankItem;
+                        return (
+                          <div className="bg-white p-4 rounded-2xl shadow-2xl border border-gray-100 animate-in fade-in zoom-in duration-200">
+                            <p className="text-[10px] font-bold text-black uppercase tracking-widest mb-1">{data.productName}</p>
+                            <p className="text-[9px] font-medium text-violet-600 uppercase tracking-wider">Sale: {data.saleQuantity} Qty</p>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                  <Bar
+                    dataKey="saleQuantity"
+                    fill="#8B5CF6"
+                    radius={[10, 10, 0, 0]}
+                    barSize={40}
+                  >
+                    {sales.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={index === 0 ? '#6D28D9' : '#C4B5FD'} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* List 섹션 */}
+            <div className="xl:col-span-2 space-y-4">
+              {sales.map((item, i) => (
+                <div key={item.productId} className="flex items-center justify-between p-5 rounded-2xl border border-gray-50 dark:border-white/5 hover:border-violet-200 transition-colors group">
+                  <div className="flex items-center gap-4">
+                    <span className={`text-xs font-serif italic ${i === 0 ? 'text-violet-600' : 'text-gray-300'}`}>0{i + 1}</span>
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-bold text-black dark:text-white uppercase tracking-widest truncate max-w-[150px]">
+                        {formatProductName(item.productName)}
+                      </span>
+                      <span className="text-[8px] font-medium text-gray-400 uppercase tracking-tighter">
+                        {item.productId}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[10px] font-bold text-violet-500 uppercase tracking-widest">{item.saleQuantity.toLocaleString()} QTY</p>
+                    <div className="flex items-center justify-end gap-1 mt-1">
+                      <div className="h-1 w-1 rounded-full bg-violet-400"></div>
+                      <span className="text-[8px] font-medium text-gray-400 uppercase tracking-tighter">Units Sold</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
       </div>
