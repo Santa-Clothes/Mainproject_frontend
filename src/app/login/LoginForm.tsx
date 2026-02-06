@@ -1,11 +1,12 @@
 "use client";
 
-import { FaArrowRight, FaGoogle } from "react-icons/fa6";
+import { FaArrowRight } from "react-icons/fa6";
+import { FcGoogle } from "react-icons/fc";
 import { SiNaver, SiKakaotalk } from "react-icons/si";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useRef, useEffect, useCallback, useState } from "react";
-import { loginAPI, socialLoginAPI } from "@/app/api/memberService/memberapi"; 
+import { loginAPI, socialLoginAPI } from "@/app/api/memberService/memberapi";
 import { useSetAtom } from "jotai";
 import { authUserAtom } from "@/jotai/loginjotai";
 
@@ -16,7 +17,7 @@ export default function LoginForm() {
   const searchParams = useSearchParams();
   // 소셜 로그인 처리 중 로딩 상태를 관리하는 state
   const [isAuthenticating, setIsAuthenticating] = useState(false);
-  
+
   // 입력 필드 참조를 위한 ref
   const userIdRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
@@ -26,7 +27,7 @@ export default function LoginForm() {
   const handleSocialCallback = useCallback(async (code: string) => {
     setIsAuthenticating(true); // 로딩 시작
     try {
-      const result = await socialLoginAPI(code); 
+      const result = await socialLoginAPI(code);
       if (result && result.success) {
         // 로그인 성공 시 Jotai atom 업데이트
         setAuth({
@@ -171,8 +172,8 @@ export default function LoginForm() {
 
           {/* 소셜 로그인 버튼 그룹 */}
           <div className="flex justify-center gap-6 pt-2">
-            <button type="button" onClick={() => handleSocialLogin('Google')} className="flex h-12 w-12 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-800 shadow-sm transition-all hover:scale-110 hover:border-violet-200">
-              <FaGoogle size={18} />
+            <button type="button" onClick={() => handleSocialLogin('Google')} className="flex h-12 w-12 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-800 shadow-sm transition-all hover:scale-110 hover:border-neutral-300 hover:bg-neutral-50 dark:border-white/10 dark:bg-neutral-900 dark:hover:bg-neutral-800">
+              <FcGoogle size={24} />
             </button>
             <button type="button" onClick={() => handleSocialLogin('Kakao')} className="flex h-12 w-12 items-center justify-center rounded-full bg-[#FEE500] text-[#3c1e1e] transition-transform hover:scale-110">
               <SiKakaotalk size={20} />
