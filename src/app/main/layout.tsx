@@ -1,10 +1,14 @@
-
 import Header from '@/app/main/Header';
 import Footer from './Footer';
+import AuthHandler from './AuthHandler';
+import { Suspense } from 'react';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
     return (
         <div className="flex flex-col relative overflow-hidden transition-colors duration-700 min-h-screen bg-background-light dark:bg-background-dark">
+            <Suspense fallback={null}>
+                <AuthHandler />
+            </Suspense>
             {/* Background Ambient Layers */}
             <div className="relative w-full h-full overflow-hidden"> {/* 부모 요소 예시 */}
 

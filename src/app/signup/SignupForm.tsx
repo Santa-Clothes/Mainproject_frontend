@@ -10,12 +10,17 @@ import { authUserAtom } from "@/jotai/loginjotai";
 export default function SignupForm() {
   const setAuth = useSetAtom(authUserAtom);
   const router = useRouter();
-  
+
   // Ref 연결을 위해 변수명 확인
   const userIdRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
   const nicknameRef = useRef<HTMLInputElement>(null);
 
+  /**
+   * 회원가입 제출 핸들러
+   * 사용자 입력을 검증한 후 signupAPI를 호출하여 신규 유저를 등록합니다.
+   * 가입 성공 시 로그인 페이지(/login)로 이동합니다.
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -44,7 +49,7 @@ export default function SignupForm() {
         nickname: nickname,
         password: password
       });
-      router.push("/main/login"); // 가입 성공 시 로그인 페이지로 이동
+      router.push("/login"); // 가입 성공 시 로그인 페이지로 이동
     } catch (error) {
       console.error("회원가입 실패:", error);
       alert("회원가입에 실패했습니다.");
@@ -55,7 +60,7 @@ export default function SignupForm() {
     <>
       <form onSubmit={handleSubmit} className="space-y-10">
         <div className="space-y-8">
-          
+
           {/* 1. 닉네임 (nickname) 입력 */}
           {/* border-neutral-300: 라이트모드에서 뚜렷한 회색 선 */}
           {/* dark:border-white/10: 다크모드에서 은은한 흰색 선 */}
@@ -113,7 +118,7 @@ export default function SignupForm() {
           </button>
 
           <div className="flex flex-col items-center gap-6">
-            <Link href="/main/login" className="border-b border-transparent pb-1 text-[9px] font-bold uppercase tracking-[0.4em] text-neutral-500 transition-colors hover:border-violet-500 hover:text-violet-600 dark:hover:text-violet-400">
+            <Link href="/login" className="border-b border-transparent pb-1 text-[9px] font-bold uppercase tracking-[0.4em] text-neutral-500 transition-colors hover:border-violet-500 hover:text-violet-600 dark:hover:text-violet-400">
               Existing Curator? Log In
             </Link>
             <div className="flex items-center gap-4 rounded-full border border-neutral-200 bg-white/50 px-6 py-3 dark:border-white/5 dark:bg-white/5">

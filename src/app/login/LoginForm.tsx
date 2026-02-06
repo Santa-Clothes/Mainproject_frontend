@@ -4,8 +4,8 @@ import { FaArrowRight } from "react-icons/fa6";
 import { FcGoogle } from "react-icons/fc";
 import { SiNaver, SiKakaotalk } from "react-icons/si";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useRef, useEffect, useCallback, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useRef, useState } from "react";
 import { loginAPI } from "@/app/api/memberService/memberapi";
 import { useSetAtom } from "jotai";
 import { authUserAtom } from "@/jotai/loginjotai";
@@ -14,7 +14,6 @@ export default function LoginForm() {
   // Jotai atom을 사용하여 전역 인증 상태 관리
   const setAuth = useSetAtom(authUserAtom);
   const router = useRouter();
-  const searchParams = useSearchParams();
   // 소셜 로그인 처리 중 로딩 상태를 관리하는 state
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
@@ -22,26 +21,12 @@ export default function LoginForm() {
   const userIdRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
 
-  // [변경] 백엔드에서 인증 완료 후 리다이렉트 시 넘겨주는 정보를 처리
-  useEffect(() => {
-    const accessToken = searchParams.get("accessToken");
-    const userId = searchParams.get("userId");
-    const name = searchParams.get("name");
 
-    // 주소창에 토큰 정보가 있다면 로그인 성공으로 간주하고 상태 저장
-    if (accessToken) {
-      setAuth({
-        accessToken,
-        userId: userId || "",
-        name: name || "",
-        profile: "", // 기본값 할당
-        success: true
-      });
-      router.push("/main");
-    }
-  }, [searchParams, router, setAuth]);
 
-  // [유지] 기존 일반 로그인 로직 (ID/PW 방식)
+  /**
+   * 일반 로그인 제출 핸들러
+   * 사용자로부터 입력받은 ID와 비밀번호를 검증하고 loginAPI를 호출합니다.
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const userId = userIdRef.current?.value || "";
@@ -75,8 +60,11 @@ export default function LoginForm() {
     }
   };
 
-  // 소셜 로그인 버튼 클릭 핸들러
-  // 각 제공자별 OAuth URL로 리다이렉트
+  /**
+   * 소셜 로그인 클릭 핸들러
+   * 선택된 서비스(구글, 카카오, 네이버)의 백엔드 OAuth2 인증 엔드포인트로 이동합니다.
+   * 인증 후 성공적으로 돌아올 redirect_uri를 쿼리 파라미터로 포함합니다.
+   */
   const handleSocialLogin = (provider: string) => {
     const backendUrl = process.env.NEXT_PUBLIC_BACK_API_URL;
     if (!backendUrl) {
@@ -84,7 +72,7 @@ export default function LoginForm() {
       return;
     }
 
-    // 프론트엔드로 돌아올 리다이렉트 주소를 동적으로 생성 (현재 도메인/login)
+    // 프론트엔드로 돌아올 리다이렉트 주소를 동적으로 생성 (현재 도메인/main)
     const frontendRedirectUrl = encodeURIComponent(`${window.location.origin}/main`);
 
     let endpoint = "";
@@ -165,17 +153,17 @@ export default function LoginForm() {
             <button type="button" onClick={() => handleSocialLogin('Google')} className="flex h-12 w-12 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-800 shadow-sm transition-all hover:scale-110 hover:border-neutral-300 hover:bg-neutral-50 dark:border-white/10 dark:bg-neutral-900 dark:hover:bg-neutral-800">
               <FcGoogle size={24} />
             </button>
-            <button type="button" onClick={() => handleSocialLogin('Kakao')} className="flex h-12 w-12 items-center justify-center rounded-full bg-[#FEE500] text-[#3c1e1e] transition-transform hover:scale-110">
-              <SiKakaotalk size={20} />
-            </button>
             <button type="button" onClick={() => handleSocialLogin('Naver')} className="flex h-12 w-12 items-center justify-center rounded-full bg-[#03C75A] text-white transition-transform hover:scale-110">
               <SiNaver size={16} />
             </button>
+            <button type="button" onClick={() => handleSocialLogin('Kakao')} className="flex h-12 w-12 items-center justify-center rounded-full bg-[#FEE500] text-[#3c1e1e] transition-transform hover:scale-110">
+              <SiKakaotalk size={20} />
+            </button>
           </div>
 
-          {/* 회원가입 링크 */}
+          {/* 회원가입 페이지 이동 링크 (경로 보정: /signup) */}
           <div className="flex flex-col items-center gap-3 pt-1">
-            <Link href="/main/signup" className="border-b border-transparent pb-1 text-[9px] font-bold uppercase tracking-[0.4em] text-neutral-500 transition-colors hover:border-violet-500 hover:text-violet-600 dark:hover:text-violet-400">
+            <Link href="/signup" className="border-b border-transparent pb-1 text-[9px] font-bold uppercase tracking-[0.4em] text-neutral-500 transition-colors hover:border-violet-500 hover:text-violet-600 dark:hover:text-violet-400">
               Registry New Curator
             </Link>
           </div>

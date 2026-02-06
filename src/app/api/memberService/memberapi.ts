@@ -1,10 +1,14 @@
-"use server"
+//"use server" // 클라이언트에서도 호출이 필요하므로 주석 처리하거나 제거
 
 import { AuthUser } from "@/types/AuthTypes";
 import { JoinRequest } from "@/types/AuthTypes";
 
 const BASEURL = process.env.NEXT_PUBLIC_BACK_API_URL;
 
+/**
+ * 일반 로그인 API: 사용자의 ID와 비밀번호를 백엔드로 전송하여 인증을 시도합니다.
+ * 성공 시 액세스 토큰과 사용자 정보를 반환합니다.
+ */
 export const loginAPI = async (email: string, password: string) => {
     const reqUrl = `${BASEURL}/api/members/login`;
 
@@ -34,6 +38,11 @@ export const loginAPI = async (email: string, password: string) => {
     }
 };
 
+
+/**
+ * 로그아웃 API: 현재 세션을 종료하고 서버 측에 토큰 무효화를 요청합니다.
+ * Authorization 헤더에 현재의 액세스 토큰을 담아 보냅니다.
+ */
 export const logoutAPI = async (authInfo: AuthUser) => {
     const reqUrl = `${BASEURL}/api/members/logout`;
 
@@ -59,6 +68,11 @@ export const logoutAPI = async (authInfo: AuthUser) => {
     }
 };
 
+
+/**
+ * 회원가입 API: 새로운 사용자를 등록합니다.
+ * ID, 닉네임, 비밀번호를 포함한 회원가입 정보를 객체 형태로 전달받습니다.
+ */
 export const signupAPI = async (JoinRequest: JoinRequest) => {
     const reqUrl = `${BASEURL}/api/members/signup`;
 
@@ -89,26 +103,32 @@ export const signupAPI = async (JoinRequest: JoinRequest) => {
     }
 };
 
-export const signoutAPI = async (email: string, password: string) => {
-    const reqUrl = `${BASEURL}/api/members/signout`;
+
+/**
+ * 내 정보 조회 API (OAuth2 대응): 
+ * 소셜 로그인 등으로 획득한 토큰을 사용하여 백엔드로부터 상세 사용자 프로토타입을 가져옵니다.
+ */
+export const getUserInfoAPI = async (token: string) => {
+    const reqUrl = `${BASEURL}/api/members/me`; // 백엔드 엔드포인트에 맞게 조정 필요
 
     try {
         const response = await fetch(reqUrl, {
-            method: 'POST',
+            method: 'GET',
             headers: {
-                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+                'ngrok-skip-browser-warning': '69420',
             },
-            body: JSON.stringify({ email, password }),
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(`User info fetch failed: ${response.status}`);
         }
 
-        const data = await response.json();
-        return data;
+        const userData = await response.json();
+
+        return userData;
     } catch (error) {
-        console.error("Login API error:", error);
+        console.error("GetUserInfo Error:", error);
         throw error;
     }
 };

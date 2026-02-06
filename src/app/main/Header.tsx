@@ -29,7 +29,10 @@ export default function Header() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
 
-  // 다크모드 초기 설정 및 감지
+  /**
+   * 다크모드 설정 로직
+   * 로컬 스토리지 또는 브라우저 설정을 확인하여 초기 테마를 결정합니다.
+   */
   useEffect(() => {
     const savedTheme = localStorage.getItem('atelier_theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -57,6 +60,10 @@ export default function Header() {
     };
   }, []);
 
+  /**
+   * 테마 토글 핸들러
+   * 라이트 모드와 다크 모드를 전환하고 설정을 로컬 스토리지에 저장합니다.
+   */
   const toggleTheme = () => {
     const newMode = !isDarkMode;
     setIsDarkMode(newMode);
@@ -69,11 +76,15 @@ export default function Header() {
     }
   };
 
+  /**
+   * 로그아웃 핸들러
+   * 서버 세션을 종료하고 클라이언트 측 인증 정보(Jotai/LocalStorage)를 초기화합니다.
+   */
   const handleLogout = async () => {
     if (!authInfo) return;
     try {
       await logoutAPI(authInfo);
-      setAuthInfo(null);
+      setAuthInfo(null); // Jotai atomWithStorage에 의해 localStorage에서도 자동 제거됨
       setIsProfileOpen(false);
       alert("로그아웃 되었습니다.");
       router.push("/main");
@@ -107,8 +118,8 @@ export default function Header() {
                 key={item.id}
                 href={item.path}
                 className={`px-5 py-2.5 rounded-full text-[9px] font-bold uppercase tracking-[0.2em] flex items-center gap-2.5 transition-all ${pathname === item.path
-                    ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/30'
-                    : 'text-gray-500 hover:text-violet-600 dark:text-gray-400 dark:hover:text-white'
+                  ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/30'
+                  : 'text-gray-500 hover:text-violet-600 dark:text-gray-400 dark:hover:text-white'
                   }`}
               >
                 {item.icon}
@@ -167,8 +178,8 @@ export default function Header() {
               <button
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
                 className={`flex items-center gap-3 pl-2 pr-4 py-1.5 rounded-full border transition-all shadow-lg active:scale-95 ${isProfileOpen
-                    ? 'bg-violet-50 dark:bg-violet-900/20 border-violet-300 dark:border-violet-700'
-                    : 'bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl border-neutral-200 dark:border-white/5'
+                  ? 'bg-violet-50 dark:bg-violet-900/20 border-violet-300 dark:border-violet-700'
+                  : 'bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl border-neutral-200 dark:border-white/5'
                   }`}
               >
                 <div className="w-8 h-8 rounded-full bg-violet-600 overflow-hidden flex items-center justify-center border border-white/20">
@@ -205,7 +216,7 @@ export default function Header() {
                     onClick={handleLogout}
                     className="w-full flex items-center gap-3 px-6 py-3 text-[9px] font-bold uppercase tracking-widest text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
                   >
-                    <FaArrowRightFromBracket size={10} /> Terminate Session
+                    <FaArrowRightFromBracket size={10} /> Logout
                   </button>
                 </div>
               )}

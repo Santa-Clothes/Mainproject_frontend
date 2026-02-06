@@ -13,26 +13,29 @@ import {
 import { getShoppingTrends } from '@/app/api/trendService/trendapi';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
-export default function Dashboard() {
-  // 트렌드 데이터 상태 관리
-  const [trends, setTrends] = useState<{ score: number, style: string }[]>([]);
+export default function Dashboard({ initialTrends = [] }: { initialTrends?: { score: number, style: string }[] }) {
+  // SSR로 받은 데이터를 초기값으로 사용
+  const [trends, setTrends] = useState<{ score: number, style: string }[]>(
+    initialTrends.length > 0 ? initialTrends.sort((a, b) => b.score - a.score) : []
+  );
 
   useEffect(() => {
-    const fetchTrends = async () => {
-      try {
-        const data = await getShoppingTrends();
-        if (data) {
-          // score 기준 내림차순 정렬
-          const sortedData = data.sort((a: any, b: any) => b.score - a.score);
-          setTrends(sortedData);
+    // 만약 SSR 데이터가 없다면 클라이언트에서 페치 (또는 최신 데이터 업데이트용)
+    if (initialTrends.length === 0) {
+      const fetchTrends = async () => {
+        try {
+          const data = await getShoppingTrends();
+          if (data) {
+            const sortedData = data.sort((a: any, b: any) => b.score - a.score);
+            setTrends(sortedData);
+          }
+        } catch (error) {
+          console.error("Failed to fetch shopping trends:", error);
         }
-      } catch (error) {
-        console.error("Failed to fetch shopping trends:", error);
-      }
-    };
-
-    fetchTrends();
-  }, []);
+      };
+      fetchTrends();
+    }
+  }, [initialTrends]);
   // 대시보드 상단에 표시될 주요 지표(Metric) 배열
   const mainMetrics = [
     { label: 'Inventory Growth', value: '+12.5%', trend: 'up', sub: 'vs last month', icon: <FaBolt />, color: 'violet' },
@@ -175,13 +178,14 @@ export default function Dashboard() {
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={trends.slice(0, 8)}
+                    data={trends.slice(0, 8).map(t => ({ score: t.score, name: t.style }))}
                     cx="50%"
                     cy="50%"
                     innerRadius={65}
                     outerRadius={90}
                     paddingAngle={8}
                     dataKey="score"
+                    nameKey="name"
                     stroke="none"
                   >
                     {trends.slice(0, 8).map((entry, index) => {
