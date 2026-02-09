@@ -105,8 +105,8 @@ export default function Header() {
         {/* Left: Brand & Nav Links */}
         <div className="flex items-center bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl p-1.5 rounded-full border border-neutral-200 dark:border-white/5 shadow-xl">
           <Link href="/" className="flex flex-col items-center px-6 py-1 hover:opacity-70 transition-opacity">
-            <h1 className="text-lg font-serif italic tracking-[0.3em] uppercase text-neutral-900 dark:text-white leading-none">ATELIER</h1>
-            <span className="text-[7px] font-bold text-violet-500 dark:text-violet-400 uppercase tracking-[0.4em] mt-1.5">Neural Archive</span>
+            <h1 className="text-xl font-sans font-black tracking-[0.4em] uppercase text-neutral-900 dark:text-white leading-none">ATELIER</h1>
+            <span className="text-[7px] font-bold text-violet-500 dark:text-violet-400 uppercase tracking-[0.3em] mt-2">Neural Archive</span>
           </Link>
 
           <div className="w-px h-6 bg-gray-200 dark:bg-white/5 mx-2" />

@@ -77,8 +77,8 @@ export default function DiscoveryPanel({ onResultFound, onAnalysisStart, startTr
             type="button"
             onClick={() => selectCategory(cat)}
             className={`px-10 py-4 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-colors outline-none ${selectedCat === cat
-                ? 'bg-violet-600 text-white border-violet-600 shadow-md'
-                : 'bg-transparent text-neutral-400 border-neutral-100 dark:border-white/10 hover:border-violet-400 hover:text-violet-600'
+              ? 'bg-violet-600 text-white border-violet-600 shadow-md'
+              : 'bg-transparent text-neutral-400 border-neutral-300 dark:border-white/10 hover:border-violet-400 hover:text-violet-600'
               }`}
           >
             {cat}
@@ -138,10 +138,10 @@ export default function DiscoveryPanel({ onResultFound, onAnalysisStart, startTr
         /* [대기 상태 UI] */
 
         <div className="py-24 flex flex-col items-center justify-center border border-dashed border-neutral-200 dark:border-white/5 rounded-4xl bg-white dark:bg-neutral-900/50">
-          <div className="w-14 h-14 rounded-full bg-white dark:bg-neutral-900/50 flex items-center justify-center text-neutral-200 dark:text-neutral-800 mb-6 border border-neutral-50 dark:border-white/5">
-            <FaFingerprint size={20} className="animate-pulse" />
+          <div className="w-14 h-14 rounded-full bg-white dark:bg-neutral-900/50 flex items-center justify-center text-neutral-400 dark:text-neutral-500 mb-6 border border-neutral-100 dark:border-white/10">
+            <FaFingerprint size={30} className="animate-pulse" />
           </div>
-          <p className="text-[9px] font-bold text-neutral-400 dark:text-neutral-600 uppercase tracking-widest text-center leading-relaxed">
+          <p className="text-[9px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-widest text-center leading-relaxed">
             Select a category above <br /> to initialize neural reference indexing
           </p>
         </div>

@@ -10,67 +10,126 @@ import {
   FaWaveSquare,
   FaBolt
 } from 'react-icons/fa6';
+import CategoryDistributionCard from './components/CategoryDistributionCard';
+import AestheticDistributionCard from './components/AestheticDistributionCard';
+import BestSellersCard from './components/BestSellersCard';
 import { getShoppingTrends } from '@/app/api/trendService/trendapi';
 import { getSalesRanking, SalesRankItem } from '@/app/api/salesService/salesapi';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
-import TSNEPlot from '@/components/TSNEPlot';
+import TSNEPlot from './components/TSNEPlot';
 
 export default function Dashboard({
-  initialTrends = [],
+  initialData = [],
   initialSales = []
 }: {
-  initialTrends?: { score: number, style: string }[],
+  initialData?: { value: number, style: string, percentStr: string }[],
   initialSales?: SalesRankItem[]
 }) {
-  // 트렌드 데이터 상태 관리
-  const [trends, setTrends] = useState<{ score: number, style: string }[]>(
-    initialTrends.length > 0 ? initialTrends.sort((a, b) => b.score - a.score) : []
+  // 통합 데이터 상태 관리 (기존 trends -> data)
+  const [data, setData] = useState<{
+    value: number, style: string, percentStr: string, score: number,
+    xcoord: number, ycoord: number, productId: string, productName: string
+  }[]>(
+    initialData.length > 0 ? initialData.map((t, i) => ({
+      ...t,
+      score: t.value || 0,
+      value: t.value || 0,
+      percentStr: t.percentStr || '0%',
+      xcoord: Math.random() * 200 - 100,
+      ycoord: Math.random() * 200 - 100,
+      productId: `init-${i}`,
+      productName: t.style || `Style-${i}`
+    })).sort((a, b) => b.value - a.value) : []
   );
+  const [isLoading, setIsLoading] = useState(initialData.length === 0);
+  const [error, setError] = useState<string | null>(null);
 
   // 매출 랭킹 데이터 상태 관리
   const [sales, setSales] = useState<SalesRankItem[]>(
     initialSales.length > 0 ? initialSales.sort((a, b) => b.saleQuantity - a.saleQuantity).slice(0, 5) : []
   );
+  const [isLoadingSales, setIsLoadingSales] = useState(initialSales.length === 0);
+  const [errorSales, setErrorSales] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (initialTrends.length === 0) {
-      const fetchTrends = async () => {
-        try {
-          const data = await getShoppingTrends();
-          if (data) {
-            setTrends(data.sort((a: any, b: any) => b.score - a.score));
-          }
-        } catch (error) {
-          console.error("Failed to fetch trends:", error);
-        }
-      };
-      fetchTrends();
-    }
-  }, [initialTrends]);
-
-  useEffect(() => {
-    if (initialSales.length === 0) {
-      const fetchSales = async () => {
-        try {
-          const data = await getSalesRanking();
-          if (data) {
-            setSales(data.sort((a, b) => b.saleQuantity - a.saleQuantity).slice(0, 5));
-          }
-        } catch (error) {
-          console.error("Failed to fetch sales ranking:", error);
-        }
-      };
-      fetchSales();
-    }
-  }, [initialSales]);
+  // 자동 Fetch 시도 여부 추적 (무한 루프 방지)
+  const [hasAttemptedFetch, setHasAttemptedFetch] = useState(false);
+  const [hasAttemptedSalesFetch, setHasAttemptedSalesFetch] = useState(false);
 
   /**
-   * 상품명 가공 함수: '-'로 연결된 이름 중 마지막 항목만 추출
+   * 타임아웃이 포함된 데이터 Fetch 함수
    */
-  const formatProductName = (name: string) => {
-    const parts = name.split('-');
-    return parts[parts.length - 1].trim();
+  const fetchWithTimeout = async <T,>(fetchFn: () => Promise<T>, timeoutMs: number = 2000): Promise<T> => {
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('TIMEOUT')), timeoutMs)
+    );
+    return Promise.race([fetchFn(), timeoutPromise]);
   };
+
+  const fetchData = async (isManual: boolean = false) => {
+    if (!isManual) {
+      setHasAttemptedFetch(true);
+    }
+    try {
+      setIsLoading(true);
+      setError(null);
+      // 충분한 대기 시간 확보 (1500ms -> 15000ms)
+      const res = await fetchWithTimeout(getShoppingTrends, 15000);
+      if (res) {
+        // API 응답 데이터 매핑: score와 value를 양립시켜 두 컴포넌트 모두 지원
+        const mappedData = res.map((item: any, i: number) => {
+          const scoreVal = item.score || item.value || 0;
+          return {
+            style: item.style || 'Unknown',
+            score: scoreVal,
+            value: item.value || scoreVal,
+            percentStr: item.percentStr || `${scoreVal.toFixed(1)}%`,
+            xcoord: item.xcoord || (Math.random() * 200 - 100),
+            ycoord: item.ycoord || (Math.random() * 200 - 100),
+            productId: item.productId || `prod-${Date.now()}-${i}`,
+            productName: item.productName || item.style || `Product-${i}`
+          };
+        });
+        setData(mappedData.sort((a: any, b: any) => b.value - a.value));
+      }
+    } catch (error: any) {
+      console.error("Failed to fetch data:", error);
+      setError(error.message === 'TIMEOUT' ? 'Neural Link Timeout' : 'Sync Failed');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchSales = async (isManual: boolean = false) => {
+    if (!isManual) {
+      setHasAttemptedSalesFetch(true);
+    }
+    try {
+      setIsLoadingSales(true);
+      setErrorSales(null);
+      const data = await fetchWithTimeout(getSalesRanking, 15000);
+      if (data) {
+        setSales(data.sort((a, b) => b.saleQuantity - a.saleQuantity).slice(0, 5));
+      }
+    } catch (error: any) {
+      console.error("Failed to fetch sales ranking:", error);
+      setErrorSales(error.message === 'TIMEOUT' ? 'Neural Link Timeout' : 'Sync Failed');
+    } finally {
+      setIsLoadingSales(false);
+    }
+  };
+
+  // 컴포넌트 마운트 시 최초 1회만 자동 시도
+  useEffect(() => {
+    if (initialData.length === 0 && !hasAttemptedFetch) {
+      fetchData();
+    }
+  }, []); // 의존성 배열을 비워 마운트 시 1회만 실행되도록 함
+
+  useEffect(() => {
+    if (initialSales.length === 0 && !hasAttemptedSalesFetch) {
+      fetchSales();
+    }
+  }, []); // 의존성 배열을 비워 마운트 시 1회만 실행되도록 함
+
   // 대시보드 상단에 표시될 주요 지표(Metric) 배열
   const mainMetrics = [
     { label: 'Inventory Growth', value: '+12.5%', trend: 'up', sub: 'vs last month', icon: <FaBolt />, color: 'violet' },
@@ -88,7 +147,7 @@ export default function Dashboard({
   ];
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-10 pb-20">
       {/* 주요 지표 그리드 영역 */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {mainMetrics.map((metric, i) => (
@@ -105,55 +164,29 @@ export default function Dashboard({
               </div>
             </div>
             <div className="space-y-1">
-              <p className="text-[9px] font-bold text-gray-300 dark:text-gray-600 uppercase tracking-widest group-hover:text-violet-300 dark:group-hover:text-violet-400 transition-colors">{metric.label}</p>
+              <p className="text-[9px] font-bold text-gray-300 dark:text-gray-600 uppercase tracking-widest group-hover:text-violet-300 dark:group-hover:text-violet-400 transition-colors subpixel-antialiased">{metric.label}</p>
               <p className="text-3xl font-serif italic text-black dark:text-white tracking-tight">{metric.value}</p>
-              <p className="text-[8px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">{metric.sub}</p>
+              <p className="text-[8px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] subpixel-antialiased">{metric.sub}</p>
             </div>
           </div>
         ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-        {/* 카테고리 분포 시각화 섹션 (Progress Bar 형태) */}
-        <div className="lg:col-span-2 bg-white dark:bg-neutral-900/50 rounded-[3rem] border border-neutral-200 dark:border-white/5 p-12 space-y-10 shadow-sm transition-colors">
-          <div className="flex justify-between items-end">
-            <div className="space-y-2">
-              <span className="text-[9px] font-bold text-gray-300 dark:text-gray-600 uppercase tracking-[0.4em]">Inventory Mapping</span>
-              <h3 className="text-3xl font-serif italic text-black dark:text-white tracking-tight">Category Distribution</h3>
-            </div>
-            <p className="text-[9px] font-bold text-violet-400 dark:text-violet-400 uppercase tracking-widest">Total: 12,482 Items</p>
-          </div>
-
-          <div className="space-y-8">
-            {categories.map((cat, i) => (
-              <div key={i} className="space-y-3">
-                <div className="flex justify-between items-end">
-                  <span className="text-[10px] font-bold text-black dark:text-white uppercase tracking-widest">{cat.name}</span>
-                  <span className="text-[10px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-widest">{cat.count} items / {cat.percentage}%</span>
-                </div>
-                {/* 커스텀 프로그레스 바: 데이터 비율 표시 */}
-                <div className="h-0.5 w-full bg-gray-50 dark:bg-neutral-800 overflow-hidden rounded-full">
-                  <div
-                    className="h-full bg-linear-to-r from-violet-500 to-indigo-600 transition-all duration-1000 ease-out"
-                    style={{ width: `${cat.percentage}%` }}
-                  ></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        {/* Modularized Trends Card */}
+        <CategoryDistributionCard trends={data as any} isLoading={isLoading} error={error} onRetry={() => fetchData(true)} />
 
         {/* AI 인사이트 카드: 시스템이 제안하는 분석 결과 표시 */}
         <div className="bg-linear-to-br from-violet-950 via-black to-black dark:from-violet-900 dark:via-black dark:to-black rounded-[3rem] p-12 text-white flex flex-col justify-between space-y-12 shadow-xl shadow-violet-900/10 border border-violet-900/20 relative overflow-hidden">
           {/* 내부 은은한 빛 효과 */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-violet-600/10 blur-[60px]" />
 
-          <div className="space-y-6 relative z-10">
+          <div className="space-y-6 relative z-10 antialiased">
             <div className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center bg-white/5 backdrop-blur-sm">
               <FaGem className="text-violet-400" />
             </div>
             <div className="space-y-3">
-              <h4 className="text-2xl font-serif italic tracking-tight">Curation Insight</h4>
+              <h4 className="text-2xl font-serif italic tracking-normal px-8 -ml-8">Curation Insight</h4>
               <p className="text-xs font-light text-violet-200/60 leading-relaxed italic">
                 "Neural analysis detects a 14% increase in 'minimalist' aesthetic DNA within the Outerwear segment. Inventory rotation is recommended for high-fidelity alignment."
               </p>
@@ -164,43 +197,8 @@ export default function Dashboard({
           <div className="pt-8 border-t border-white/10 relative z-10">
             <div className="flex items-center gap-3">
               <div className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse"></div>
-              <span className="text-[9px] font-bold uppercase tracking-[0.4em] text-violet-400/60">AI Intelligence Optimal</span>
+              <span className="text-[9px] font-bold uppercase tracking-[0.4em] text-violet-400/60 subpixel-antialiased">AI Intelligence Optimal</span>
             </div>
-          </div>
-        </div>
-
-        <div className="lg:col-span-2 bg-white dark:bg-neutral-900/50 rounded-[3rem] border border-neutral-200 dark:border-white/5 p-12 space-y-10 shadow-sm transition-colors">
-          <div className="flex justify-between items-end">
-            <div className="space-y-2">
-              <span className="text-[9px] font-bold text-gray-300 dark:text-gray-600 uppercase tracking-[0.4em]">Trend Analysis</span>
-              <h3 className="text-3xl font-serif italic text-black dark:text-white tracking-tight">Shopping Style Insights</h3>
-            </div>
-            <p className="text-[9px] font-bold text-violet-400 dark:text-violet-400 uppercase tracking-widest">Top 5 Trending Styles</p>
-          </div>
-
-          <div className="space-y-8">
-            {trends.length > 0 ? (
-              trends.slice(0, 5).map((trend, i) => (
-                <div key={i} className="space-y-3">
-                  <div className="flex justify-between items-end">
-                    <span className="text-[10px] font-bold text-black dark:text-white uppercase tracking-widest">{trend.style}</span>
-                    <span className="text-[10px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-widest">Score: {trend.score.toFixed(2)}</span>
-                  </div>
-                  {/* 커스텀 프로그레스 바: 스코어 비율 표시 (최대 100 가정) */}
-                  <div className="h-[2px] w-full bg-gray-50 dark:bg-neutral-800 overflow-hidden rounded-full">
-                    <div
-                      className="h-full bg-linear-to-r from-violet-500 to-indigo-600 transition-all duration-1000 ease-out"
-                      style={{ width: `${Math.min(trend.score, 100)}%` }}
-                    ></div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="flex flex-col items-center justify-center py-20 space-y-4 opacity-30">
-                <div className="h-4 w-4 animate-spin rounded-full border-2 border-violet-600 border-t-transparent"></div>
-                <p className="text-[10px] uppercase tracking-widest">Loading Insights...</p>
-              </div>
-            )}
           </div>
         </div>
 
@@ -211,174 +209,11 @@ export default function Dashboard({
         */}
         <TSNEPlot />
 
-        {/* 신규: Recharts를 사용한 전체 스타일 분포 차트 */}
-        <div className="lg:col-span-3 bg-white dark:bg-neutral-900/50 rounded-[3rem] border border-neutral-200 dark:border-white/5 p-12 shadow-sm transition-colors overflow-hidden relative">
-          <div className="flex flex-col md:flex-row items-center gap-16">
+        {/* Modularized Distribution Card with Recharts */}
+        <AestheticDistributionCard data={data} isLoading={isLoading} error={error} onRetry={() => fetchData(true)} />
 
-            {/* Recharts PieChart 영역 */}
-            <div className="relative w-72 h-72 shrink-0">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={trends.slice(0, 8).map(t => ({ score: t.score, name: t.style }))}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={65}
-                    outerRadius={90}
-                    paddingAngle={8}
-                    dataKey="score"
-                    nameKey="name"
-                    stroke="none"
-                  >
-                    {trends.slice(0, 8).map((entry, index) => {
-                      // 보라색을 기반으로 하되 채도와 명도를 다양하게 하여 구분감 확보
-                      const CHART_COLORS = [
-                        '#8B5CF6', // Violet 500
-                        '#3B82F6', // Blue 500
-                        '#EC4899', // Pink 500
-                        '#818CF8', // Indigo 400
-                        '#2DD4BF', // Teal 400
-                        '#60A5FA', // Sky 400
-                        '#F472B6', // Pink 400
-                        '#A78BFA'  // Violet 400
-                      ];
-                      return <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />;
-                    })}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                      borderRadius: '16px',
-                      border: 'none',
-                      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-                      fontSize: '10px',
-                      fontWeight: 'bold',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.1em'
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-              {/* 중앙 텍스트 오버레이 */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
-                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Style</span>
-                <span className="text-2xl font-serif italic text-black dark:text-white">DNA</span>
-              </div>
-            </div>
-
-            {/* 범례 (Legend) */}
-            <div className="flex-1 grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-6">
-              <div className="col-span-full mb-2">
-                <span className="text-[9px] font-bold text-gray-300 dark:text-gray-600 uppercase tracking-[0.4em]">Style Proportion</span>
-                <h3 className="text-2xl font-serif italic text-black dark:text-white tracking-tight">Full Aesthetic Distribution</h3>
-              </div>
-              {trends.length > 0 ? trends.slice(0, 12).map((trend, i) => {
-                const colors = [
-                  'bg-[#8B5CF6]', 'bg-[#3B82F6]', 'bg-[#EC4899]', 'bg-[#818CF8]',
-                  'bg-[#2DD4BF]', 'bg-[#60A5FA]', 'bg-[#F472B6]', 'bg-[#A78BFA]',
-                  'bg-gray-400', 'bg-gray-300', 'bg-gray-200', 'bg-gray-100'
-                ];
-                return (
-                  <div key={i} className="flex items-center gap-3 group transition-all hover:translate-x-1">
-                    <div className={`w-2 h-2 rounded-full ${colors[i % colors.length]} shadow-sm`}></div>
-                    <div className="flex flex-col">
-                      <span className="text-[9px] font-bold text-black dark:text-white uppercase tracking-widest group-hover:text-violet-500 transition-colors truncate max-w-[100px]">{trend.style}</span>
-                      <span className="text-[8px] font-medium text-gray-400 dark:text-gray-500 uppercase">{trend.score.toFixed(1)}%</span>
-                    </div>
-                  </div>
-                );
-              }) : (
-                <p className="text-[10px] text-gray-400 uppercase tracking-widest col-span-full">No data available</p>
-              )}
-            </div>
-          </div>
-
-          {/* 장식용 배경 요소 */}
-          <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-violet-500/5 rounded-full blur-3xl pointer-events-none"></div>
-        </div>
-
-        {/* 신규: 매출 랭킹 차트 및 리스트 (BarChart 사용) */}
-        <div className="lg:col-span-3 bg-white dark:bg-neutral-900/50 rounded-[3rem] border border-neutral-200 dark:border-white/5 p-12 shadow-sm transition-colors">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
-            <div className="space-y-2">
-              <span className="text-[9px] font-bold text-gray-300 dark:text-gray-600 uppercase tracking-[0.4em]">Sales Performance</span>
-              <h3 className="text-3xl font-serif italic text-black dark:text-white tracking-tight">Best Selling Products</h3>
-            </div>
-            <div className="flex items-center gap-4 px-5 py-2 bg-violet-50 dark:bg-violet-950/30 rounded-full border border-violet-100 dark:border-violet-900/40">
-              <span className="text-[9px] font-bold text-violet-600 dark:text-violet-400 uppercase tracking-widest">Quantity Normalized Analysis</span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 xl:grid-cols-5 gap-12">
-            {/* Bar Chart 섹션 */}
-            <div className="xl:col-span-3 h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={sales.map(s => ({ ...s, shortName: formatProductName(s.productName) }))}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                  <XAxis
-                    dataKey="shortName"
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fontSize: 9, fontWeight: 'bold', fill: '#9CA3AF' }}
-                  />
-                  <YAxis hide domain={[0, 'auto']} />
-                  <Tooltip
-                    cursor={{ fill: 'transparent' }}
-                    content={({ active, payload }) => {
-                      if (active && payload && payload.length) {
-                        const data = payload[0].payload as SalesRankItem;
-                        return (
-                          <div className="bg-white p-4 rounded-2xl shadow-2xl border border-gray-100 animate-in fade-in zoom-in duration-200">
-                            <p className="text-[10px] font-bold text-black uppercase tracking-widest mb-1">{data.productName}</p>
-                            <p className="text-[9px] font-medium text-violet-600 uppercase tracking-wider">Sale: {data.saleQuantity} Qty</p>
-                          </div>
-                        );
-                      }
-                      return null;
-                    }}
-                  />
-                  <Bar
-                    dataKey="saleQuantity"
-                    fill="#8B5CF6"
-                    radius={[10, 10, 0, 0]}
-                    barSize={40}
-                  >
-                    {sales.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={index === 0 ? '#6D28D9' : '#C4B5FD'} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-
-            {/* List 섹션 */}
-            <div className="xl:col-span-2 space-y-4">
-              {sales.map((item, i) => (
-                <div key={item.productId} className="flex items-center justify-between p-5 rounded-2xl border border-gray-50 dark:border-white/5 hover:border-violet-200 transition-colors group">
-                  <div className="flex items-center gap-4">
-                    <span className={`text-xs font-serif italic ${i === 0 ? 'text-violet-600' : 'text-gray-300'}`}>0{i + 1}</span>
-                    <div className="flex flex-col">
-                      <span className="text-[10px] font-bold text-black dark:text-white uppercase tracking-widest truncate max-w-[150px]">
-                        {formatProductName(item.productName)}
-                      </span>
-                      <span className="text-[8px] font-medium text-gray-400 uppercase tracking-tighter">
-                        {item.productId}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[10px] font-bold text-violet-500 uppercase tracking-widest">{item.saleQuantity.toLocaleString()} QTY</p>
-                    <div className="flex items-center justify-end gap-1 mt-1">
-                      <div className="h-1 w-1 rounded-full bg-violet-400"></div>
-                      <span className="text-[8px] font-medium text-gray-400 uppercase tracking-tighter">Units Sold</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
+        {/* Modularized Best Sellers Card with Recharts */}
+        <BestSellersCard sales={sales} isLoading={isLoadingSales} error={errorSales} onRetry={() => fetchSales(true)} />
       </div>
     </div>
   );

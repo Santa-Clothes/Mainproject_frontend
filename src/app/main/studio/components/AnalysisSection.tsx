@@ -36,6 +36,9 @@ const mockBarData = [
     { name: 'Volume', val: 45 },
 ];
 
+/**
+ * AnalysisSection: Studio 페이지 전 전에서 이미지 분석 결과를 시각화합니다.
+ */
 export default function AnalysisSection({ sourceImage, productName, isLoading }: AnalysisSectionProps) {
     const [isMounting, setIsMounting] = useState(true);
 

@@ -7,11 +7,12 @@ import Image from 'next/image';
 interface UploadPanelProps {
   onResultFound: (results: any[] | null) => void;
   onAnalysisStart: (imgUrl: string, name?: string) => void;
+  onAnalysisCancel: () => void;
   isPending: boolean;
   startTransition: React.TransitionStartFunction;
 }
 
-export default function UploadPanel({ onResultFound, onAnalysisStart, isPending, startTransition }: UploadPanelProps) {
+export default function UploadPanel({ onResultFound, onAnalysisStart, onAnalysisCancel, isPending, startTransition }: UploadPanelProps) {
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -26,6 +27,13 @@ export default function UploadPanel({ onResultFound, onAnalysisStart, isPending,
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleCancel = () => {
+    setPreview(null);
+    onAnalysisCancel();
+    // 검색 결과도 같이 초기화를 원할 경우
+    onResultFound(null);
   };
 
   const handleSearch = () => {
@@ -71,7 +79,7 @@ export default function UploadPanel({ onResultFound, onAnalysisStart, isPending,
               unoptimized
             />
             <button
-              onClick={() => setPreview(null)}
+              onClick={handleCancel}
               className="absolute top-6 right-6 w-10 h-10 bg-black/60 backdrop-blur-md text-white rounded-full flex items-center justify-center hover:bg-red-500 transition-colors shadow-lg"
             >
               <FaXmark size={14} />

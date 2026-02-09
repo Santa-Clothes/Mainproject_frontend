@@ -1,10 +1,10 @@
 "use client"
 import React, { useState, useTransition, useEffect } from 'react';
-import ResultGrid from '@/components/ResultGrid';
+import ResultGrid from './components/ResultGrid';
 import ModeTabs from './ModeTabs';
 import DiscoveryPanel from './DiscoveryPanel';
 import UploadPanel from './UploadPanel';
-import AnalysisSection from '@/components/AnalysisSection';
+import AnalysisSection from './components/AnalysisSection';
 import { useSearchParams, useRouter } from 'next/navigation';
 
 
@@ -75,6 +75,7 @@ export default function Studio(/* { serverAction }: StudioClientProps */) {
     setActiveCategory(null);
     setAnalysisImage(null);
     setAnalysisName(undefined);
+    setIsAnalyzing(false);
 
     // shallow routing 효과를 위해 주소창만 업데이트
     router.push(`/main/studio?mode=${newMode}`, { scroll: false });
@@ -116,6 +117,15 @@ export default function Studio(/* { serverAction }: StudioClientProps */) {
     }, 1500);
   };
 
+  /**
+   * [핸들러] 분석 취소 (업로드 취소 시 호출)
+   */
+  const handleAnalysisCancel = () => {
+    setAnalysisImage(null);
+    setAnalysisName(undefined);
+    setIsAnalyzing(false);
+  };
+
 
   return (
     <div className="space-y-10" suppressHydrationWarning>
@@ -139,6 +149,7 @@ export default function Studio(/* { serverAction }: StudioClientProps */) {
               key="upload-panel"
               onResultFound={handleSearchResult}
               onAnalysisStart={handleAnalysisStart}
+              onAnalysisCancel={handleAnalysisCancel}
               isPending={isPending}
               startTransition={startTransition}
             />

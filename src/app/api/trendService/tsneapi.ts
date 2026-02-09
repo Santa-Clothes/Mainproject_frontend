@@ -1,10 +1,11 @@
 const BASEURL = process.env.NEXT_PUBLIC_BACK_API_URL;
 
 export interface TSNEPoint {
-    x: number;
-    y: number;
-    label: string;
-    cluster: number; // 색상 구분을 위한 클러스터 ID
+    productId: string,
+    productName: string,
+    style: string,
+    xcoord: number,
+    ycoord: number
 }
 
 /**
@@ -13,7 +14,7 @@ export interface TSNEPoint {
  */
 export const getTSNEPoints = async (): Promise<TSNEPoint[]> => {
     try {
-        const response = await fetch(`${BASEURL}/api/trends/tsne-map`, {
+        const response = await fetch(`${BASEURL}/api/products/map`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

@@ -10,18 +10,18 @@ export default function Footer() {
       3. dark:bg-black: 다크모드에서 확실히 더 깊은 검정색으로 분리
     */
     <footer className="relative border-t border-neutral-200 bg-neutral-100/50 px-8 pt-10 pb-5 text-neutral-900 transition-colors duration-500 dark:border-white/5 dark:bg-black dark:text-white">
-      
+
       {/* Footer Ambient Light: 크기를 줄여 영역 침범 최소화 */}
       <div className="pointer-events-none absolute right-0 bottom-0 h-64 w-64 rounded-full bg-violet-600/5 blur-[100px] dark:bg-violet-600/10" />
-      
+
       <div className="relative z-10 mx-auto max-w-7xl">
         {/* 그리드 간격을 gap-16에서 gap-10으로 줄임 */}
         <div className="mb-10 grid grid-cols-1 gap-10 md:grid-cols-4">
-          
+
           {/* Brand Section: col-span-2로 공간 확보 */}
           <div className="col-span-1 space-y-6 md:col-span-2">
             <Link href="/main" className="group flex flex-col items-start">
-              <h2 className="font-serif text-2xl italic uppercase tracking-[0.3em] text-neutral-900 transition-colors group-hover:text-violet-600 dark:text-white dark:group-hover:text-violet-400">
+              <h2 className="font-sans text-xl font-black uppercase tracking-[0.4em] text-neutral-900 transition-colors group-hover:text-violet-600 dark:text-white dark:group-hover:text-violet-400">
                 ATELIER
               </h2>
               <span className="mt-1.5 text-[7px] font-bold uppercase tracking-[0.5em] text-violet-500 dark:text-violet-800">
@@ -29,19 +29,19 @@ export default function Footer() {
               </span>
             </Link>
             <p className="max-w-xs font-light text-xs italic leading-relaxed text-neutral-500 dark:text-neutral-400">
-              Curating the future by indexing the aesthetic DNA of the past. <br/>
+              Curating the future by indexing the aesthetic DNA of the past. <br />
               A high-fidelity interface for archive management.
             </p>
           </div>
-          
+
           {/* System Links */}
           <div className="space-y-6">
             <h4 className="text-[9px] font-bold uppercase tracking-[0.4em] text-violet-600 dark:text-violet-500">System</h4>
             <ul className="space-y-3">
               {['Overview', 'Studio', 'Statistics'].map((item) => (
                 <li key={item}>
-                  <Link 
-                    href={item === 'Overview' ? '/main' : `/main/${item.toLowerCase()}`} 
+                  <Link
+                    href={item === 'Overview' ? '/main' : `/main/${item.toLowerCase()}`}
                     className="text-[11px] font-light uppercase tracking-widest text-neutral-500 transition-colors hover:text-violet-600 dark:text-neutral-400 dark:hover:text-violet-400"
                   >
                     {item}
@@ -61,8 +61,8 @@ export default function Footer() {
                 { label: 'Status', path: '/status' }
               ].map((item) => (
                 <li key={item.label}>
-                  <Link 
-                    href={item.path} 
+                  <Link
+                    href={item.path}
                     className="text-[11px] font-light uppercase tracking-widest text-neutral-500 transition-colors hover:text-violet-600 dark:text-neutral-400 dark:hover:text-violet-400"
                   >
                     {item.label}
@@ -80,10 +80,10 @@ export default function Footer() {
               © 2026 ATELIER
             </span>
             <div className="flex items-center gap-4">
-               <div className="h-1 w-1 animate-pulse rounded-full bg-violet-600"></div>
-               <span className="text-[8px] font-bold uppercase tracking-[0.4em] text-neutral-400 dark:text-violet-900/60">
-                 Core v2.4.0
-               </span>
+              <div className="h-1 w-1 animate-pulse rounded-full bg-violet-600"></div>
+              <span className="text-[8px] font-bold uppercase tracking-[0.4em] text-neutral-400 dark:text-violet-900/60">
+                Core v2.4.0
+              </span>
             </div>
           </div>
           <div className="text-[8px] font-bold uppercase tracking-[0.4em] text-neutral-400 dark:text-violet-950">

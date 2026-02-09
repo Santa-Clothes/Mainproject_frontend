@@ -14,7 +14,7 @@ export default function IntroPage() {
     <main
       style={{ backgroundColor: 'black' }}
       suppressHydrationWarning
-      className="relative h-screen w-full overflow-hidden text-white selection:bg-violet-500 selection:text-white"
+      className="relative h-screen w-full overflow-hidden text-white selection:bg-violet-500 selection:text-white antialiased"
     >
 
       {/* 1. 배경 이미지: React 상태를 타지 않고 이미지가 준비되는 즉시 브라우저가 그리도록 합니다. */}
@@ -43,20 +43,20 @@ export default function IntroPage() {
       <div className="relative z-10 flex h-full flex-col items-center justify-between px-10 py-12">
 
         {/* Header 영역 */}
-        <header className="mx-auto flex w-full max-w-7xl items-center justify-between border-b border-white/10 pb-6">
-          <div className="text-[10px] font-bold uppercase tracking-[0.5em] opacity-40">Issue No. 001</div>
-          <h1 className="font-serif text-2xl italic tracking-[0.3em] text-violet-100">ATELIER</h1>
-          <div className="text-[10px] font-bold uppercase tracking-[0.5em] opacity-40">2026 Archive</div>
+        <header className="mx-auto flex w-full max-w-7xl items-center justify-between border-b border-white/10 pb-6 opacity-80">
+          <div className="text-[10px] font-bold uppercase tracking-[0.4em] opacity-40">Issue No. 001</div>
+          <h1 className="font-sans text-xl font-black tracking-[0.5em] text-white transition-opacity hover:opacity-80">ATELIER</h1>
+          <div className="text-[10px] font-bold uppercase tracking-[0.4em] opacity-40">2026 Archive</div>
         </header>
 
         {/* Hero Section: 고정된 다크 스타일 타이포그래피 */}
         <div className="mx-auto flex max-w-5xl flex-col items-center text-center">
           <div className="mb-8 inline-block rounded-full border border-violet-500/20 bg-violet-500/10 px-4 py-1.5 backdrop-blur-sm">
-            <span className="text-[9px] font-bold uppercase tracking-[0.4em] text-violet-300">New Protocol Ready</span>
+            <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-violet-300 subpixel-antialiased">New Protocol Ready</span>
           </div>
 
-          {/* 하이엔드 텍스트 그라데이션 고정 */}
-          <h2 className="mb-12 bg-linear-to-b from-white to-violet-200 bg-clip-text font-serif text-[12vw] leading-[0.85] italic tracking-tighter text-transparent md:text-[10vw]">
+          {/* 하이엔드 텍스트 그라데이션 수정: px-16 및 tracking-normal로 글자 잘림을 완벽히 방지 */}
+          <h2 className="mb-12 bg-linear-to-b from-white to-violet-200 bg-clip-text font-serif text-[12vw] leading-none italic tracking-normal text-transparent md:text-[10vw] px-20 block">
             Curated <br /> Intelligence
           </h2>
 
@@ -79,7 +79,7 @@ export default function IntroPage() {
 
         {/* Footer 영역 */}
         <footer className="mx-auto flex w-full max-w-7xl items-end justify-between opacity-30">
-          <div className="text-[8px] font-bold uppercase tracking-[0.5em]">© 2026 ATELIER Studio</div>
+          <div className="text-[8px] font-bold uppercase tracking-[0.4em]">© 2026 ATELIER Studio</div>
           <div className="flex gap-12 text-[10px] font-bold uppercase tracking-[0.4em]">
             <span className="cursor-pointer hover:text-violet-400 transition-colors">Vision</span>
             <span className="cursor-pointer hover:text-violet-400 transition-colors">Protocol</span>
