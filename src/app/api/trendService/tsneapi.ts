@@ -22,7 +22,8 @@ export const getTSNEPoints = async (): Promise<TSNEPoint[]> => {
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            console.error(`서버 에러: ${response.status}`);
+            return [];
         }
 
         const data = await response.json();
@@ -30,6 +31,6 @@ export const getTSNEPoints = async (): Promise<TSNEPoint[]> => {
     } catch (error) {
         console.error("getTSNEPoints error:", error);
         // API가 아직 준비되지 않았을 경우를 대비해 빈 배열 혹은 에러를 던집니다.
-        throw error;
+        return [];
     }
 };

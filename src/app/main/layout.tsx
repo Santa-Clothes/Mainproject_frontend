@@ -9,19 +9,44 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             <Suspense fallback={null}>
                 <AuthHandler />
             </Suspense>
-            {/* Background Ambient Layers */}
-            <div className="relative w-full h-full overflow-hidden"> {/* 부모 요소 예시 */}
+            {/* Background Atmospheric Effects */}
+            <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+                {/* Light Mode: Sunlight effect from top-left corner */}
+                <div
+                    className="absolute -top-20 -left-20 w-[800px] h-[800px] dark:opacity-0 blur-3xl"
+                    style={{
+                        background: 'radial-gradient(circle at center, rgba(254, 240, 138, 0.5) 0%, rgba(254, 215, 170, 0.3) 40%, transparent 70%)'
+                    }}
+                />
+                <div className="absolute top-10 left-10 w-[400px] h-[400px] bg-yellow-100/60 dark:opacity-0 rounded-full blur-[100px]" />
 
-                {/* 1. 우측 상단 큰 보라색 빛 */}
-                <div className="absolute -top-[10%] -right-[5%] w-[60%] h-[60%] bg-violet-200/20 dark:bg-violet-900/10 blur-[180px] rounded-full pointer-events-none z-0" />
+                {/* Dark Mode: Moonlight effect from top-right */}
+                <div
+                    className="absolute -top-10 -right-10 w-[600px] h-[600px] opacity-0 dark:opacity-100 blur-3xl"
+                    style={{
+                        background: 'radial-gradient(circle at center, rgba(191, 219, 254, 0.15) 0%, rgba(199, 210, 254, 0.08) 40%, transparent 70%)'
+                    }}
+                />
+                <div className="absolute top-20 right-20 w-[200px] h-[200px] bg-blue-100/30 opacity-0 dark:opacity-100 rounded-full blur-[80px]" />
 
-                {/* 2. 좌측 하단 인디고 빛 */}
-                <div className="absolute -bottom-[15%] -left-[10%] w-[70%] h-[70%] bg-indigo-100/30 dark:bg-indigo-900/10 blur-[200px] rounded-full pointer-events-none z-0" />
-
-                {/* 3. 중앙 좌측 은은한 퍼플 빛 */}
-                <div className="absolute top-[30%] left-[20%] w-[20%] h-[20%] bg-purple-100/10 dark:bg-purple-900/5 blur-[100px] rounded-full pointer-events-none z-0" />
-
+                {/* Dark Mode: Twinkling stars */}
+                <div className="absolute inset-0 opacity-0 dark:opacity-100">
+                    {[...Array(50)].map((_, i) => (
+                        <div
+                            key={i}
+                            className="absolute w-1 h-1 bg-white rounded-full animate-pulse"
+                            style={{
+                                top: `${Math.random() * 100}%`,
+                                left: `${Math.random() * 100}%`,
+                                animationDelay: `${Math.random() * 6}s`,
+                                animationDuration: `${3 + Math.random() * 2}s`,
+                                opacity: 0.1 + Math.random() * 0.9
+                            }}
+                        />
+                    ))}
+                </div>
             </div>
+
 
             {/* 상단 버튼으로 변경 */}
             <Header />

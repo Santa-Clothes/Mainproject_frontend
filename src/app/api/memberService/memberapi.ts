@@ -25,8 +25,9 @@ export const loginAPI = async (email: string, password: string) => {
         });
 
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(`HTTP error! status: ${response.status}` + `, 에러 데이터: ${errorData}`);
+            // const errorData = await response.json().catch(() => ({}));
+            console.error(`HTTP error! status: ${response.status}`);
+            return [];
         }
 
         const data = await response.json();
@@ -34,7 +35,7 @@ export const loginAPI = async (email: string, password: string) => {
         return data;
     } catch (error) {
         console.error("Login API error:", error);
-        throw error;
+        return [];
     }
 };
 
@@ -57,14 +58,15 @@ export const logoutAPI = async (authInfo: AuthUser) => {
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            console.error(`HTTP error! status: ${response.status}`);
+            return [];
         }
 
         // const data = await response.json();
         return;// data;
     } catch (error) {
         console.error("Login API error:", error);
-        throw error;
+        return [];
     }
 };
 
@@ -92,14 +94,15 @@ export const signupAPI = async (JoinRequest: JoinRequest) => {
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            console.error(`HTTP error! status: ${response.status}`);
+            return [];
         }
 
         // const data = await response.json();
         return;// data;
     } catch (error) {
         console.error("Login API error:", error);
-        throw error;
+        return [];
     }
 };
 
@@ -120,7 +123,8 @@ export const getUserInfoAPI = async (token: string) => {
         });
 
         if (!response.ok) {
-            throw new Error(`User info fetch failed: ${response.status}`);
+            console.error(`User info fetch failed: ${response.status}`);
+            return [];
         }
 
         const userData = await response.json();
@@ -128,6 +132,6 @@ export const getUserInfoAPI = async (token: string) => {
         return userData;
     } catch (error) {
         console.error("GetUserInfo Error:", error);
-        throw error;
+        return [];
     }
 };

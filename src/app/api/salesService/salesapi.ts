@@ -23,12 +23,13 @@ export const getSalesRanking = async (): Promise<SalesRankItem[]> => {
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            console.error(`서버 에러: ${response.status}`);
+            return []; // 빈 배열을 반환해서 UI가 깨지지 않게 함
         }
 
         return await response.json();
     } catch (error) {
         console.error("fetchSalesRanking error:", error);
-        throw error;
+        return [];
     }
 };

@@ -50,68 +50,53 @@ export default function Dashboard({
   const [isLoadingSales, setIsLoadingSales] = useState(initialSales.length === 0);
   const [errorSales, setErrorSales] = useState<string | null>(null);
 
-  // 자동 Fetch 시도 여부 추적 (무한 루프 방지)
+  // 데이터 fetch 시도 여부 플래그 (무한 루프 방지)
   const [hasAttemptedFetch, setHasAttemptedFetch] = useState(false);
   const [hasAttemptedSalesFetch, setHasAttemptedSalesFetch] = useState(false);
 
-  /**
-   * 타임아웃이 포함된 데이터 Fetch 함수
-   */
-  const fetchWithTimeout = async <T,>(fetchFn: () => Promise<T>, timeoutMs: number = 2000): Promise<T> => {
-    const timeoutPromise = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('TIMEOUT')), timeoutMs)
-    );
-    return Promise.race([fetchFn(), timeoutPromise]);
-  };
+  // 통합 데이터 fetch 함수
+  const fetchData = async (isRetry = false) => {
+    if (!isRetry && hasAttemptedFetch) return;
+    setHasAttemptedFetch(true);
+    setIsLoading(true);
+    setError(null);
 
-  const fetchData = async (isManual: boolean = false) => {
-    if (!isManual) {
-      setHasAttemptedFetch(true);
-    }
     try {
-      setIsLoading(true);
-      setError(null);
-      // 충분한 대기 시간 확보 (1500ms -> 15000ms)
-      const res = await fetchWithTimeout(getShoppingTrends, 15000);
-      if (res) {
-        // API 응답 데이터 매핑: score와 value를 양립시켜 두 컴포넌트 모두 지원
-        const mappedData = res.map((item: any, i: number) => {
-          const scoreVal = item.score || item.value || 0;
-          return {
-            style: item.style || 'Unknown',
-            score: scoreVal,
-            value: item.value || scoreVal,
-            percentStr: item.percentStr || `${scoreVal.toFixed(1)}%`,
-            xcoord: item.xcoord || (Math.random() * 200 - 100),
-            ycoord: item.ycoord || (Math.random() * 200 - 100),
-            productId: item.productId || `prod-${Date.now()}-${i}`,
-            productName: item.productName || item.style || `Product-${i}`
-          };
-        });
-        setData(mappedData.sort((a: any, b: any) => b.value - a.value));
-      }
-    } catch (error: any) {
-      console.error("Failed to fetch data:", error);
-      setError(error.message === 'TIMEOUT' ? 'Neural Link Timeout' : 'Sync Failed');
+      const result = await getShoppingTrends();
+      const processedData = result.map((item: any, i: number) => ({
+        ...item,
+        score: item.value || 0,
+        value: item.value || 0,
+        percentStr: item.percentStr || '0%',
+        xcoord: Math.random() * 200 - 100,
+        ycoord: Math.random() * 200 - 100,
+        productId: `trend-${i}`,
+        productName: item.style || `Style-${i}`
+      })).sort((a: any, b: any) => b.value - a.value);
+
+      setData(processedData);
+    } catch (err) {
+      console.error('Failed to fetch trends:', err);
+      setError('Connection Failed');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const fetchSales = async (isManual: boolean = false) => {
-    if (!isManual) {
-      setHasAttemptedSalesFetch(true);
-    }
+  // 매출 랭킹 fetch 함수
+  const fetchSales = async (isRetry = false) => {
+    if (!isRetry && hasAttemptedSalesFetch) return;
+    setHasAttemptedSalesFetch(true);
+    setIsLoadingSales(true);
+    setErrorSales(null);
+
     try {
-      setIsLoadingSales(true);
-      setErrorSales(null);
-      const data = await fetchWithTimeout(getSalesRanking, 15000);
-      if (data) {
-        setSales(data.sort((a, b) => b.saleQuantity - a.saleQuantity).slice(0, 5));
-      }
-    } catch (error: any) {
-      console.error("Failed to fetch sales ranking:", error);
-      setErrorSales(error.message === 'TIMEOUT' ? 'Neural Link Timeout' : 'Sync Failed');
+      const result = await getSalesRanking();
+      const sortedSales = result.sort((a, b) => b.saleQuantity - a.saleQuantity).slice(0, 5);
+      setSales(sortedSales);
+    } catch (err) {
+      console.error('Failed to fetch sales:', err);
+      setErrorSales('Connection Failed');
     } finally {
       setIsLoadingSales(false);
     }
@@ -122,12 +107,14 @@ export default function Dashboard({
     if (initialData.length === 0 && !hasAttemptedFetch) {
       fetchData();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // 의존성 배열을 비워 마운트 시 1회만 실행되도록 함
 
   useEffect(() => {
     if (initialSales.length === 0 && !hasAttemptedSalesFetch) {
       fetchSales();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // 의존성 배열을 비워 마운트 시 1회만 실행되도록 함
 
   // 대시보드 상단에 표시될 주요 지표(Metric) 배열
@@ -136,14 +123,6 @@ export default function Dashboard({
     { label: 'Aesthetic DNA Score', value: '94.8', trend: 'up', sub: 'High Fidelity', icon: <FaGem />, color: 'indigo' },
     { label: 'Curation Rate', value: '820/d', trend: 'down', sub: '-4% from avg', icon: <FaWaveSquare />, color: 'black' },
     { label: 'Active Metadata', value: '45.2K', trend: 'up', sub: 'Optimal indexing', icon: <FaTags />, color: 'violet' },
-  ];
-
-  // 인벤토리 카테고리별 분포 데이터 배열
-  const categories = [
-    { name: 'Outerwear', count: 4281, percentage: 34 },
-    { name: 'Tops', count: 3120, percentage: 25 },
-    { name: 'Bottoms', count: 2890, percentage: 23 },
-    { name: 'Accessories', count: 2191, percentage: 18 },
   ];
 
   return (
@@ -158,15 +137,14 @@ export default function Dashboard({
                 }`}>
                 {metric.icon}
               </div>
-              {/* 트렌드(상승/하락) 표시 영역 */}
-              <div className={`flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest ${metric.trend === 'up' ? 'text-violet-500' : 'text-red-400'}`}>
-                {metric.trend === 'up' ? <FaArrowUp /> : <FaArrowDown />} {metric.value}
+              <div className={`flex items-center gap-1 text-xs font-bold ${metric.trend === 'up' ? 'text-green-500' : 'text-red-500'}`}>
+                {metric.trend === 'up' ? <FaArrowUp size={10} /> : <FaArrowDown size={10} />}
               </div>
             </div>
-            <div className="space-y-1">
-              <p className="text-[9px] font-bold text-gray-300 dark:text-gray-600 uppercase tracking-widest group-hover:text-violet-300 dark:group-hover:text-violet-400 transition-colors subpixel-antialiased">{metric.label}</p>
-              <p className="text-3xl font-serif italic text-black dark:text-white tracking-tight">{metric.value}</p>
-              <p className="text-[8px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] subpixel-antialiased">{metric.sub}</p>
+            <div className="space-y-2">
+              <p className="text-[9px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-widest">{metric.label}</p>
+              <h3 className="text-3xl font-serif italic text-black dark:text-white tracking-tight">{metric.value}</h3>
+              <p className="text-[9px] text-gray-400 dark:text-gray-600 uppercase tracking-widest">{metric.sub}</p>
             </div>
           </div>
         ))}
@@ -201,10 +179,13 @@ export default function Dashboard({
             </div>
           </div>
         </div>
+      </div>
 
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
         {/* 
           [t-SNE 시각화 섹션]
           고차원 스타일 데이터를 2차원으로 투영하여 클러스터링을 시각화합니다.
+          각 점은 개별 상품을 나타내며, 유사한 스타일은 가까이 배치됩니다.
           별도의 컴포넌트로 분리하여 관리가 용이하도록 했습니다.
         */}
         <TSNEPlot />

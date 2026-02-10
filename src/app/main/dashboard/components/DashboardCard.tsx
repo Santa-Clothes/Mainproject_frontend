@@ -12,6 +12,7 @@ interface Props {
     topRight?: React.ReactNode;
     className?: string;
     lgColSpan?: number;
+    isLoading?: boolean;
 }
 
 /**
@@ -21,6 +22,7 @@ interface Props {
 const DashboardCard: React.FC<Props> = ({
     title,       // 카드의 제목 (예: "Shopping Style Insights")
     subtitle,    // 카드의 소제목/카테고리 (예: "Trend Analysis")
+    isLoading,
     error,       // 에러 발생 시 표시할 메시지 (null이면 정상)
     onRetry,     // 에러 발생 시 나타나는 재시도 버튼 클릭 핸들러
     children,    // 카드 내부의 실제 데이터 렌더링 영역
