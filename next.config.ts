@@ -13,6 +13,18 @@ const nextConfig: NextConfig = {
         port: '8080',               // 포트 번호
         pathname: '/**',    // 이미지 저장 경로 패턴
       },
+      {
+        //https://wizardofounce.loca.lt
+        protocol: 'https',
+        hostname: '*.wizardofounce.loca.lt',
+        pathname: '/**',
+      },
+      {
+        //https://fjoylosbfvojioljibku.supabase.co
+        protocol: 'https',
+        hostname: 'fjoylosbfvojioljibku.supabase.co',
+        pathname: '/**',
+      },
       //1. 카카오 (Kakao)
       {
         protocol: 'http',

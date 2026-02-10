@@ -3,6 +3,23 @@ export interface ProductType {
   name: string;
   brand: string;
   price: number;
-  imgUrl: string;      
-  category: string; 
+  imgUrl: string;
+  category: string;
+}
+
+export interface ProductData {
+  productId: string,
+  productName: string,
+  price: number,
+  categoryName: string
+  imageUrl: string
+}
+
+export interface RecommendData {
+  productId: string,
+  title: string,
+  price: number,
+  imageUrl: string,
+  productLink: string,
+  similarityScore: number
 }

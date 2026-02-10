@@ -3,15 +3,15 @@
 import React from 'react';
 import { FaLayerGroup, FaMagnifyingGlass, FaWaveSquare } from 'react-icons/fa6';
 import ProductCard from './ProductCard';
-import { ProductType } from '@/types/ProductType';
+import { ProductType, RecommendData } from '@/types/ProductType';
 
 interface ResultGridProps {
     title?: string;
     subtitle?: string;
     isActive?: boolean;
     isPending?: boolean; // AI 분석 진행 여부
-    products?: ProductType[] | null;
-    onProductClick?: (product: ProductType) => void;
+    products?: RecommendData[] | null;
+    onProductClick?: (product: RecommendData) => void;
 }
 
 /**
@@ -106,7 +106,7 @@ const ResultGrid: React.FC<ResultGridProps> = ({
                 <div className="grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
                     {products.map((item, idx) => (
                         <ProductCard
-                            key={item.id}
+                            key={item.productId}
                             product={item}
                             index={idx}
                             onClick={() => onProductClick?.(item)}
