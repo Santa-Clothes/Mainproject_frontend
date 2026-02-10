@@ -48,8 +48,7 @@ export default function Studio() {
   };
 
   return (
-    <div className="space-y-10">
-      {/* 1. 모드 전환 탭 (결과 화면일 때는 숨기거나 디자인 변경 가능) */}
+    <div className="space-y-10 max-w-7xl mx-auto w-full">
       {!results && (
         <ModeTabs mode={mode} onModeChange={(newMode) => {
           setResults(null);
@@ -57,13 +56,15 @@ export default function Studio() {
         }} />
       )}
 
-      <div className="bg-white dark:bg-neutral-900/50 rounded-[2.5rem] border border-neutral-200 dark:border-white/5 shadow-xl overflow-hidden min-h-125">
-        <div className="p-10 lg:p-14">
+      {/* 카드 컨테이너: 카드 자체의 높이를 크게 잡습니다. */}
+      <div className="bg-white dark:bg-neutral-900/50 rounded-[2.5rem] border border-neutral-200 dark:border-white/5 shadow-xl overflow-hidden flex flex-col h-[1100px]">
 
-          {/* 상황에 따른 화면 전환 */}
+        {/* 패딩을 조절한 내부 컨테이너 */}
+        <div className="flex-1 flex flex-col p-8 lg:p-12 overflow-hidden h-full">
+
           {results ? (
-            /* [결과 화면] */
-            <div className="space-y-12 animate-in fade-in slide-in-from-right duration-500">
+            /* 결과 화면도 내부 스크롤 적용 */
+            <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-12 animate-in fade-in slide-in-from-right duration-500">
               <button
                 onClick={handleBackToSearch}
                 className="flex items-center gap-2 text-violet-600 font-bold text-xs uppercase tracking-widest hover:underline"
@@ -82,7 +83,6 @@ export default function Studio() {
                 isPending={isPending}
                 products={results}
                 title="Neural Recommendations"
-                subtitle={`Similar to selected ${activeCategory || 'Items'}`}
                 onProductClick={(product: any) => {
                   setAnalysisImage(product.imageUrl);
                   setAnalysisName(product.productName);
@@ -90,7 +90,7 @@ export default function Studio() {
               />
             </div>
           ) : (
-            /* [입력 패널 화면] */
+            /* 입력 패널: DiscoveryPanel 내부에서 스크롤을 제어하도록 넘깁니다. */
             mode === 'imageDiscovery' ? (
               <DiscoveryPanel
                 onResultFound={handleSearchResult}
