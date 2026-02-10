@@ -9,7 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "framer-motion": "^12.33.0",
+    "framer-motion": "^12.34.0",
     "jotai": "^2.16.2",
     "lodash": "^4.17.23",
     "next": "^16.1.6",

@@ -2,11 +2,9 @@
 
 import React from 'react';
 import { FaSliders, FaImage } from 'react-icons/fa6';
-import { StudioMode } from '../Studio';
-
 interface ModeTabsProps {
-  mode: StudioMode;
-  onModeChange: (newMode: StudioMode) => void;
+  mode: string;
+  onModeChange: (newMode: string) => void;
 }
 
 /**

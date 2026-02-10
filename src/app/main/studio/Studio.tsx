@@ -11,10 +11,13 @@ import AnalysisSection from './components/AnalysisSection';
 
 import { ProductType, RecommendData } from '@/types/ProductType';
 
+export type StudioMode = 'imageDiscovery' | 'imageInput';
+
 export default function Studio() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const mode = (searchParams.get('mode') as any) || 'imageDiscovery';
+  const modeParam = searchParams.get('mode');
+  const mode: StudioMode = modeParam === 'imageInput' ? 'imageInput' : 'imageDiscovery';
 
   const [isPending, startTransition] = useTransition();
 
