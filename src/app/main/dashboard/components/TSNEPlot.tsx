@@ -142,7 +142,7 @@ export default function TSNEPlot() {
 
     return (
         <>
-            <div className={`lg:col-span-3 bg-white dark:bg-neutral-900/50 rounded-[3rem] border border-neutral-200 dark:border-white/5 p-12 space-y-10 shadow-sm transition-colors overflow-hidden flex flex-col min-h-187.5 relative ${isExpanded ? 'invisible' : ''}`}>
+            <div className={`lg:col-span-4 bg-white dark:bg-neutral-900/50 rounded-4xl border border-neutral-200 dark:border-white/5 p-8 space-y-8 shadow-sm transition-colors overflow-hidden flex flex-col min-h-87.5 relative ${isExpanded ? 'invisible' : ''}`}>
                 <div className="flex justify-between items-end relative z-10">
                     <div className="space-y-2">
                         <span className="text-[9px] font-bold text-gray-300 dark:text-gray-600 uppercase tracking-[0.4em]">Style Projection</span>
@@ -165,7 +165,7 @@ export default function TSNEPlot() {
                 </div>
 
                 {/* 그래프 컨테이너 (축소 상태) */}
-                <div className="w-full flex-1 min-h-[550px] rounded-4xl overflow-hidden border border-neutral-300 dark:border-white/10 bg-gray-50/10 dark:bg-black/20 relative shadow-inner cursor-pointer" onClick={() => setIsExpanded(true)}>
+                <div className="w-full flex-1 min-h-100 rounded-3xl overflow-hidden border border-neutral-300 dark:border-white/10 bg-gray-50/10 dark:bg-black/20 relative shadow-inner cursor-pointer" onClick={() => setIsExpanded(true)}>
                     <AnimatePresence>
                         {isLoading && (
                             <motion.div
@@ -185,7 +185,7 @@ export default function TSNEPlot() {
                         )}
                     </AnimatePresence>
 
-                    <div className="w-full h-[550px] relative z-10 bg-white/5 pointer-events-none">
+                    <div className="w-full h-100 relative z-10 bg-white/5 pointer-events-none">
                         <Plot
                             data={plotData}
                             layout={{

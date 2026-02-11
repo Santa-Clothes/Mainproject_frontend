@@ -33,7 +33,7 @@ const DashboardCard: React.FC<Props> = ({
     const colSpanClass = lgColSpan === 2 ? 'lg:col-span-2' : lgColSpan === 3 ? 'lg:col-span-3' : '';
 
     return (
-        <div className={`${colSpanClass} bg-white dark:bg-neutral-900/50 rounded-[3rem] border border-neutral-200 dark:border-white/5 p-12 space-y-10 shadow-sm transition-colors relative overflow-hidden ${className}`}>
+        <div className={`${colSpanClass} bg-white dark:bg-neutral-900/50 rounded-3xl border border-neutral-200 dark:border-white/5 p-6 space-y-6 shadow-sm transition-colors relative overflow-hidden ${className}`}>
             {/* 카드 헤더 영역: 제목, 소제목 및 우측 상단 컨트롤 */}
             <div className="flex justify-between items-end relative z-10">
                 <div className="space-y-2">

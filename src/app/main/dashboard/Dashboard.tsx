@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -10,51 +9,69 @@ import {
   FaWaveSquare,
   FaBolt
 } from 'react-icons/fa6';
-import CategoryDistributionCard from './components/CategoryDistributionCard';
+import SearchRankCard from './components/SearchRankCard';
 import AestheticDistributionCard from './components/AestheticDistributionCard';
 import BestSellersCard from './components/BestSellersCard';
 import { getShoppingTrends } from '@/app/api/trendService/trendapi';
 import { getSalesRanking, SalesRankItem } from '@/app/api/salesService/salesapi';
 import TSNEPlot from './components/TSNEPlot';
 
+/**
+ * DashboardTrendItem: 트렌드 분석 결과 데이터의 내부 타입 정의
+ */
+interface DashboardTrendItem {
+  value: number;
+  style: string;
+  percentStr: string;
+  score: number;
+  xcoord: number; // t-SNE 시각화를 위한 X 좌표
+  ycoord: number; // t-SNE 시각화를 위한 Y 좌표
+  productId: string;
+  productName: string;
+}
+
+/**
+ * Dashboard Component
+ * 서비스의 주요 지표, 스타일 트렌드, 매출 순위 등을 한눈에 보여주는 메인 관제 센터
+ */
 export default function Dashboard({
   initialData = [],
   initialSales = []
 }: {
-  initialData?: { value: number, style: string, percentStr: string }[],
+  initialData?: any[],
   initialSales?: SalesRankItem[]
 }) {
-  // 통합 데이터 상태 관리 (기존 trends -> data)
-  const [data, setData] = useState<{
-    value: number, style: string, percentStr: string, score: number,
-    xcoord: number, ycoord: number, productId: string, productName: string
-  }[]>(
+  // [상태 관리] 트렌드(Data Map) 및 매출 랭킹 데이터
+  const [data, setData] = useState<DashboardTrendItem[]>(
     initialData.length > 0 ? initialData.map((t, i) => ({
       ...t,
       score: t.value || 0,
       value: t.value || 0,
       percentStr: t.percentStr || '0%',
+      // 데모를 위해 초기 좌표를 무작위로 생성 (백엔드 좌표 연동 시 수정 필요)
       xcoord: Math.random() * 200 - 100,
       ycoord: Math.random() * 200 - 100,
       productId: `init-${i}`,
       productName: t.style || `Style-${i}`
     })).sort((a, b) => b.value - a.value) : []
   );
+
   const [isLoading, setIsLoading] = useState(initialData.length === 0);
   const [error, setError] = useState<string | null>(null);
 
-  // 매출 랭킹 데이터 상태 관리
   const [sales, setSales] = useState<SalesRankItem[]>(
     initialSales.length > 0 ? initialSales.sort((a, b) => b.saleQuantity - a.saleQuantity).slice(0, 5) : []
   );
   const [isLoadingSales, setIsLoadingSales] = useState(initialSales.length === 0);
   const [errorSales, setErrorSales] = useState<string | null>(null);
 
-  // 데이터 fetch 시도 여부 플래그 (무한 루프 방지)
+  // 무한 페칭 방지를 위한 요청 시도 플래그
   const [hasAttemptedFetch, setHasAttemptedFetch] = useState(false);
   const [hasAttemptedSalesFetch, setHasAttemptedSalesFetch] = useState(false);
 
-  // 통합 데이터 fetch 함수
+  /**
+   * 스타일 트렌드 데이터 페칭 및 가공
+   */
   const fetchData = async (isRetry = false) => {
     if (!isRetry && hasAttemptedFetch) return;
     setHasAttemptedFetch(true);
@@ -83,7 +100,9 @@ export default function Dashboard({
     }
   };
 
-  // 매출 랭킹 fetch 함수
+  /**
+   * 매출 랭킹 데이터 페칭
+   */
   const fetchSales = async (isRetry = false) => {
     if (!isRetry && hasAttemptedSalesFetch) return;
     setHasAttemptedSalesFetch(true);
@@ -92,7 +111,7 @@ export default function Dashboard({
 
     try {
       const result = await getSalesRanking();
-      const sortedSales = result.sort((a, b) => b.saleQuantity - a.saleQuantity).slice(0, 5);
+      const sortedSales = result.sort((a, b) => b.saleQuantity - a.saleQuantity);
       setSales(sortedSales);
     } catch (err) {
       console.error('Failed to fetch sales:', err);
@@ -102,22 +121,13 @@ export default function Dashboard({
     }
   };
 
-  // 컴포넌트 마운트 시 최초 1회만 자동 시도
   useEffect(() => {
-    if (initialData.length === 0 && !hasAttemptedFetch) {
-      fetchData();
-    }
+    if (initialData.length === 0 && !hasAttemptedFetch) fetchData();
+    if (initialSales.length === 0 && !hasAttemptedSalesFetch) fetchSales();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // 의존성 배열을 비워 마운트 시 1회만 실행되도록 함
+  }, []);
 
-  useEffect(() => {
-    if (initialSales.length === 0 && !hasAttemptedSalesFetch) {
-      fetchSales();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // 의존성 배열을 비워 마운트 시 1회만 실행되도록 함
-
-  // 대시보드 상단에 표시될 주요 지표(Metric) 배열
+  // 대시보드 메트릭 카드 정의
   const mainMetrics = [
     { label: 'Inventory Growth', value: '+12.5%', trend: 'up', sub: 'vs last month', icon: <FaBolt />, color: 'violet' },
     { label: 'Aesthetic DNA Score', value: '94.8', trend: 'up', sub: 'High Fidelity', icon: <FaGem />, color: 'indigo' },
@@ -126,11 +136,11 @@ export default function Dashboard({
   ];
 
   return (
-    <div className="space-y-10 pb-20">
-      {/* 주요 지표 그리드 영역 */}
+    <div className="space-y-8 pb-20">
+      {/* 1. 상단 주요 지표 요약 섹션 */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {mainMetrics.map((metric, i) => (
-          <div key={i} className="bg-white dark:bg-neutral-900/50 p-8 rounded-[2.5rem] border border-neutral-200 dark:border-white/5 shadow-sm space-y-6 hover:border-violet-100 dark:hover:border-violet-800 transition-colors group">
+          <div key={i} className="bg-white dark:bg-neutral-900/50 p-6 rounded-4xl border border-neutral-200 dark:border-white/5 shadow-sm space-y-4 hover:border-violet-100 dark:hover:border-violet-800 transition-colors group">
             <div className="flex justify-between items-start">
               <div className={`w-10 h-10 rounded-2xl flex items-center justify-center text-white text-sm shadow-lg ${metric.color === 'violet' ? 'bg-violet-600 shadow-violet-100 dark:shadow-none' :
                 metric.color === 'indigo' ? 'bg-indigo-600 shadow-indigo-100 dark:shadow-none' : 'bg-black dark:bg-neutral-800 shadow-gray-100 dark:shadow-none'
@@ -150,51 +160,20 @@ export default function Dashboard({
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-        {/* Modularized Trends Card */}
-        <CategoryDistributionCard trends={data as any} isLoading={isLoading} error={error} onRetry={() => fetchData(true)} />
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* 1열: 사용자 검색 순위 리스트 (ColSpan: 1) */}
+        <SearchRankCard trends={data as any} isLoading={isLoading} error={error} onRetry={() => fetchData(true)} />
 
-        {/* AI 인사이트 카드: 시스템이 제안하는 분석 결과 표시 */}
-        <div className="bg-linear-to-br from-violet-950 via-black to-black dark:from-violet-900 dark:via-black dark:to-black rounded-[3rem] p-12 text-white flex flex-col justify-between space-y-12 shadow-xl shadow-violet-900/10 border border-violet-900/20 relative overflow-hidden">
-          {/* 내부 은은한 빛 효과 */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-violet-600/10 blur-[60px]" />
-
-          <div className="space-y-6 relative z-10 antialiased">
-            <div className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center bg-white/5 backdrop-blur-sm">
-              <FaGem className="text-violet-400" />
-            </div>
-            <div className="space-y-3">
-              <h4 className="text-2xl font-serif italic tracking-normal px-8 -ml-8">Curation Insight</h4>
-              <p className="text-xs font-light text-violet-200/60 leading-relaxed italic">
-                "Neural analysis detects a 14% increase in 'minimalist' aesthetic DNA within the Outerwear segment. Inventory rotation is recommended for high-fidelity alignment."
-              </p>
-            </div>
-          </div>
-
-          {/* 하단 상태 표시 영역 */}
-          <div className="pt-8 border-t border-white/10 relative z-10">
-            <div className="flex items-center gap-3">
-              <div className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse"></div>
-              <span className="text-[9px] font-bold uppercase tracking-[0.4em] text-violet-400/60 subpixel-antialiased">AI Intelligence Optimal</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-        {/* 
-          [t-SNE 시각화 섹션]
-          고차원 스타일 데이터를 2차원으로 투영하여 클러스터링을 시각화합니다.
-          각 점은 개별 상품을 나타내며, 유사한 스타일은 가까이 배치됩니다.
-          별도의 컴포넌트로 분리하여 관리가 용이하도록 했습니다.
-        */}
-        <TSNEPlot />
-
-        {/* Modularized Distribution Card with Recharts */}
+        {/* 2-3열: 미적 분포(Aesthetic Distribution) 레이더 차트 (ColSpan: 2) */}
         <AestheticDistributionCard data={data} isLoading={isLoading} error={error} onRetry={() => fetchData(true)} />
 
-        {/* Modularized Best Sellers Card with Recharts */}
+        {/* 4열: 베스트 셀러 상품 랭킹 바 차트 (ColSpan: 1) */}
         <BestSellersCard sales={sales} isLoading={isLoadingSales} error={errorSales} onRetry={() => fetchSales(true)} />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* t-SNE 스타일 투영 산점도 (ColSpan: 4 - Full Width) */}
+        <TSNEPlot />
       </div>
     </div>
   );

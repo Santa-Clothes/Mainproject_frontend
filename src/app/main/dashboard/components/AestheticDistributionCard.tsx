@@ -41,37 +41,35 @@ const AestheticDistributionCard: React.FC<Props> = ({ data, isLoading, error, on
 
     return (
         <DashboardCard
-            title="Full Aesthetic Distribution"
-            subtitle="Style Proportion"
+            title="Aesthetic"
+            subtitle="Distribution"
             isLoading={isLoading}
             error={error}
             onRetry={onRetry}
-            lgColSpan={3}
+            lgColSpan={2}
+            className="min-h-72"
         >
-            <div className="flex flex-col md:flex-row items-center gap-16">
-                {/* 왼쪽 영역: Recharts 도넛 차트 */}
-                <div className="relative w-72 h-72 shrink-0">
+            <div className="flex flex-col md:flex-row items-center gap-4 h-full">
+                {/* 차트 영역: 왼쪽 배치 (이전 상태 복구) */}
+                <div className="relative w-48 h-48 shrink-0">
                     {isLoading ? (
-                        // 로딩 중: 회전하는 원형 스켈레톤
                         <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-48 h-48 rounded-full border-4 border-gray-100 dark:border-neutral-800 animate-pulse"></div>
+                            <div className="w-36 h-36 rounded-full border-4 border-gray-100 dark:border-neutral-800 animate-pulse"></div>
                         </div>
                     ) : error ? (
-                        // 에러 시: 경고 아이콘 표시
                         <div className="absolute inset-0 flex items-center justify-center opacity-20">
-                            <FaTriangleExclamation size={40} className="text-red-500" />
+                            <FaTriangleExclamation size={30} className="text-red-500" />
                         </div>
                     ) : (
-                        // 데이터 정상: PieChart 렌더링
                         <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
                                 <Pie
                                     data={data.slice(0, 8).map(t => ({ score: t?.score || 0, name: t?.style || 'Unknown' }))}
                                     cx="50%"
                                     cy="50%"
-                                    innerRadius={65}
-                                    outerRadius={90}
-                                    paddingAngle={8}
+                                    innerRadius={55}
+                                    outerRadius={75}
+                                    paddingAngle={6}
                                     dataKey="score"
                                     nameKey="name"
                                     stroke="none"
@@ -82,54 +80,46 @@ const AestheticDistributionCard: React.FC<Props> = ({ data, isLoading, error, on
                                 </Pie>
                                 <Tooltip
                                     contentStyle={{
-                                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                                        borderRadius: '16px',
+                                        backgroundColor: 'white',
+                                        borderRadius: '12px',
                                         border: 'none',
-                                        boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-                                        fontSize: '10px',
-                                        fontWeight: 'bold',
-                                        textTransform: 'uppercase',
-                                        letterSpacing: '0.1em'
+                                        fontSize: '8px',
+                                        fontWeight: 'bold'
                                     }}
                                 />
                             </PieChart>
                         </ResponsiveContainer>
                     )}
-                    {/* 차트 중앙 텍스트 오버레이 */}
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Style</span>
                         <span className="text-2xl font-serif italic text-black dark:text-white">DNA</span>
                     </div>
                 </div>
 
-                {/* 오른쪽 영역: 동적 범례 리스트 */}
-                <div className="flex-1 grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-6">
+                {/* 범례 영역: 오른쪽 그리드 배치 (이전 상태 복구) */}
+                <div className="flex-1 grid grid-cols-2 gap-x-6 gap-y-3">
                     {isLoading ? (
-                        // 로딩 스켈레톤 아이템 8개
-                        Array.from({ length: 8 }).map((_, i) => (
-                            <div key={i} className="flex items-center gap-3 animate-pulse">
-                                <div className="w-2 h-2 rounded-full bg-gray-100 dark:bg-neutral-800 shrink-0"></div>
-                                <div className="space-y-1 w-full">
-                                    <div className="h-2 w-16 bg-gray-100 dark:bg-neutral-800 rounded-full"></div>
-                                    <div className="h-1.5 w-10 bg-gray-50 dark:bg-neutral-900 rounded-full"></div>
-                                </div>
+                        Array.from({ length: 6 }).map((_, i) => (
+                            <div key={i} className="flex items-center gap-2 animate-pulse">
+                                <div className="w-1.5 h-1.5 rounded-full bg-gray-100 dark:bg-neutral-800 shrink-0"></div>
+                                <div className="h-2 w-16 bg-gray-100 dark:bg-neutral-800 rounded-full"></div>
                             </div>
                         ))
-                    ) : data.length > 0 ? (
-                        // 스타일 리스트 렌더링
-                        data.slice(0, 12).map((trend, i) => (
-                            <div key={i} className="flex items-center gap-3 group transition-all hover:translate-x-1">
-                                <div className={`w-2 h-2 rounded-full ${legendColors[i % legendColors.length]} shadow-sm`}></div>
-                                <div className="flex flex-col">
-                                    <span className="text-[9px] font-bold text-black dark:text-white uppercase tracking-widest group-hover:text-violet-500 transition-colors truncate max-w-25">{trend?.style || 'Unknown'}</span>
-                                    <span className="text-[8px] font-medium text-gray-400 dark:text-gray-500 uppercase">{(trend?.score || 0).toFixed(1)}%</span>
+                    ) : (
+                        data.slice(0, 10).map((trend, i) => (
+                            <div key={i} className="flex items-center justify-between group px-2 py-1 rounded-lg hover:bg-neutral-50 dark:hover:bg-white/5 transition-colors">
+                                <div className="flex items-center gap-2">
+                                    <div className={`w-2 h-2 rounded-full ${legendColors[i % legendColors.length]}`}></div>
+                                    <span className="text-[11px] font-bold text-black dark:text-white uppercase tracking-widest truncate max-w-28">
+                                        {trend?.style || 'Unknown'}
+                                    </span>
                                 </div>
+                                <span className="text-[10px] font-medium text-gray-400">{(trend?.score || 0).toFixed(0)}%</span>
                             </div>
                         ))
-                    ) : null}
+                    )}
                 </div>
+                <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-violet-500/5 rounded-full blur-3xl pointer-events-none"></div>
             </div>
-            <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-violet-500/5 rounded-full blur-3xl pointer-events-none"></div>
         </DashboardCard>
     );
 };

@@ -48,7 +48,8 @@ export default function LoginForm() {
           userId: result.userId,
           name: result.name,
           profile: result.profile,
-          success: result.success
+          success: result.success,
+          provider: 'local'
         });
         router.push("/main");
       } else {

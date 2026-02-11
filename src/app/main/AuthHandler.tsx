@@ -34,7 +34,8 @@ export default function AuthHandler() {
                             userId: userInfo.userId || "",
                             name: userInfo.name || "",
                             profile: userInfo.profile || "",
-                            success: true
+                            success: true,
+                            provider: userInfo.provider || 'social'
                         });
 
                         // 주소창에서 토큰을 지우기 위해 쿼리 없이 현재 경로로 이동
@@ -56,7 +57,7 @@ export default function AuthHandler() {
 
     if (isProcessing) {
         return (
-            <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md">
+            <div className="fixed inset-0 z-9999 flex flex-col items-center justify-center bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md">
                 <div className="flex flex-col items-center gap-6">
                     <div className="relative w-16 h-16">
                         <div className="absolute inset-0 rounded-full border-4 border-violet-100 dark:border-violet-900/30"></div>

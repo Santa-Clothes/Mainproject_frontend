@@ -4,6 +4,7 @@ export interface AuthUser {
     name: string;
     profile: string;
     success: boolean;
+    provider?: string; // local, google, kakao, naver 등
 }
 
 export interface JoinRequest {

@@ -135,3 +135,72 @@ export const getUserInfoAPI = async (token: string) => {
         return [];
     }
 };
+/**
+ * 내 정보 수정 API: 닉네임 또는 프로필 이미지를 업데이트합니다.
+ */
+export const updateMemberAPI = async (token: string, data: { nickname?: string; profile?: string }) => {
+    const reqUrl = `${BASEURL}/api/members/me`;
+
+    try {
+        const response = await fetch(reqUrl, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify(data),
+        });
+
+        if (!response.ok) return null;
+        return await response.json();
+    } catch (error) {
+        console.error("UpdateMember Error:", error);
+        return null;
+    }
+};
+
+/**
+ * 비밀번호 변경 API: 로컬 계정 전용.
+ */
+export const updatePasswordAPI = async (token: string, password: string) => {
+    const reqUrl = `${BASEURL}/api/members/update`;
+
+    try {
+        const response = await fetch(reqUrl, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({ password }),
+        });
+
+        if (!response.ok) return null;
+        return await response.json();
+    } catch (error) {
+        console.error("UpdatePassword Error:", error);
+        return null;
+    }
+};
+
+/**
+ * 회원 탈퇴 API
+ */
+export const deleteMemberAPI = async (token: string) => {
+    const reqUrl = `${BASEURL}/api/members/me`;
+
+    try {
+        const response = await fetch(reqUrl, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+
+        if (!response.ok) return null;
+        return await response.json();
+    } catch (error) {
+        console.error("DeleteMember Error:", error);
+        return null;
+    }
+};

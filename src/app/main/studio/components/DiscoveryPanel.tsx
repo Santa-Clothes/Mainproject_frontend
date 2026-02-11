@@ -14,6 +14,10 @@ interface DiscoveryPanelProps {
   startTransition: React.TransitionStartFunction;
 }
 
+/**
+ * DiscoveryPanel: 카테고리별 상품을 탐색하고, 특정 상품을 선택하여 스타일 검색을 시작하는 컴포넌트
+ * 무한 스크롤(가상화), 카테고리 필터링, 상품 선택 기능을 포함합니다.
+ */
 export default function DiscoveryPanel({
   onResultFound,
   onAnalysisStart,
@@ -23,17 +27,22 @@ export default function DiscoveryPanel({
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [isFetching, setIsFetching] = useState(false);
-  const [isFiltering, setIsFiltering] = useState(false);
-  const [allProducts, setAllProducts] = useState<ProductData[]>([]);
-  const [displayCount, setDisplayCount] = useState(24); // 초기 렌더링 개수 (배수 권장)
+  // 상태 관리
+  const [isFetching, setIsFetching] = useState(false);  // 전체 데이터 로딩 상태
+  const [isFiltering, setIsFiltering] = useState(false); // 필터링 시각적 피드백 상태
+  const [allProducts, setAllProducts] = useState<ProductData[]>([]); // 원본 상품 데이터
+  const [displayCount, setDisplayCount] = useState(24); // 현재 화면에 렌더링할 상품 개수 (무한 스크롤)
 
+  // URL 쿼리 파라미터에서 현재 선택된 정보 추출
   const selectedCat = searchParams.get('cat') || null;
   const selectedProductId = searchParams.get('pid') || null;
 
+  // 프로젝트에서 사용하는 카테고리 목록
   const categories = ['All', "블라우스", "블라우스나시", "가디건", "코트", "데님", "이너웨어", "자켓", "점퍼", "니트나시", "니트", "레깅스", "원피스", "바지", "스커트", "슬랙스", "세트", "티셔츠나시", "티셔츠", "베스트이너", "베스트", "남방"];
 
-  // 1. 초기 데이터 로드
+  /**
+   * 1. 초기 데이터 로드 (컴포넌트 마운트 시 1회 실행)
+   */
   useEffect(() => {
     const initLoad = async () => {
       setIsFetching(true);
@@ -49,12 +58,16 @@ export default function DiscoveryPanel({
     initLoad();
   }, []);
 
-  // 2. 카테고리 변경 시 출력 개수 초기화
+  /**
+   * 2. 카테고리 변경 시 출력 개수 초기화 (성능 최적화)
+   */
   useEffect(() => {
     setDisplayCount(24);
   }, [selectedCat]);
 
-  // 3. 필터링 로직 (메모리 내 전체 결과)
+  /**
+   * 3. 필터링 로직 (메모리 내 전체 결과에서 카테고리 필터링)
+   */
   const filteredProducts = useMemo(() => {
     const results = !selectedCat || selectedCat === 'All'
       ? allProducts
@@ -62,45 +75,57 @@ export default function DiscoveryPanel({
     return results;
   }, [selectedCat, allProducts]);
 
-  // 4. [핵심] 실제 화면에 보일 부분만 슬라이싱
+  /**
+   * 4. [핵심] 실제 화면에 보일 부분만 슬라이싱하여 렌더링 부하 감소
+   */
   const visibleProducts = useMemo(() => {
     return filteredProducts.slice(0, displayCount);
   }, [filteredProducts, displayCount]);
 
-  // 5. 스크롤 이벤트 핸들러 (div에 연결됨)
+  /**
+   * 5. 무한 스크롤 핸들러 (리스트 바닥 감지 시 렌더링 개수 증가)
+   */
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
-    // 바닥에서 200px 정도 여유를 두고 다음 데이터 로드
     if (scrollHeight - scrollTop <= clientHeight + 200) {
       if (displayCount < filteredProducts.length) {
-        setDisplayCount(prev => prev + 24); // 24개씩 추가 렌더링
+        setDisplayCount(prev => prev + 24);
       }
     }
   }, [displayCount, filteredProducts.length]);
 
+  /**
+   * 카테고리 선택 처리
+   */
   const selectCategory = (cat: string) => {
     if (selectedCat === cat || isFetching) return;
     const params = new URLSearchParams(searchParams.toString());
     params.set('cat', cat);
-    params.delete('pid');
+    params.delete('pid'); // 카테고리 변경 시 선택 상품 해제
     router.replace(`?${params.toString()}`, { scroll: false });
 
     setIsFiltering(true);
-    onResultFound(null);
+    onResultFound(null); // 이전 결과 초기화
     setTimeout(() => setIsFiltering(false), 300);
   };
 
+  /**
+   * 개별 상품 선택 처리
+   */
   const selectProduct = (product: ProductData) => {
     const params = new URLSearchParams(searchParams.toString());
     if (selectedProductId === product.productId) {
-      params.delete('pid');
+      params.delete('pid'); // 이미 선택된 상품이면 해제
     } else {
       params.set('pid', product.productId);
-      onAnalysisStart(product.imageUrl, product.productName);
+      onAnalysisStart(product.imageUrl, product.productName); // 분석 미리보기용 데이터 전달
     }
     router.replace(`?${params.toString()}`, { scroll: false });
   };
 
+  /**
+   * [핵심] 선택된 상품으로 유사 스타일 검색 시작
+   */
   const startAnalysis = () => {
     if (!selectedProductId) return;
     startTransition(async () => {
@@ -113,6 +138,9 @@ export default function DiscoveryPanel({
     });
   };
 
+  /**
+   * 필터 및 선택 초기화
+   */
   const handleReset = () => {
     const params = new URLSearchParams(searchParams.toString());
     params.delete('cat');
@@ -123,7 +151,7 @@ export default function DiscoveryPanel({
 
   return (
     <div className="flex flex-col h-full gap-y-8 overflow-hidden">
-      {/* 고정 영역: 카테고리 및 버튼 */}
+      {/* 1. 고정 영역: 카테고리 칩 및 검색 시작 버튼 */}
       <div className="flex-none space-y-6">
         <div className={`flex flex-wrap justify-center gap-3 transition-all duration-500 ${isFetching ? 'opacity-40 grayscale pointer-events-none' : 'opacity-100'}`}>
           {categories.map(cat => (
@@ -161,17 +189,19 @@ export default function DiscoveryPanel({
         </button>
       </div>
 
-      {/* 스크롤 영역: onScroll 연결 필수 */}
+      {/* 2. 스크롤 영역: 상품 그리드 리스트 */}
       <div
         onScroll={handleScroll}
         className="flex-1 overflow-y-auto pr-4 custom-scrollbar min-h-0 border-t border-neutral-200 dark:border-white/10"
       >
         {isFetching || isFiltering ? (
+          /* 로딩 중 표시 */
           <div className="flex flex-col items-center justify-center h-full gap-4">
             <FaArrowsRotate className="animate-spin text-violet-600" size={32} />
             <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">Caching Assets...</p>
           </div>
         ) : selectedCat ? (
+          /* 상품 리스트 노출 */
           <div className="pt-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
             <div className="flex items-center justify-between pb-6">
               <span className="text-[9px] font-bold text-neutral-900 dark:text-white uppercase tracking-widest">
@@ -183,13 +213,12 @@ export default function DiscoveryPanel({
               </button>
             </div>
 
-            {/* 그리드 영역: visibleProducts를 사용하여 렌더링 부하 감소 */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pb-20">
               {visibleProducts.map(product => (
                 <div
                   key={product.productId}
                   onClick={() => selectProduct(product)}
-                  // 렌더링 최적화 속성 유지
+                  // 대량 렌더링 성능 최적화 속성
                   style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}
                   className={`group relative aspect-[3/4] rounded-2xl overflow-hidden cursor-pointer border-2 transition-all 
                   ${selectedProductId === product.productId ? 'border-violet-600 shadow-2xl ring-4 ring-violet-600/10' : 'border-transparent hover:border-violet-200'}`}
@@ -213,6 +242,7 @@ export default function DiscoveryPanel({
             </div>
           </div>
         ) : (
+          /* 카테고리 선택 전 빈 화면 */
           <div className="h-full flex flex-col items-center justify-center bg-white dark:bg-neutral-900/50 rounded-[3rem] py-20">
             <div className="w-20 h-20 rounded-full bg-neutral-50 dark:bg-neutral-900 flex items-center justify-center text-neutral-300 mb-8 border border-neutral-100 shadow-inner">
               <FaFingerprint size={40} className="animate-pulse" />

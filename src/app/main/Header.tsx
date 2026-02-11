@@ -19,16 +19,23 @@ import { useAtom } from 'jotai';
 import { authUserAtom } from '@/jotai/loginjotai';
 import { logoutAPI } from '../api/memberService/memberapi';
 
+/**
+ * Header Component
+ * 어플리케이션의 최상단 네비게이션 바입니다.
+ * 테마 전환(Dark/Light), 인증 상태 관리, 페이지 이동 기능을 포함합니다.
+ */
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
-  const [authInfo, setAuthInfo] = useAtom(authUserAtom);
+  const [authInfo, setAuthInfo] = useAtom(authUserAtom); // 전역 인증 상태 (Jotai)
 
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false); // SSR과 일치시키기 위해 기본값 false
+  // [상태 관리]
+  const [isProfileOpen, setIsProfileOpen] = useState(false); // 프로필 드롭다운 열림 여부
+  const [isScrolled, setIsScrolled] = useState(false); // 스크롤 발생 여부 (UI 변화 트리거)
+  const [isDarkMode, setIsDarkMode] = useState(false); // 다크 모드 활성화 여부
   const profileRef = useRef<HTMLDivElement>(null);
 
+  // 초기 테마 설정 확인
   useEffect(() => {
     const savedTheme = localStorage.getItem('atelier_theme');
     if (savedTheme === 'dark') {
@@ -37,10 +44,11 @@ export default function Header() {
     }
   }, []);
 
-  // 스크롤 및 외부 클릭 감지
+  // 전역 클릭 및 스크롤 이벤트 리스너 등록
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
     const handleClickOutside = (event: MouseEvent) => {
+      // 프로필 영역 외부 클릭 시 드롭다운 닫기
       if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
         setIsProfileOpen(false);
       }
@@ -55,8 +63,7 @@ export default function Header() {
   }, []);
 
   /**
-   * 테마 토글 핸들러
-   * 라이트 모드와 다크 모드를 전환하고 설정을 로컬 스토리지에 저장합니다.
+   * 테마 전환 핸들러
    */
   const toggleTheme = () => {
     const newMode = !isDarkMode;
@@ -71,14 +78,13 @@ export default function Header() {
   };
 
   /**
-   * 로그아웃 핸들러
-   * 서버 세션을 종료하고 클라이언트 측 인증 정보(Jotai/LocalStorage)를 초기화합니다.
+   * 로그아웃 처리 핸들러
    */
   const handleLogout = async () => {
     if (!authInfo) return;
     try {
       await logoutAPI(authInfo);
-      setAuthInfo(null); // Jotai atomWithStorage에 의해 localStorage에서도 자동 제거됨
+      setAuthInfo(null); // 로컬 스토리지 정보도 자동 초기화됨
       setIsProfileOpen(false);
       alert("로그아웃 되었습니다.");
       router.push("/main");
@@ -87,6 +93,7 @@ export default function Header() {
     }
   };
 
+  // 네비게이션 아이템 정의
   const navItems = [
     { id: 'home', label: 'Overview', icon: <FaHouse size={12} />, path: '/main' },
     { id: 'studio', label: 'Studio', icon: <FaMicrochip size={12} />, path: '/main/studio' },
@@ -95,14 +102,9 @@ export default function Header() {
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 px-8 py-6 transition-all duration-300 ${isScrolled ? '-translate-y-1' : 'translate-y-0'}`}>
-      {/* 
-        [Header Stabilization]
-        기존 py-4 <-> py-8 전환은 전체 레이아웃 높이를 변화시켜 버튼들이 흔들리는 현상(Jitter)을 유발했습니다.
-        패딩을 고정하고 translate-y 또는 border/glassmorphism 효과만 변화시켜 시각적 안정성을 확보합니다.
-      */}
       <div className="max-w-7xl mx-auto flex items-center justify-between">
 
-        {/* Left: Brand & Nav Links */}
+        {/* 1. 좌측: 브랜드 로고 및 메인 네비게이션 */}
         <div className="flex items-center bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl p-1.5 rounded-full border border-neutral-200 dark:border-white/5 shadow-xl">
           <Link href="/" className="flex flex-col items-center px-6 py-1 hover:opacity-70 transition-opacity">
             <h1 className="text-xl font-sans font-black tracking-[0.4em] uppercase text-neutral-900 dark:text-white leading-none">ATELIER</h1>
@@ -128,9 +130,9 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Right: Controls & Profile */}
+        {/* 2. 우측: 테마 토글 및 유저 프로필(인증) */}
         <div className="flex items-center gap-4">
-          {/* Theme Toggle */}
+          {/* 테마 스위치: CSS 전용 로직을 포함하여 초기 렌더링 깜빡임 최소화 */}
           <button
             onClick={toggleTheme}
             type="button"
@@ -138,11 +140,6 @@ export default function Header() {
             className="relative w-24 h-10 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl border border-neutral-200 dark:border-white/5 
                           rounded-full shadow-lg cursor-pointer overflow-hidden hover:border-violet-400 outline-none"
           >
-            {/* 
-              [Pure CSS Driven UI]
-              isDarkMode 상태(React)가 아닌 html 태그의 .dark 클래스(CSS)를 기준으로 UI를 초기 렌더링합니다.
-              layout.tsx의 헤드 스크립트가 이미 클래스를 박아두었으므로, 하이드레이션 에러 없이 로딩 즉시 올바른 위치에 있게 됩니다.
-            */}
             <div className="absolute top-1 w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center text-white transition-transform duration-500 ease-in-out z-20 
                     translate-x-1 dark:translate-x-14.5"
             >
@@ -150,12 +147,10 @@ export default function Header() {
               <FaMoon size={10} className="hidden dark:block" />
             </div>
 
-            {/* 버튼 내부 텍스트 레이어 */}
             <div className="relative w-full h-full flex items-center justify-between px-3 z-10">
               <span className="text-[8px] font-bold uppercase tracking-widest transition-all duration-500 opacity-0 translate-x-2 dark:opacity-100 dark:translate-x-0 text-gray-400">
                 Night
               </span>
-
               <span className="text-[8px] font-bold uppercase tracking-widest transition-all duration-500 opacity-100 translate-x-0 dark:opacity-0 dark:-translate-x-2 text-gray-500">
                 Day
               </span>
@@ -163,6 +158,7 @@ export default function Header() {
           </button>
 
           {!authInfo ? (
+            /* 비로그인 상태: 로그인/회원가입 링크 */
             <div className="flex items-center gap-1 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl p-1.5 rounded-full border border-neutral-200 dark:border-white/5 shadow-lg">
               <Link href="/login" className="px-5 py-2.5 text-[9px] font-bold uppercase tracking-widest text-gray-500 hover:text-violet-600 transition-colors">
                 Log In
@@ -172,6 +168,7 @@ export default function Header() {
               </Link>
             </div>
           ) : (
+            /* 로그인 상태: 유저 프로필 드롭다운 */
             <div className="relative" ref={profileRef}>
               <button
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
@@ -196,15 +193,15 @@ export default function Header() {
                 <FaChevronDown size={8} className={`text-gray-400 transition-transform ${isProfileOpen ? 'rotate-180' : ''}`} />
               </button>
 
-              {/* Dropdown */}
+              {/* 유저 메뉴 드롭다운 */}
               {isProfileOpen && (
-                <div className="absolute top-full right-0 mt-3 w-56 bg-white dark:bg-neutral-900/50 border border-neutral-200 dark:border-white/5 rounded-3xl shadow-2xl overflow-hidden py-2 z-50">
+                <div className="absolute top-full right-0 mt-3 w-56 bg-white dark:bg-neutral-900 rounded-3xl shadow-2xl overflow-hidden py-2 z-50 border border-neutral-100 dark:border-white/5 animate-in fade-in zoom-in-95 duration-200">
                   <div className="px-6 py-4 border-b border-neutral-200 dark:border-white/5 mb-1">
                     <p className="text-[7px] font-bold text-gray-400 uppercase tracking-widest">Access Key</p>
                     <p className="text-[10px] font-bold text-neutral-900 dark:text-white truncate mt-1">{authInfo.name}</p>
                   </div>
                   <Link
-                    href="/main/profile"
+                    href="/main/memberinfo"
                     onClick={() => setIsProfileOpen(false)}
                     className="flex items-center gap-3 px-6 py-3 text-[9px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-violet-600 transition-colors"
                   >
