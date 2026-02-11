@@ -135,6 +135,29 @@ export const getUserInfoAPI = async (token: string) => {
         return [];
     }
 };
+
+export const updateProfileImg = async (token: string, id: string, profileImg: File) => {
+    const reqUrl = `${BASEURL}/api/imageupload/profile?id=${id}`;
+    const formData = new FormData();
+    formData.append('file', profileImg);
+
+    try {
+        const response = await fetch(reqUrl, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            body: formData,
+        });
+
+        return response.ok;
+    } catch (error) {
+        console.error("UpdateProfileImg Error:", error);
+        return false;
+    }
+};
+
+
 /**
  * 내 정보 수정 API: 닉네임 또는 프로필 이미지를 업데이트합니다.
  */
@@ -186,15 +209,17 @@ export const updatePasswordAPI = async (token: string, password: string) => {
 /**
  * 회원 탈퇴 API
  */
-export const deleteMemberAPI = async (token: string) => {
-    const reqUrl = `${BASEURL}/api/members/me`;
+export const deleteMemberAPI = async (token: string, id: string, password: string) => {
+    const reqUrl = `${BASEURL}/api/members/withdraw`;
 
     try {
         const response = await fetch(reqUrl, {
             method: 'DELETE',
             headers: {
+                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`,
             },
+            body: JSON.stringify({ id, password })
         });
 
         if (!response.ok) return null;

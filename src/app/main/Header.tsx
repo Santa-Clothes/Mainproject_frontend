@@ -33,7 +33,12 @@ export default function Header() {
   const [isProfileOpen, setIsProfileOpen] = useState(false); // 프로필 드롭다운 열림 여부
   const [isScrolled, setIsScrolled] = useState(false); // 스크롤 발생 여부 (UI 변화 트리거)
   const [isDarkMode, setIsDarkMode] = useState(false); // 다크 모드 활성화 여부
+  const [isMounted, setIsMounted] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // 초기 테마 설정 확인
   useEffect(() => {
@@ -157,65 +162,78 @@ export default function Header() {
             </div>
           </button>
 
-          {!authInfo ? (
-            /* 비로그인 상태: 로그인/회원가입 링크 */
-            <div className="flex items-center gap-1 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl p-1.5 rounded-full border border-neutral-200 dark:border-white/5 shadow-lg">
-              <Link href="/login" className="px-5 py-2.5 text-[9px] font-bold uppercase tracking-widest text-gray-500 hover:text-violet-600 transition-colors">
-                Log In
-              </Link>
-              <Link href="/signup" className="px-6 py-2.5 bg-violet-600 text-white text-[9px] font-bold uppercase tracking-widest rounded-full hover:bg-violet-700 transition-all flex items-center gap-2 shadow-md active:scale-95">
-                Join <FaArrowRight size={8} />
-              </Link>
-            </div>
-          ) : (
-            /* 로그인 상태: 유저 프로필 드롭다운 */
-            <div className="relative" ref={profileRef}>
-              <button
-                onClick={() => setIsProfileOpen(!isProfileOpen)}
-                className={`flex items-center gap-3 pl-2 pr-4 py-1.5 rounded-full border transition-all shadow-lg active:scale-95 ${isProfileOpen
-                  ? 'bg-violet-50 dark:bg-violet-900/20 border-violet-300 dark:border-violet-700'
-                  : 'bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl border-neutral-200 dark:border-white/5'
-                  }`}
-              >
-                <div className="w-8 h-8 rounded-full bg-violet-600 overflow-hidden flex items-center justify-center border border-white/20">
-                  {authInfo.profile ? (
-                    <img src={authInfo.profile} alt="profile" className="w-full h-full object-cover" />
-                  ) : (
-                    <FaUser size={12} className="text-white" />
-                  )}
-                </div>
-                <div className="hidden sm:flex flex-col items-start text-left">
-                  <span className="text-[9px] font-bold uppercase tracking-widest text-neutral-900 dark:text-white leading-none">
-                    {authInfo.name}
-                  </span>
-                  <span className="text-[6px] font-bold text-violet-500 uppercase tracking-widest mt-1">Authorized</span>
-                </div>
-                <FaChevronDown size={8} className={`text-gray-400 transition-transform ${isProfileOpen ? 'rotate-180' : ''}`} />
-              </button>
-
-              {/* 유저 메뉴 드롭다운 */}
-              {isProfileOpen && (
-                <div className="absolute top-full right-0 mt-3 w-56 bg-white dark:bg-neutral-900 rounded-3xl shadow-2xl overflow-hidden py-2 z-50 border border-neutral-100 dark:border-white/5 animate-in fade-in zoom-in-95 duration-200">
-                  <div className="px-6 py-4 border-b border-neutral-200 dark:border-white/5 mb-1">
-                    <p className="text-[7px] font-bold text-gray-400 uppercase tracking-widest">Access Key</p>
-                    <p className="text-[10px] font-bold text-neutral-900 dark:text-white truncate mt-1">{authInfo.name}</p>
+          {isMounted ? (
+            !authInfo ? (
+              /* 비로그인 상태: 로그인/회원가입 링크 */
+              <div className="flex items-center gap-1 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl p-1.5 rounded-full border border-neutral-200 dark:border-white/5 shadow-lg">
+                <Link href="/login" className="px-5 py-2.5 text-[9px] font-bold uppercase tracking-widest text-gray-500 hover:text-violet-600 transition-colors">
+                  Log In
+                </Link>
+                <Link href="/signup" className="px-6 py-2.5 bg-violet-600 text-white text-[9px] font-bold uppercase tracking-widest rounded-full hover:bg-violet-700 transition-all flex items-center gap-2 shadow-md active:scale-95">
+                  Join <FaArrowRight size={8} />
+                </Link>
+              </div>
+            ) : (
+              /* 로그인 상태: 유저 프로필 드롭다운 */
+              <div className="relative" ref={profileRef}>
+                <button
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  className={`flex items-center gap-3 pl-2 pr-4 py-1.5 rounded-full border transition-all shadow-lg active:scale-95 ${isProfileOpen
+                    ? 'bg-violet-50 dark:bg-violet-900/20 border-violet-300 dark:border-violet-700'
+                    : 'bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl border-neutral-200 dark:border-white/5'
+                    }`}
+                >
+                  <div className="w-8 h-8 rounded-full bg-violet-600 overflow-hidden flex items-center justify-center border border-white/20">
+                    {authInfo.profile ? (
+                      <img
+                        src={
+                          authInfo.profile.startsWith('data:')
+                            ? authInfo.profile
+                            : (authInfo.profile.includes('?') ? `${authInfo.profile}&t=${Date.now()}` : `${authInfo.profile}?t=${Date.now()}`)
+                        }
+                        alt="profile"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <FaUser size={12} className="text-white" />
+                    )}
                   </div>
-                  <Link
-                    href="/main/memberinfo"
-                    onClick={() => setIsProfileOpen(false)}
-                    className="flex items-center gap-3 px-6 py-3 text-[9px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-violet-600 transition-colors"
-                  >
-                    <FaGear size={10} /> Configuration
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full flex items-center gap-3 px-6 py-3 text-[9px] font-bold uppercase tracking-widest text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
-                  >
-                    <FaArrowRightFromBracket size={10} /> Logout
-                  </button>
-                </div>
-              )}
-            </div>
+                  <div className="hidden sm:flex flex-col items-start text-left">
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-neutral-900 dark:text-white leading-none">
+                      {authInfo.name}
+                    </span>
+                    <span className="text-[6px] font-bold text-violet-500 uppercase tracking-widest mt-1">Authorized</span>
+                  </div>
+                  <FaChevronDown size={8} className={`text-gray-400 transition-transform ${isProfileOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {/* 유저 메뉴 드롭다운 */}
+                {isProfileOpen && (
+                  <div className="absolute top-full right-0 mt-3 w-56 bg-white dark:bg-neutral-900 rounded-3xl shadow-2xl overflow-hidden py-2 z-50 border border-neutral-100 dark:border-white/5 animate-in fade-in zoom-in-95 duration-200">
+                    <div className="px-6 py-4 border-b border-neutral-200 dark:border-white/5 mb-1">
+                      <p className="text-[7px] font-bold text-gray-400 uppercase tracking-widest">Access Key</p>
+                      <p className="text-[10px] font-bold text-neutral-900 dark:text-white truncate mt-1">{authInfo.name}</p>
+                    </div>
+                    <Link
+                      href="/main/memberinfo"
+                      onClick={() => setIsProfileOpen(false)}
+                      className="flex items-center gap-3 px-6 py-3 text-[9px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-violet-600 transition-colors"
+                    >
+                      <FaGear size={10} /> Configuration
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-3 px-6 py-3 text-[9px] font-bold uppercase tracking-widest text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                    >
+                      <FaArrowRightFromBracket size={10} /> Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            )
+          ) : (
+            /* 하이드레이션 중에는 빈 영역을 유지하여 레이아웃 어긋남 방지 */
+            <div className="w-32 h-10"></div>
           )}
         </div>
       </div>

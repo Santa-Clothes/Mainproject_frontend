@@ -3,9 +3,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAtom } from 'jotai';
 import { authUserAtom } from '@/jotai/loginjotai';
-import { updateMemberAPI, updatePasswordAPI, deleteMemberAPI } from '@/app/api/memberService/memberapi';
+import { updateMemberAPI, updatePasswordAPI, deleteMemberAPI, updateProfileImg } from '@/app/api/memberService/memberapi';
 import { useRouter } from 'next/navigation';
-import { FaUser, FaLock, FaTrash, FaCamera, FaCircleCheck, FaTriangleExclamation } from 'react-icons/fa6';
+import { FaUser, FaLock, FaTrash, FaCamera, FaCircleCheck, FaTriangleExclamation, FaXmark } from 'react-icons/fa6';
 import Image from 'next/image';
 
 /**
@@ -23,22 +23,44 @@ export default function MemberInfo() {
   const [profileImage, setProfileImage] = useState(auth?.profile || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   // OAuth2 계정 여부 판단
   const isOAuth2 = auth?.provider && auth.provider !== 'local';
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
+
+
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    if (!auth) {
-      router.push('/login');
-    }
-  }, [auth, router]);
+    setIsMounted(true);
+  }, []);
 
-  // 프로필 이미지 변경 핸들러 (파일 시뮬레이션)
+
+  // auth 데이터가 로드되면 로컬 상태 변수들에 동기화
+  useEffect(() => {
+    if (auth) {
+      setNickname(auth.name || '');
+      setProfileImage(auth.profile || '');
+    }
+  }, [auth]);
+
+  useEffect(() => {
+    if (isMounted) {
+      const stored = localStorage.getItem('auth_info');
+      const isActuallyLoggedOut = !auth && (!stored || stored === 'null');
+
+      if (isActuallyLoggedOut) {
+        router.push('/login');
+      }
+    }
+  }, [isMounted, auth, router]);
+
+  // 프로필 이미지 변경 핸들러
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setSelectedFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setProfileImage(reader.result as string);
@@ -49,21 +71,22 @@ export default function MemberInfo() {
 
   // 프로필 이미지 업데이트 핸들러
   const handleUpdateImage = async () => {
-    if (!auth) return;
+    if (!auth || !selectedFile) {
+      return;
+    }
 
     setIsSubmitting(true);
     setMessage(null);
 
     try {
-      const result = await updateMemberAPI(auth.accessToken, {
-        profile: profileImage
-      });
+      const result = await updateProfileImg(auth.accessToken, auth.userId, selectedFile);
 
       if (result) {
-        setAuth({ ...auth, profile: profileImage });
+        setAuth(prev => prev ? { ...prev, profile: profileImage } : null);
+        setSelectedFile(null);
         setMessage({ type: 'success', text: 'Profile image updated.' });
       } else {
-        setMessage({ type: 'error', text: 'Failed to update image.' });
+        setMessage({ type: 'error', text: 'Failed to update image' });
       }
     } catch (error) {
       setMessage({ type: 'error', text: 'Error occurred.' });
@@ -125,25 +148,37 @@ export default function MemberInfo() {
     }
   };
 
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [withdrawId, setWithdrawId] = useState('');
+  const [withdrawPassword, setWithdrawPassword] = useState('');
+
   // 회원 탈퇴 처리
   const handleDeleteAccount = async () => {
     if (!auth) return;
-    if (!confirm('Are you sure you want to delete your account? This action cannot be undone.')) return;
+    setIsDeleteModalOpen(true);
+  };
+
+  const submitWithdraw = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!auth) return;
 
     try {
-      const result = await deleteMemberAPI(auth.accessToken);
+      setIsSubmitting(true);
+      const result = await deleteMemberAPI(auth.accessToken, withdrawId, withdrawPassword);
       if (result) {
         setAuth(null);
         router.push('/login');
       } else {
-        alert('Account deletion failed.');
+        alert('Withdrawal failed. Please check your credentials.');
       }
     } catch (error) {
-      alert('Error occurred during account deletion.');
+      alert('Error occurred during withdrawal.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  if (!auth) return null;
+  if (!isMounted || !auth) return null;
 
   const isImageChanged = profileImage !== auth.profile;
 
@@ -171,19 +206,33 @@ export default function MemberInfo() {
           <div className="flex flex-col gap-4">
             <div className="relative group mx-auto w-48 h-48 lg:w-full lg:h-auto aspect-square rounded-[3rem] overflow-hidden bg-neutral-100 dark:bg-neutral-800 border-4 border-white dark:border-neutral-900 shadow-2xl transition-transform hover:scale-[1.02]">
               {profileImage ? (
-                <Image src={profileImage} alt="Profile" fill className="object-cover" />
+                /* src 뒤에 항상 타임스탬프를 붙여 캐시 방지 */
+                <Image
+                  src={
+                    profileImage.startsWith('data:')
+                      ? profileImage
+                      : (profileImage.includes('?') ? `${profileImage}&t=${Date.now()}` : `${profileImage}?t=${Date.now()}`)
+                  }
+                  alt="Profile"
+                  fill
+                  className="object-cover"
+                />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-neutral-300">
                   <FaUser size={60} />
                 </div>
               )}
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm cursor-pointer"
-              >
+              {/* input을 감싸는 label로 변경: 클릭 안정성 확보 */}
+              <label className="absolute inset-0 z-10 bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm cursor-pointer">
                 <FaCamera size={30} className="text-white mb-2" />
-                <span className="text-[10px] font-bold text-white uppercase tracking-widest">Update Visual</span>
-              </button>
+                <span className="text-[10px] font-bold text-white uppercase tracking-widest text-center">Update Visual</span>
+                <input
+                  type="file"
+                  onChange={handleImageChange}
+                  className="hidden"
+                  accept="image/*"
+                />
+              </label>
             </div>
 
             {isImageChanged && (
@@ -197,13 +246,7 @@ export default function MemberInfo() {
             )}
           </div>
 
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleImageChange}
-            className="hidden"
-            accept="image/*"
-          />
+
 
           <div className="p-6 rounded-3xl bg-neutral-50 dark:bg-neutral-900/50 border border-neutral-100 dark:border-white/5 space-y-4">
             <div className="flex flex-col gap-1">
@@ -318,9 +361,80 @@ export default function MemberInfo() {
           className="group flex items-center gap-4 px-8 py-4 rounded-2xl border border-red-100 dark:border-red-900/20 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all active:scale-95"
         >
           <FaTrash size={14} className="group-hover:animate-bounce" />
-          <span className="text-[10px] font-black uppercase tracking-[0.3em]">Withdraw Membership</span>
+          <span className="text-[10px] font-black uppercase tracking-[0.3em]">Withdraw</span>
         </button>
       </div>
+
+      {/* 회원 탈퇴 모달 (Withdrawal Modal) */}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/60 backdrop-blur-md animate-in fade-in">
+          <div className="w-full max-w-md bg-white dark:bg-neutral-900 rounded-[2.5rem] shadow-2xl border border-neutral-100 dark:border-white/5 overflow-hidden animate-in zoom-in-95 duration-300">
+            <div className="p-8 space-y-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 rounded-2xl bg-red-500 text-white shadow-lg shadow-red-500/20">
+                    <FaTrash size={14} />
+                  </div>
+                  <h2 className="text-xl font-normal italic text-neutral-900 dark:text-white">Security Verification</h2>
+                </div>
+                <button
+                  onClick={() => setIsDeleteModalOpen(false)}
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                >
+                  <FaXmark size={18} />
+                </button>
+              </div>
+
+              <div className="space-y-2">
+                <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest">Withdrawal Protocol Initiation</p>
+                <p className="text-xs text-neutral-500">To proceed with account withdrawal, please verify your credentials. This action is irreversible.</p>
+              </div>
+
+              <form onSubmit={submitWithdraw} className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest ml-1">Curator ID</label>
+                  <input
+                    type="text"
+                    value={withdrawId}
+                    onChange={(e) => setWithdrawId(e.target.value)}
+                    required
+                    className="w-full px-5 py-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-white/5 outline-none focus:border-red-500 transition-all text-sm font-bold tracking-widest"
+                    placeholder="Enter ID"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest ml-1">Security Key</label>
+                  <input
+                    type="password"
+                    value={withdrawPassword}
+                    onChange={(e) => setWithdrawPassword(e.target.value)}
+                    required
+                    className="w-full px-5 py-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-white/5 outline-none focus:border-red-500 transition-all text-sm font-bold tracking-widest"
+                    placeholder="Enter Password"
+                  />
+                </div>
+
+                <div className="pt-4 flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setIsDeleteModalOpen(false)}
+                    className="flex-1 py-4 rounded-2xl bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 text-[10px] font-bold uppercase tracking-widest hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-all"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="flex-2 py-4 rounded-2xl bg-red-500 text-white text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-red-500/20 hover:bg-red-600 transition-all disabled:opacity-50"
+                  >
+                    {isSubmitting ? 'Terminating...' : 'Confirm Withdrawal'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

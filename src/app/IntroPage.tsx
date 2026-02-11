@@ -57,7 +57,7 @@ export default function IntroPage() {
 
           {/* 하이엔드 텍스트 그라데이션 수정: px-16 및 tracking-normal로 글자 잘림을 완벽히 방지 */}
           <h2 className="mb-12 bg-linear-to-b from-white to-violet-200 bg-clip-text font-serif text-[12vw] leading-none italic tracking-normal text-transparent md:text-[10vw] px-20 block">
-            Curated <br /> Intelligence
+            Santa <br /> Clothes
           </h2>
 
           <p className="mx-auto max-w-md text-sm font-light uppercase leading-relaxed tracking-widest text-neutral-400">
