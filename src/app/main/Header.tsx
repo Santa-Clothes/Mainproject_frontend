@@ -3,15 +3,14 @@
 import { useState, useRef, useEffect } from 'react';
 import {
   FaHouse,
-  FaMicrochip,
   FaArrowRightFromBracket,
-  FaChevronDown,
   FaGear,
   FaArrowRight,
   FaChartLine,
   FaSun,
   FaMoon,
-  FaUser
+  FaUser,
+  FaShirt
 } from 'react-icons/fa6';
 import { IoSettingsSharp } from "react-icons/io5";
 
@@ -20,6 +19,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAtom } from 'jotai';
 import { authUserAtom } from '@/jotai/loginjotai';
 import { logoutAPI } from '../api/memberService/memberapi';
+import Image from 'next/image';
+import Wizard from '@/assets/wizard.svg';
 
 /**
  * Header Component
@@ -102,9 +103,9 @@ export default function Header() {
 
   // 네비게이션 아이템 정의
   const navItems = [
-    { id: 'home', label: 'Overview', icon: <FaHouse size={12} />, path: '/main' },
-    { id: 'studio', label: 'Studio', icon: <FaMicrochip size={12} />, path: '/main/studio' },
-    { id: 'dashboard', label: 'Dashboard', icon: <FaChartLine size={12} />, path: '/main/dashboard' },
+    { id: 'home', label: 'Overview', icon: <FaHouse size={20} />, path: '/main' },
+    { id: 'studio', label: 'Studio', icon: <FaShirt size={20} />, path: '/main/studio' },
+    { id: 'dashboard', label: 'Dashboard', icon: <FaChartLine size={20} />, path: '/main/dashboard' },
   ];
 
   return (
@@ -112,10 +113,11 @@ export default function Header() {
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 md:gap-0">
 
         {/* 1. 좌측: 브랜드 로고 및 메인 네비게이션 */}
-        <div className="flex items-center bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl p-1.5 rounded-full border border-neutral-200 dark:border-white/5 shadow-xl">
-          <Link href="/" className="flex flex-col items-center px-6 py-1 hover:opacity-70 transition-opacity">
-            <h1 className="text-[10px] sm:text-lg md:text-xl lg:text-2xl font-sans font-black tracking-widest sm:tracking-[0.4em] uppercase text-neutral-900 dark:text-white leading-none transition-all">
-              Wizard of Ounce
+        <div className="flex items-center bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl p-1.5 rounded-full border-2 border-neutral-100 dark:border-white/10 shadow-xl">
+          <Link href="/" className="flex flex-row gap-2 items-center px-6 py-1 hover:opacity-70 transition-opacity">
+            <Image src={Wizard} alt="Logo" width={50} height={50} />
+            <h1 className="hidden sm:block text-[10px] sm:text-lg md:text-xl lg:text-2xl font-sans font-black tracking-widest sm:tracking-[0.4em] uppercase text-neutral-900 dark:text-white leading-none transition-all">
+              <span className="text-yellow-400"> Wizard</span> of <span className='text-purple-700'>Ounce</span>
             </h1>
           </Link>
 
@@ -141,8 +143,8 @@ export default function Header() {
         {/* 2. 우측: 통합 설정 및 유저 프로필 (연결된 캡슐 형태) */}
         <div className="relative self-end md:self-auto" ref={profileRef}>
           <div className={`flex items-center p-1 rounded-full border transition-all shadow-lg backdrop-blur-xl ${isProfileOpen
-            ? 'bg-violet-50 dark:bg-violet-900/20 border-violet-300 dark:border-violet-700'
-            : 'bg-white/80 dark:bg-neutral-900/80 border-neutral-200 dark:border-white/5'
+            ? 'bg-violet-50 dark:bg-violet-900/20 border-2 border-violet-300 dark:border-violet-700'
+            : 'bg-white/80 dark:bg-neutral-900/80 border-2 border-neutral-100 dark:border-white/10'
             }`}>
 
             {/* 로그인 상태인 경우 프로필 정보를 버튼 내측 왼쪽에 표시 */}
@@ -165,7 +167,7 @@ export default function Header() {
                   <span className={`text-[10px] font-black leading-none uppercase tracking-wider ${isProfileOpen ? 'text-violet-700 dark:text-violet-300' : 'text-neutral-900 dark:text-white'}`}>
                     {authInfo.name}
                   </span>
-                  <span className="text-[6px] font-bold text-violet-500 uppercase tracking-widest mt-0.5">Member</span>
+                  {/* <span className="text-[6px] font-bold text-violet-500 uppercase tracking-widest mt-0.5">Member</span> */}
                 </div>
                 {/* 캡슐 내 구분선 */}
                 <div className="w-px h-4 bg-neutral-200 dark:bg-white/10 mx-1" />
@@ -186,7 +188,7 @@ export default function Header() {
 
           {/* 통합 설정 드롭다운 메뉴 */}
           {isProfileOpen && (
-            <div className="absolute top-full right-0 mt-4 w-64 bg-white/95 dark:bg-neutral-950/95 backdrop-blur-2xl rounded-3xl shadow-2xl overflow-hidden z-50 border border-neutral-100 dark:border-white/5 animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-200">
+            <div className="absolute top-full right-0 mt-4 w-64 bg-white/95 dark:bg-neutral-950/95 backdrop-blur-2xl rounded-3xl shadow-2xl overflow-hidden z-50 border-2 border-neutral-100 dark:border-white/10 animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-200">
 
               {/* 테마 설정 섹션 */}
               <div className="p-5 border-b border-neutral-100 dark:border-white/5 bg-neutral-50/50 dark:bg-white/5">

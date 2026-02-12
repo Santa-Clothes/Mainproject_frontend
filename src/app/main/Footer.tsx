@@ -9,7 +9,7 @@ export default function Footer() {
       2. bg-neutral-100/50: 라이트모드에서 배경 대비를 더 명확히 함
       3. dark:bg-black: 다크모드에서 확실히 더 깊은 검정색으로 분리
     */
-    <footer className="relative border-t border-neutral-200 bg-neutral-100/50 px-8 pt-10 pb-5 text-neutral-900 transition-colors duration-500 dark:border-white/5 dark:bg-black dark:text-white">
+    <footer className="relative border-t-2 border-neutral-200 bg-neutral-100/50 px-8 pt-10 pb-5 text-neutral-900 transition-colors duration-500 dark:border-white/10 dark:bg-black dark:text-white">
 
       {/* Footer Ambient Light: 크기를 줄여 영역 침범 최소화 */}
       <div className="pointer-events-none absolute right-0 bottom-0 h-64 w-64 rounded-full bg-violet-600/5 blur-[100px] dark:bg-violet-600/10" />
@@ -24,13 +24,12 @@ export default function Footer() {
               <h2 className="font-sans text-xl font-black uppercase tracking-[0.4em] text-neutral-900 transition-colors group-hover:text-violet-600 dark:text-white dark:group-hover:text-violet-400">
                 WIZARD of OUNCE
               </h2>
-              <span className="mt-1.5 text-[7px] font-bold uppercase tracking-[0.5em] text-violet-500 dark:text-violet-800">
-                The Neural Fashion Archive
+              <span className="mt-1.5 text-[8px] font-bold uppercase tracking-[0.5em] text-violet-500 dark:text-violet-600">
+                The AI Fashion Archive
               </span>
             </Link>
             <p className="max-w-xs font-light text-xs italic leading-relaxed text-neutral-500 dark:text-neutral-400">
-              Curating the future by indexing the aesthetic DNA of the past. <br />
-              A high-fidelity interface for archive management.
+              의류 이미지를 AI로 분석하여 새로운 제품을 추천해주는 서비스 입니다.
             </p>
           </div>
 
@@ -53,21 +52,21 @@ export default function Footer() {
 
         </div>
 
-        <div className="flex flex-col items-center justify-between gap-4 border-t border-neutral-200 pt-4 dark:border-white/5 md:flex-row">
+        <div className="flex flex-col items-center justify-between gap-4 border-t-2 border-neutral-200 pt-4 dark:border-white/10 md:flex-row">
           <div className="flex items-center gap-8">
-            <span className="text-[8px] font-bold uppercase tracking-[0.4em] text-neutral-400 dark:text-violet-900/60">
+            <span className="text-[8px] font-bold uppercase tracking-[0.4em] text-neutral-400 dark:text-violet-200/60">
               © 2026 Santa Clothes
             </span>
             <div className="flex items-center gap-4">
               <div className="h-1 w-1 animate-pulse rounded-full bg-violet-600"></div>
-              <span className="text-[8px] font-bold uppercase tracking-[0.4em] text-neutral-400 dark:text-violet-900/60">
+              {/* <span className="text-[8px] font-bold uppercase tracking-[0.4em] text-neutral-400 dark:text-violet-900/60">
                 temp
-              </span>
+              </span> */}
             </div>
           </div>
-          <div className="text-[8px] font-bold uppercase tracking-[0.4em] text-neutral-400 dark:text-violet-950">
+          {/* <div className="text-[8px] font-bold uppercase tracking-[0.4em] text-neutral-400 dark:text-violet-950">
             temp
-          </div>
+          </div> */}
         </div>
       </div>
     </footer>

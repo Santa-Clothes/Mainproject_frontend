@@ -27,7 +27,7 @@ export default function MainPage() {
         {/* Card 1: Archive Studio */}
         <Link
           href="/main/studio"
-          className="lg:col-span-2 group relative h-[560px] bg-neutral-900 rounded-[3rem] overflow-hidden border border-neutral-200 dark:border-white/5 transition-shadow hover:shadow-xl"
+          className="lg:col-span-2 group relative h-[560px] bg-neutral-900 rounded-[3rem] overflow-hidden border-2 border-neutral-100 dark:border-white/10 transition-shadow hover:shadow-xl"
         >
           <div className="absolute inset-0 bg-neutral-900 overflow-hidden">
             <Image
@@ -53,7 +53,7 @@ export default function MainPage() {
             </div>
             {/* transition-all은 기본 제공 클래스입니다. */}
             <div className="flex items-center gap-6 text-[11px] font-bold text-white uppercase tracking-widest transition-all group-hover:gap-10">
-              Initialize Engine <FaArrowRight className="text-violet-400 transition-transform group-hover:translate-x-2" />
+              Initialize Recommender <FaArrowRight className="text-violet-400 transition-transform group-hover:translate-x-2" />
             </div>
           </div>
         </Link>
@@ -62,7 +62,7 @@ export default function MainPage() {
         <Link
           href="/main/statistics"
           suppressHydrationWarning
-          className="relative flex flex-col justify-between overflow-hidden rounded-[3rem] border border-neutral-200 bg-white p-10 dark:border-white/5 dark:bg-neutral-900/50 md:p-14 group shadow-sm transition-[border-color,box-shadow,transform] duration-300 hover:border-violet-500/40"
+          className="relative flex flex-col justify-between overflow-hidden rounded-[3rem] border-2 border-neutral-100 bg-white p-10 dark:border-white/10 dark:bg-neutral-900/50 md:p-14 group shadow-sm transition-[border-color,box-shadow,transform] duration-300 hover:border-violet-500/40"
         >
           <div className="relative z-10 space-y-12">
             <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-violet-600 shadow-lg group-hover:bg-violet-500">

@@ -35,40 +35,30 @@ const DashboardCard: React.FC<Props> = ({
     const colSpanClass = lgColSpan === 2 ? 'lg:col-span-2' : lgColSpan === 3 ? 'lg:col-span-3' : '';
 
     return (
-        <div className={`${colSpanClass} bg-white dark:bg-neutral-900/50 rounded-3xl border border-neutral-200 dark:border-white/5 p-7 flex flex-col shadow-sm transition-colors relative overflow-hidden ${className}`}>
+        <div className={`${colSpanClass} bg-white dark:bg-neutral-900/50 rounded-3xl border-2 border-neutral-100 dark:border-white/10 p-7 flex flex-col shadow-sm transition-colors relative overflow-hidden ${className}`}>
             {isMetric ? (
-                <>
-                    {/* [Metric Mode] 3단 수직 분할 레이아웃: 상단(소제목), 중앙(제목), 하단(컨텐츠) */}
-                    <div className="flex justify-between items-center relative z-10">
+                /* [Metric Mode Header] 소제목과 아이콘만 상단에 고정 */
+                <div className="flex justify-between items-center relative z-10">
+                    <span className="text-[9px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-[0.4em]">{subtitle}</span>
+                    {topRight}
+                </div>
+            ) : (
+                /* [Standard Mode Header] 소제목, 제목, 아이콘 포함 */
+                <div className="flex justify-between items-start relative z-10 mb-6">
+                    <div className="space-y-3">
                         <span className="text-[9px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-[0.4em]">{subtitle}</span>
-                        {topRight}
-                    </div>
-
-                    <div className="relative z-10 flex-1 flex flex-col justify-center py-2">
                         <h3 className="text-5xl font-serif italic text-black dark:text-white tracking-tight flex items-center gap-3">
                             {title}
                         </h3>
                     </div>
-                </>
-            ) : (
-                <>
-                    {/* [Standard Mode] 일반 레이아웃: 소제목과 제목이 하나로 묶인 헤더 */}
-                    <div className="flex justify-between items-start relative z-10 mb-6">
-                        <div className="space-y-3">
-                            <span className="text-[9px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-[0.4em]">{subtitle}</span>
-                            <h3 className="text-5xl font-serif italic text-black dark:text-white tracking-tight flex items-center gap-3">
-                                {title}
-                            </h3>
-                        </div>
-                        {topRight}
-                    </div>
-                </>
+                    {topRight}
+                </div>
             )}
 
             {/* 카드 콘텐츠 영역: 에러/로딩/컨텐츠 통합 관리 */}
             <div className="relative z-10 flex-1 flex flex-col">
                 {error ? (
-                    <div className="flex-1 flex flex-col items-center justify-center py-4 space-y-4 animate-in fade-in zoom-in duration-300">
+                    <div className="flex-1 flex flex-col items-center justify-center py-4 space-y-4 animate-in fade-in duration-300">
                         <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 mb-2">
                             <FaTriangleExclamation size={20} />
                         </div>
@@ -81,14 +71,29 @@ const DashboardCard: React.FC<Props> = ({
                         </button>
                     </div>
                 ) : isLoading ? (
-                    <div className="flex-1 flex flex-col items-center justify-center py-2 space-y-2 animate-in fade-in duration-500">
-                        <div className="w-8 h-8 rounded-full bg-violet-500/10 flex items-center justify-center text-violet-500 animate-spin">
-                            <FaArrowsRotate size={14} />
+                    <div className={`flex-1 flex items-center justify-center relative animate-in fade-in duration-500 ${isMetric ? 'min-h-25' : 'min-h-40'}`}>
+                        <div className="relative flex flex-col items-center">
+                            {/* StyleDistributionCard 스타일의 맥동하는 원형 배경 */}
+                            <div className={`relative ${isMetric ? 'w-20 h-20' : 'w-32 h-32'} flex items-center justify-center`}>
+                                <div className="absolute inset-0 rounded-full border-4 border-gray-100 dark:border-neutral-800 animate-pulse"></div>
+                                <div className="text-violet-500 animate-spin">
+                                    <FaArrowsRotate size={isMetric ? 18 : 24} />
+                                </div>
+                            </div>
+                            {!isMetric && (
+                                <p className="mt-4 text-[8px] font-bold text-violet-400 uppercase tracking-[0.2em] animate-pulse">Synchronizing Data...</p>
+                            )}
                         </div>
-                        <p className="text-[8px] font-bold text-violet-400 uppercase tracking-[0.2em] animate-pulse">Synchronizing...</p>
                     </div>
                 ) : (
                     <div className="flex-1 flex flex-col">
+                        {isMetric && (
+                            <div className="relative z-10 flex-1 flex flex-col justify-center py-2">
+                                <h3 className="text-5xl font-serif italic text-black dark:text-white tracking-tight flex items-center gap-3">
+                                    {title}
+                                </h3>
+                            </div>
+                        )}
                         {children}
                     </div>
                 )}

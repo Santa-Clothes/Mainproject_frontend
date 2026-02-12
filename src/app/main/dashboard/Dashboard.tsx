@@ -2,23 +2,19 @@
 
 import { useState, useEffect } from 'react';
 import {
-  FaArrowUp,
-  FaArrowDown,
   FaTags,
-  FaGem,
   FaWaveSquare,
-  FaBolt,
   FaArrowsRotate,
   FaBoxesStacked
 } from 'react-icons/fa6';
 import SearchRankCard from './components/SearchRankCard';
-import AestheticDistributionCard from './components/AestheticDistributionCard';
+import StyleDistributionCard from './components/StyleDistributionCard';
 import BestSellersCard from './components/BestSellersCard';
 import DashboardCard from './components/DashboardCard';
 import { getShoppingTrends } from '@/app/api/trendService/trendapi';
 import { getSalesRanking, SalesRankItem } from '@/app/api/salesService/salesapi';
 import TSNEPlot from './components/TSNEPlot';
-import { getNaverProductList, getProductList } from '@/app/api/productService/productapi';
+import { getInternalProductCount, getNaverProductCount } from '@/app/api/productService/productapi';
 import { SiNaver } from "react-icons/si";
 
 
@@ -105,8 +101,8 @@ export default function Dashboard({
     setIsLoadingInternalProductCount(true);
     setErrorInternalProductCount(null);
     try {
-      const result = await getProductList();
-      setInternalProductCount(result.length);
+      const result = await getInternalProductCount();
+      setInternalProductCount(result);
     } catch (err) {
       console.error('Failed to fetch product count:', err);
       setErrorInternalProductCount('Connection Failed');
@@ -122,8 +118,8 @@ export default function Dashboard({
     setIsLoadingNaverProductCount(true);
     setErrorNaverProductCount(null);
     try {
-      const result = await getNaverProductList();
-      setNaverProductCount(result.length);
+      const result = await getNaverProductCount();
+      setNaverProductCount(result);
     } catch (err) {
       console.error('Failed to fetch product count:', err);
       setErrorNaverProductCount('Connection Failed');
@@ -209,12 +205,12 @@ export default function Dashboard({
       value: naverProductCount,
       sub: 'Total Products',
       icon: <SiNaver size={12} />,
-      color: 'green',
+      color: 'violet',
       isLoading: isLoadingNaverProductCount,
       error: errorNaverProductCount,
       onRetry: () => fetchNaverProductCount(true)
     },
-    { label: 'Curation Rate', value: '820/d', sub: '-4% from avg', icon: <FaWaveSquare />, color: 'black', isLoading: false, error: null },
+    { label: 'Curation Rate', value: '820/d', sub: '-4% from avg', icon: <FaWaveSquare />, color: 'violet', isLoading: false, error: null },
     { label: 'Active Metadata', value: '45.2K', sub: 'Optimal indexing', icon: <FaTags />, color: 'violet', isLoading: false, error: null },
   ];
 
@@ -227,17 +223,8 @@ export default function Dashboard({
             key={i}
             isMetric={true}
             subtitle={metric.label}
-            title={
-              metric.isLoading ? (
-                <div className="flex items-center gap-3">
-                  <span className="opacity-20 translate-y-1">---</span>
-                  <FaArrowsRotate size={18} className="text-violet-500/40 animate-spin" />
-                </div>
-              ) : (
-                String(metric.value)
-              )
-            }
-            isLoading={false} // 카드 전체 로딩 대신 제목(Title) 내에서 로딩 처리
+            title={metric.value}
+            isLoading={metric.isLoading}
             error={metric.error}
             onRetry={metric.onRetry || (() => { })}
             lgColSpan={1}
@@ -259,8 +246,8 @@ export default function Dashboard({
         {/* 1열: 사용자 검색 순위 리스트 (ColSpan: 1) */}
         <SearchRankCard trends={data as any} isLoading={isLoading} error={error} onRetry={() => fetchData(true)} />
 
-        {/* 2-3열: 미적 분포(Aesthetic Distribution) 레이더 차트 (ColSpan: 2) */}
-        <AestheticDistributionCard data={data} isLoading={isLoading} error={error} onRetry={() => fetchData(true)} />
+        {/* 2-3열: 미적 분포(Style Distribution) 레이더 차트 (ColSpan: 2) */}
+        <StyleDistributionCard data={data} isLoading={isLoading} error={error} onRetry={() => fetchData(true)} />
 
         {/* 4열: 베스트 셀러 상품 랭킹 바 차트 (ColSpan: 1) */}
         <BestSellersCard sales={sales} isLoading={isLoadingSales} error={errorSales} onRetry={() => fetchSales(true)} />

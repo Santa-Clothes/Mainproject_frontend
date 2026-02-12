@@ -11,10 +11,10 @@ export default function DashboardPage() {
         </div>
         <div className="flex justify-between items-end">
           <h2 className="text-6xl font-serif italic tracking-tighter">Insights Archive</h2>
-          <div className="text-right">
+          {/* <div className="text-right">
             <p className="text-[10px] font-bold text-black uppercase tracking-[0.3em]">Neural Engine Sync</p>
             <p className="text-[8px] font-bold text-gray-300 uppercase tracking-[0.3em] mt-1">High-Fidelity Interface</p>
-          </div>
+          </div> */}
         </div>
       </div>
 

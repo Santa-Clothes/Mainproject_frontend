@@ -26,6 +26,7 @@ const SearchRankCard: React.FC<Props> = ({ trends, isLoading, error, onRetry }) 
         <DashboardCard
             title="Search Rank"
             subtitle="Top 5 Trends"
+            isLoading={isLoading}
             error={error}
             onRetry={onRetry}
             lgColSpan={1}
@@ -38,43 +39,28 @@ const SearchRankCard: React.FC<Props> = ({ trends, isLoading, error, onRetry }) 
             }
         >
             <div className="flex flex-col h-full space-y-2">
-                {isLoading ? (
-                    /* 로딩 중: 스켈레톤 행 표시 */
-                    Array.from({ length: 5 }).map((_, i) => (
-                        <div key={i} className="flex items-center p-2 rounded-2xl bg-gray-50/50 dark:bg-neutral-800/20 animate-pulse">
-                            <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 bg-gray-100 dark:bg-neutral-700 rounded-xl"></div>
-                                <div className="space-y-1">
-                                    <div className="h-2 w-24 bg-gray-100 dark:bg-neutral-700 rounded-full"></div>
-                                    <div className="h-1.5 w-16 bg-gray-50 dark:bg-neutral-800 rounded-full"></div>
-                                </div>
+                {/* 분석 완료: 검색 순위 리스트 표시 (수치 제외) */}
+                {trends.slice(0, 5).map((trend, i) => (
+                    <div
+                        key={i}
+                        className="flex items-center p-2 rounded-2xl border border-neutral-100 dark:border-white/5 bg-white dark:bg-neutral-900/10 hover:border-violet-300 dark:hover:border-violet-800 transition-all hover:translate-x-1 group shadow-sm"
+                    >
+                        <div className="flex items-center gap-2">
+                            {/* 순위 인덱스 */}
+                            <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-normal italic text-sm shadow-sm transition-colors bg-violet-600 text-white`}>
+                                {i + 1}
                             </div>
-                        </div>
-                    ))
-                ) : (
-                    /* 분석 완료: 검색 순위 리스트 표시 (수치 제외) */
-                    trends.slice(0, 5).map((trend, i) => (
-                        <div
-                            key={i}
-                            className="flex items-center p-2 rounded-2xl border border-neutral-100 dark:border-white/5 bg-white dark:bg-neutral-900/10 hover:border-violet-300 dark:hover:border-violet-800 transition-all hover:translate-x-1 group shadow-sm"
-                        >
-                            <div className="flex items-center gap-2">
-                                {/* 순위 인덱스 */}
-                                <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-normal italic text-sm shadow-sm transition-colors bg-violet-600 text-white`}>
-                                    {i + 1}
-                                </div>
 
-                                {/* 스타일 명칭 */}
-                                <div className="flex flex-col">
-                                    <span className="text-[11px] font-bold text-neutral-900 dark:text-white uppercase tracking-widest group-hover:text-violet-600 transition-colors">
-                                        {trend?.style || 'Analysis Pending'}
-                                    </span>
-                                    {/* <span className="text-[10px] font-medium text-gray-400 uppercase tracking-tighter">Style DNA Matrix</span> */}
-                                </div>
+                            {/* 스타일 명칭 */}
+                            <div className="flex flex-col">
+                                <span className="text-[11px] font-bold text-neutral-900 dark:text-white uppercase tracking-widest group-hover:text-violet-600 transition-colors">
+                                    {trend?.style || 'Analysis Pending'}
+                                </span>
+                                {/* <span className="text-[10px] font-medium text-gray-400 uppercase tracking-tighter">Style DNA Matrix</span> */}
                             </div>
                         </div>
-                    ))
-                )}
+                    </div>
+                ))}
             </div>
         </DashboardCard>
     );

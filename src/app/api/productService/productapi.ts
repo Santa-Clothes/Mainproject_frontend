@@ -83,3 +83,47 @@ export const getNaverProductList = async (): Promise<ProductData[]> => {
         return [];
     }
 }
+
+export const getNaverProductCount = async (): Promise<number> => {
+    try {
+        const response = await fetch(`${BASEURL}/api/products/naver-count`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            console.error(`서버 에러: ${response.status}`);
+            return 0;
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("getRecommendList error:", error);
+        return 0;
+    }
+}
+
+export const getInternalProductCount = async (): Promise<number> => {
+    try {
+        const response = await fetch(`${BASEURL}/api/products/internal-count`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            console.error(`서버 에러: ${response.status}`);
+            return 0;
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("getRecommendList error:", error);
+        return 0;
+    }
+}

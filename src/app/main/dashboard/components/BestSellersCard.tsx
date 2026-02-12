@@ -65,40 +65,28 @@ const BestSellersCard: React.FC<Props> = ({ sales, isLoading, error, onRetry }) 
             }
         >
             <div className="flex flex-col h-full space-y-4">
-                {isLoading ? (
-                    Array.from({ length: 5 }).map((_, i) => (
-                        <div key={i} className="space-y-2 animate-pulse">
-                            <div className="flex justify-between items-center">
-                                <div className="h-2 w-20 bg-gray-100 rounded-full"></div>
-                                <div className="h-2 w-8 bg-gray-50 rounded-full"></div>
-                            </div>
-                            <div className="h-1.5 w-full bg-gray-50 rounded-full"></div>
-                        </div>
-                    ))
-                ) : (
-                    aggregatedData.map((item, i) => (
-                        <div key={item.shortName} className="space-y-1.5 group">
-                            <div className="flex justify-between items-end">
-                                <div className="flex items-center gap-2">
-                                    <span className={`text-[12px] italic text-violet-600 font-bold`}>0{i + 1}</span>
-                                    <span className="text-[11px] font-bold text-black dark:text-white uppercase tracking-tight truncate max-w-28 group-hover:text-violet-500 transition-colors">
-                                        {item.shortName}
-                                    </span>
-                                </div>
-                                <span className="text-[12px] font-black text-violet-600 tracking-tighter">
-                                    {item.quantity.toLocaleString()}
+                {aggregatedData.map((item, i) => (
+                    <div key={item.shortName} className="space-y-1.5 group">
+                        <div className="flex justify-between items-end">
+                            <div className="flex items-center gap-2">
+                                <span className={`text-[12px] italic text-violet-600 font-bold`}>0{i + 1}</span>
+                                <span className="text-[11px] font-bold text-black dark:text-white uppercase tracking-tight truncate max-w-28 group-hover:text-violet-500 transition-colors">
+                                    {item.shortName}
                                 </span>
                             </div>
-                            {/* 가로형 커스텀 바 가시화 */}
-                            <div className="h-1.5 w-full bg-gray-50 dark:bg-white/5 rounded-full overflow-hidden">
-                                <div
-                                    className={`h-full rounded-full transition-all duration-1000 bg-violet-600`}
-                                    style={{ width: `${(item.quantity / (aggregatedData[0]?.quantity || 1)) * 100}%` }}
-                                ></div>
-                            </div>
+                            <span className="text-[12px] font-black text-violet-600 tracking-tighter">
+                                {item.quantity.toLocaleString()}
+                            </span>
                         </div>
-                    ))
-                )}
+                        {/* 가로형 커스텀 바 가시화 */}
+                        <div className="h-1.5 w-full bg-gray-50 dark:bg-white/5 rounded-full overflow-hidden">
+                            <div
+                                className={`h-full rounded-full transition-all duration-1000 bg-violet-600`}
+                                style={{ width: `${(item.quantity / (aggregatedData[0]?.quantity || 1)) * 100}%` }}
+                            ></div>
+                        </div>
+                    </div>
+                ))}
             </div>
         </DashboardCard>
     );

@@ -30,7 +30,7 @@ export default function ProductCard({ product, index = 0, selected = false, onCl
         >
             {/* 1. 이미지 컨테이너 */}
             <div className={`aspect-3/4 overflow-hidden rounded-3xl bg-white dark:bg-neutral-900/50 border-2 relative shadow-sm transition-all
-                ${selected ? 'border-violet-600 ring-4 ring-violet-600/10 shadow-2xl' : 'border-neutral-200 dark:border-white/5 group-hover:border-violet-200'}`}>
+                ${selected ? 'border-violet-600 ring-4 ring-violet-600/10 shadow-2xl' : 'border-neutral-100 dark:border-white/15 group-hover:border-violet-200'}`}>
                 <Image
                     src={product.imageUrl}
                     alt={product.title}

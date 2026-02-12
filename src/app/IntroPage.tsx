@@ -2,6 +2,7 @@ import React from 'react';
 import { FaArrowRight } from 'react-icons/fa6';
 import Link from 'next/link';
 import Image from 'next/image';
+import Wizard from '@/assets/wizard.svg';
 
 /**
  * [IntroPage]
@@ -44,9 +45,10 @@ export default function IntroPage() {
 
         {/* Header 영역 */}
         <header className="mx-auto flex w-full max-w-7xl items-center justify-between border-b border-white/10 pb-6 opacity-80">
-          <div className="text-[10px] font-bold uppercase tracking-[0.4em] opacity-40">Issue No. 001</div>
-          <h1 className="font-sans text-xl font-black tracking-[0.5em] text-white transition-opacity hover:opacity-80">ATELIER</h1>
-          <div className="text-[10px] font-bold uppercase tracking-[0.4em] opacity-40">2026 Archive</div>
+          {/* <div className="text-[10px] font-bold uppercase tracking-[0.4em] opacity-40">Issue No. 001</div>
+          <h1 className="font-sans text-xl font-black tracking-[0.5em] text-white transition-opacity hover:opacity-80">
+            <Image src={Wizard} alt="Logo" width={50} height={50} /></h1>
+          <div className="text-[10px] font-bold uppercase tracking-[0.4em] opacity-40">2026 Archive</div> */}
         </header>
 
         {/* Hero Section: 고정된 다크 스타일 타이포그래피 */}
@@ -79,11 +81,7 @@ export default function IntroPage() {
 
         {/* Footer 영역 */}
         <footer className="mx-auto flex w-full max-w-7xl items-end justify-between opacity-30">
-          <div className="text-[8px] font-bold uppercase tracking-[0.4em]">© 2026 ATELIER Studio</div>
-          <div className="flex gap-12 text-[10px] font-bold uppercase tracking-[0.4em]">
-            <span className="cursor-pointer hover:text-violet-400 transition-colors">Vision</span>
-            <span className="cursor-pointer hover:text-violet-400 transition-colors">Protocol</span>
-          </div>
+          <div className="text-[8px] font-bold uppercase tracking-[0.4em]">© 2026 Wizard of Ounce</div>
         </footer>
       </div>
     </main>

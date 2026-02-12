@@ -87,7 +87,7 @@ export default function UploadPanel({ onResultFound, onAnalysisStart, onAnalysis
             /* 파일 선택 전: 드롭존 형태의 UI */
             <div
               onClick={() => fileInputRef.current?.click()}
-              className="group aspect-square lg:aspect-video border-2 border-dashed border-neutral-200 dark:border-white/5 rounded-[2.5rem] flex flex-col items-center justify-center gap-6 cursor-pointer hover:border-violet-400 dark:hover:border-violet-500 transition-all bg-neutral-50/50 dark:bg-neutral-900/30 hover:bg-white dark:hover:bg-neutral-900/50 shadow-inner"
+              className="group aspect-square lg:aspect-video border-2 border-dashed border-neutral-200 dark:border-white/10 rounded-[2.5rem] flex flex-col items-center justify-center gap-6 cursor-pointer hover:border-violet-400 dark:hover:border-violet-500 transition-all bg-neutral-50/50 dark:bg-neutral-900/30 hover:bg-white dark:hover:bg-neutral-900/50 shadow-inner"
             >
               <div className="w-20 h-20 rounded-full bg-white dark:bg-neutral-900 shadow-xl flex items-center justify-center text-gray-400 group-hover:text-violet-600 group-hover:scale-110 transition-all duration-500">
                 <FaCloudArrowUp size={32} />
@@ -134,11 +134,11 @@ export default function UploadPanel({ onResultFound, onAnalysisStart, onAnalysis
             className="w-full py-6 bg-violet-600 text-white text-[11px] font-black uppercase tracking-[0.4em] rounded-full disabled:opacity-20 flex items-center justify-center gap-4 transition-all active:scale-[0.98] shadow-2xl shadow-violet-600/20 hover:bg-violet-500"
           >
             {isPending ? (
-              <span className="animate-pulse">Processing DNA Matrix...</span>
+              <span className="animate-pulse">Style 분석 중...</span>
             ) : (
               <>
                 <FaMagnifyingGlass size={14} />
-                <span>Initialize Analysis</span>
+                <span>Style 분석 시작</span>
               </>
             )}
           </button>
@@ -151,14 +151,14 @@ export default function UploadPanel({ onResultFound, onAnalysisStart, onAnalysis
             <div className="p-2.5 rounded-2xl bg-violet-600 text-white shadow-lg shadow-violet-600/20">
               <FaCircleInfo size={14} />
             </div>
-            <h2 className="text-xl font-normal italic text-neutral-900 dark:text-white">Upload Protocol</h2>
+            <h2 className="text-xl font-normal italic text-neutral-900 dark:text-white">이미지 업로드 유의사항</h2>
           </div>
 
           {/* Integrated Example & Specs */}
           <div className="space-y-4">
             <div className="flex gap-5">
               {/* Single Example Image Placeholder */}
-              <div className="w-32 h-32 flex-none rounded-4xl bg-neutral-100 dark:bg-neutral-800/50 border border-neutral-100 dark:border-white/5 overflow-hidden relative group/ex">
+              <div className="w-32 h-32 flex-none rounded-4xl bg-neutral-100 dark:bg-neutral-800/50 border-2 border-neutral-100 dark:border-white/10 overflow-hidden relative group/ex">
                 <div className="absolute inset-0 flex items-center justify-center text-neutral-300 dark:text-neutral-700">
                   <FaFileImage size={24} />
                 </div>
@@ -170,21 +170,21 @@ export default function UploadPanel({ onResultFound, onAnalysisStart, onAnalysis
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <div className="w-1 h-3 bg-violet-500 rounded-full" />
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-neutral-800 dark:text-neutral-200">Scale</h4>
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-neutral-800 dark:text-neutral-200">이미지 규격</h4>
                   </div>
                   <p className="text-[10px] text-neutral-500 dark:text-neutral-400 pl-3">Under 800x800px optimization.</p>
                 </div>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <div className="w-1 h-3 bg-violet-500 rounded-full" />
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-neutral-800 dark:text-neutral-200">Clarity</h4>
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-neutral-800 dark:text-neutral-200">이미지 형태</h4>
                   </div>
                   <p className="text-[10px] text-neutral-500 dark:text-neutral-400 pl-3">Centered & clear focus.</p>
                 </div>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <div className="w-1 h-3 bg-violet-500 rounded-full" />
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-neutral-800 dark:text-neutral-200">Size</h4>
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-neutral-800 dark:text-neutral-200">파일 크기</h4>
                   </div>
                   <p className="text-[10px] text-neutral-500 dark:text-neutral-400 pl-3">Under 10MB.</p>
                 </div>
@@ -192,7 +192,7 @@ export default function UploadPanel({ onResultFound, onAnalysisStart, onAnalysis
             </div>
 
             {/* Bottom Side Info */}
-            <div className="p-5 rounded-3xl border border-neutral-100 dark:border-white/5 bg-neutral-50/50 dark:bg-neutral-800/30 space-y-2">
+            <div className="p-5 rounded-3xl border-2 border-neutral-100 dark:border-white/10 bg-neutral-50/50 dark:bg-neutral-800/30 space-y-2">
               <h4 className="text-[10px] font-black uppercase tracking-widest text-neutral-800 dark:text-neutral-200">Formats & Quality</h4>
               <p className="text-[10px] text-neutral-500 dark:text-neutral-400 leading-relaxed">
                 Standard JPG/PNG with clean backgrounds ensures maximum DNA fidelity and matching accuracy.

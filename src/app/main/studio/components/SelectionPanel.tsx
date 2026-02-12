@@ -8,7 +8,7 @@ import ProductCard from './ProductCard';
 import { getProductList, getRecommendList } from '@/app/api/productService/productapi';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-interface DiscoveryPanelProps {
+interface SelectionPanelProps {
   onResultFound: (results: RecommendData[] | null, category?: string) => void;
   onAnalysisStart: (imgUrl: string, name?: string) => void;
   isPending: boolean;
@@ -19,12 +19,12 @@ interface DiscoveryPanelProps {
  * DiscoveryPanel: 카테고리별 상품을 탐색하고, 특정 상품을 선택하여 스타일 검색을 시작하는 컴포넌트
  * 무한 스크롤(가상화), 카테고리 필터링, 상품 선택 기능을 포함합니다.
  */
-export default function DiscoveryPanel({
+export default function SelectionPanel({
   onResultFound,
   onAnalysisStart,
   startTransition,
   isPending
-}: DiscoveryPanelProps) {
+}: SelectionPanelProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -184,13 +184,30 @@ export default function DiscoveryPanel({
           ) : (
             <div className="flex items-center justify-center gap-3">
               <FaMagnifyingGlass size={14} />
-              <span>Scan Selected Reference</span>
+              <span>Scan Selected Product</span>
             </div>
           )}
         </button>
       </div>
 
       {/* 2. 스크롤 영역: 상품 그리드 리스트 */}
+      <div className="flex items-center justify-between">
+        <span className="text-[9px] font-bold text-neutral-900 dark:text-white uppercase tracking-widest">
+          Category: <span className="font-extrabold normal-case text-xs text-violet-500">{selectedCat}</span>
+          <span className="ml-2 text-neutral-400 font-normal">({filteredProducts.length} items)</span>
+        </span>
+        {/* Data Insights Badges */}
+        <div className="flex flex-wrap gap-2.5">
+          <div className="px-4 py-2 flex flex-row items-center gap-2.5">
+            <FaCalendarDays size={10} className="text-violet-600 dark:text-violet-400" />
+            <span className="text-[8px] font-black text-violet-600 dark:text-violet-400 uppercase tracking-[0.2em]">Past 12 Months Analytics</span>
+          </div>
+          <div className="px-4 py-2 flex flex-row items-center gap-2.5">
+            <FaChartLine size={10} className="text-neutral-500 dark:text-neutral-400" />
+            <span className="text-[8px] font-black text-neutral-500 dark:text-neutral-400 uppercase tracking-[0.2em]">Ranked by Sales Momentum</span>
+          </div>
+        </div>
+      </div>
       <div
         onScroll={handleScroll}
         className="flex-1 overflow-y-auto pr-4 custom-scrollbar min-h-0 border-t border-neutral-200 dark:border-white/10"
@@ -205,27 +222,13 @@ export default function DiscoveryPanel({
           /* 상품 리스트 노출 */
           <div className="pt-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
             <div className="flex flex-col gap-4 pb-8">
-              <div className="flex items-center justify-between">
-                <span className="text-[9px] font-bold text-neutral-900 dark:text-white uppercase tracking-widest">
-                  Reference: <span className="font-extrabold normal-case text-xs text-violet-500">{selectedCat}</span>
-                  <span className="ml-2 text-neutral-400 font-normal">({filteredProducts.length} items)</span>
-                </span>
-                <button onClick={handleReset} className="text-neutral-300 hover:text-violet-600 transition-colors">
+              <div className="flex items-center justify-end">
+                <button onClick={handleReset} className="text-neutral-500 hover:text-violet-600 transition-colors">
                   <FaArrowRotateLeft size={14} />
                 </button>
               </div>
 
-              {/* Data Insights Badges */}
-              <div className="flex flex-wrap gap-2.5">
-                <div className="px-4 py-2 bg-violet-50 dark:bg-violet-900/20 rounded-full border border-violet-100 dark:border-violet-800/30 flex items-center gap-2.5 shadow-sm">
-                  <FaCalendarDays size={10} className="text-violet-600 dark:text-violet-400" />
-                  <span className="text-[8px] font-black text-violet-600 dark:text-violet-400 uppercase tracking-[0.2em]">Past 12 Months Analytics</span>
-                </div>
-                <div className="px-4 py-2 bg-neutral-50 dark:bg-neutral-800/50 rounded-full border border-neutral-100 dark:border-white/5 flex items-center gap-2.5 shadow-sm">
-                  <FaChartLine size={10} className="text-neutral-500 dark:text-neutral-400" />
-                  <span className="text-[8px] font-black text-neutral-500 dark:text-neutral-400 uppercase tracking-[0.2em]">Ranked by Sales Momentum</span>
-                </div>
-              </div>
+
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-10 pb-20">

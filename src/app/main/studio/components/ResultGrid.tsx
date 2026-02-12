@@ -55,7 +55,7 @@ const ResultGrid: React.FC<ResultGridProps> = ({
     return (
         <div className="flex flex-col h-full min-h-0">
             {/* 1. 고정 헤더 영역: 검색 통계 및 제목 */}
-            <div className="flex-none flex flex-col md:flex-row justify-between items-end gap-6 border-b border-neutral-100 dark:border-white/5 pb-6 mb-8">
+            <div className="flex-none flex flex-col md:flex-row justify-between items-end gap-6 border-b-2 border-neutral-100 dark:border-white/10 pb-6 mb-8">
                 <div className="space-y-2">
                     <div className="flex items-center gap-2 text-neutral-400 dark:text-neutral-500">
                         <FaLayerGroup size={10} className="text-violet-500" />
@@ -71,7 +71,7 @@ const ResultGrid: React.FC<ResultGridProps> = ({
                     <div className="flex items-center gap-3 rounded-full border border-violet-100 bg-violet-50 px-6 py-2.5 hover:bg-violet-600 hover:text-white dark:border-violet-800 dark:bg-violet-900/10 dark:hover:bg-violet-700 group shadow-sm transition-all">
                         <FaWaveSquare size={10} className="text-violet-400 group-hover:text-white animate-pulse" />
                         <span className="flex items-center gap-2 text-[8px] font-bold uppercase tracking-widest text-violet-700 group-hover:text-white dark:text-violet-400">
-                            DNA Similarity:
+                            Latent Vector Similarity:
                             <span className="font-serif text-[10px] italic">98.2%</span>
                         </span>
                     </div>
@@ -82,7 +82,7 @@ const ResultGrid: React.FC<ResultGridProps> = ({
             <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 min-h-0">
                 {isPending ? (
                     /* [상태 1] AI 분석 및 로딩 중 */
-                    <div className="flex flex-col items-center justify-center rounded-[2.5rem] bg-gray-50/50 dark:bg-white/5 py-32 border border-violet-100/50 dark:border-violet-500/10 backdrop-blur-sm">
+                    <div className="flex flex-col items-center justify-center rounded-[2.5rem] bg-gray-50/50 dark:bg-white/5 py-32 border-2 border-violet-100 dark:border-violet-500/20 backdrop-blur-sm">
                         <div className="relative mb-10">
                             {/* 이중 링 스핀 애니메이션 */}
                             <div className="h-24 w-24 rounded-full border-t-2 border-r-2 border-violet-600 animate-spin"></div>
@@ -97,7 +97,7 @@ const ResultGrid: React.FC<ResultGridProps> = ({
                                 {loadingMessages[messageIndex]}
                             </p>
                             <p className="text-[9px] text-gray-400 uppercase tracking-widest animate-pulse font-medium">
-                                Neural Processing in progress
+                                Analysis in progress
                             </p>
                         </div>
                     </div>
@@ -115,7 +115,7 @@ const ResultGrid: React.FC<ResultGridProps> = ({
                     </div>
                 ) : (
                     /* [상태 3] 분석 대기 중 (기본 상태) */
-                    <div className="flex flex-col items-center justify-center rounded-[2.5rem] border border-dashed border-neutral-200 bg-white dark:bg-neutral-900/50 py-24 transition-colors hover:bg-neutral-100 dark:border-white/5 dark:hover:bg-white/10 group">
+                    <div className="flex flex-col items-center justify-center rounded-[2.5rem] border-2 border-dashed border-neutral-200 bg-white dark:bg-neutral-900/50 py-24 transition-colors hover:bg-neutral-100 dark:border-white/10 dark:hover:bg-white/20 group">
                         <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full border border-neutral-100 bg-white text-neutral-200 shadow-sm transition-all duration-500 group-hover:scale-110 group-hover:text-violet-500 dark:border-white/5 dark:bg-neutral-800 dark:text-neutral-700">
                             <FaMagnifyingGlass size={20} className="animate-pulse" />
                         </div>

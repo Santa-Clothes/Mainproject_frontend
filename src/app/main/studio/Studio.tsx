@@ -5,13 +5,13 @@ import { useSearchParams, useRouter } from 'next/navigation';
 // UI 컴포넌트 임포트
 import ResultGrid from './components/ResultGrid';
 import ModeTabs from './components/ModeTabs';
-import DiscoveryPanel from './components/DiscoveryPanel';
+import SelectionPanel from './components/SelectionPanel';
 import UploadPanel from './components/UploadPanel';
 import AnalysisSection from './components/AnalysisSection';
 
 import { RecommendData } from '@/types/ProductType';
 
-export type StudioMode = 'imageInput' | 'imageDiscovery';
+export type StudioMode = 'imageInput' | 'imageSelection';
 
 /**
  * Studio: AI 기반 스타일 탐색 및 분석의 메인 페이지 컨테이너
@@ -24,7 +24,7 @@ export default function Studio() {
 
   // URL 파라미터를 통한 모드 관리
   const modeParam = searchParams.get('mode');
-  const mode: StudioMode = modeParam ? modeParam === 'imageInput' ? 'imageInput' : 'imageDiscovery' : 'imageInput';
+  const mode: StudioMode = modeParam ? modeParam === 'imageInput' ? 'imageInput' : 'imageSelection' : 'imageInput';
 
   // React 18 Transition을 사용한 매끄러운 상태 전환
   const [isPending, startTransition] = useTransition();
@@ -77,7 +77,7 @@ export default function Studio() {
         <div className="space-y-10 animate-in fade-in slide-in-from-right duration-500 pb-20">
 
           {/* Card 1: 분석 보고서 섹션 (DNA Matrix) */}
-          <div className="bg-white dark:bg-neutral-900/50 rounded-4xl lg:rounded-[2.5rem] border border-neutral-200 dark:border-white/5 shadow-xl p-6 lg:p-12">
+          <div className="bg-white dark:bg-neutral-900/50 rounded-4xl lg:rounded-[2.5rem] border-2 border-neutral-100 dark:border-white/10 shadow-xl p-6 lg:p-12">
             <button
               onClick={handleBackToSearch}
               className="flex items-center gap-2 text-violet-600 font-bold text-xs uppercase tracking-widest hover:underline mb-10 transition-all hover:gap-3"
@@ -92,12 +92,12 @@ export default function Studio() {
           </div>
 
           {/* Card 2: 추천 결과 그리드 섹션 */}
-          <div className="bg-white dark:bg-neutral-900/50 rounded-4xl lg:rounded-[2.5rem] border border-neutral-200 dark:border-white/5 shadow-xl p-6 lg:p-12 h-200 lg:h-225 flex flex-col">
+          <div className="bg-white dark:bg-neutral-900/50 rounded-4xl lg:rounded-[2.5rem] border-2 border-neutral-100 dark:border-white/10 shadow-xl p-6 lg:p-12 h-200 lg:h-225 flex flex-col">
             <ResultGrid
               isActive={true}
               isPending={isPending}
               products={results}
-              title="Neural Recommendations"
+              title="Recommendations"
               onProductClick={(product: RecommendData) => {
                 // 추천 상품 클릭 시 상세 페이지(상품 링크)로 이동
                 if (product.productLink) {
@@ -112,15 +112,15 @@ export default function Studio() {
         <div className={`
           bg-white dark:bg-neutral-900/50 
           rounded-4xl lg:rounded-[2.5rem] 
-          border border-neutral-200 dark:border-white/5 
+          border-2 border-neutral-100 dark:border-white/10 
           shadow-xl overflow-hidden flex flex-col 
           transition-all duration-500 ease-in-out
           min-h-125
           ${mode === 'imageInput' ? 'lg:h-150' : 'lg:h-275'}
         `}>
           <div className="flex-1 flex flex-col p-6 lg:p-12 overflow-hidden h-full">
-            {mode === 'imageDiscovery' ? (
-              <DiscoveryPanel
+            {mode === 'imageSelection' ? (
+              <SelectionPanel
                 onResultFound={handleSearchResult}
                 onAnalysisStart={handleAnalysisStart}
                 isPending={isPending}

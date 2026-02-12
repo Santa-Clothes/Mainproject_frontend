@@ -49,14 +49,13 @@ export default function AnalysisSection({ sourceImage, productName, isLoading }:
     return (
         <div className="space-y-8">
             {/* 1. Header Area with dynamic title */}
-            <div className="flex flex-col md:flex-row justify-between items-end gap-6 border-b border-neutral-200 pb-8 dark:border-white/5">
+            <div className="flex flex-col md:flex-row justify-between items-end gap-6 border-b-2 border-neutral-100 dark:border-white/10 pb-8">
                 <div className="space-y-2">
                     <div className="flex items-center gap-2 text-neutral-400 dark:text-neutral-500">
-                        <FaFingerprint size={10} className="text-violet-500" />
                         <span className="text-[9px] font-bold uppercase tracking-widest">Neural Analysis Dashboard</span>
                     </div>
                     <h3 className="font-serif text-4xl italic tracking-tighter text-neutral-900 dark:text-white">
-                        {isLoading ? "Analyzing DNA..." : `DNA Matrix: ${productName || "Reference Item"}`}
+                        {isLoading ? "Analyzing DNA..." : `Product Analysis: ${productName || "Reference Item"}`}
                     </h3>
                 </div>
             </div>
@@ -66,7 +65,7 @@ export default function AnalysisSection({ sourceImage, productName, isLoading }:
 
                 {/* Left Col: Source Image Preview */}
                 <div className="lg:col-span-4 space-y-6">
-                    <div className="aspect-square relative rounded-4xl overflow-hidden border border-neutral-200 dark:border-white/5 bg-gray-50 dark:bg-neutral-800 shadow-inner group">
+                    <div className="aspect-square relative rounded-4xl overflow-hidden border-2 border-neutral-100 dark:border-white/10 bg-gray-50 dark:bg-neutral-800 shadow-inner group">
                         {isLoading ? (
                             <div className="absolute inset-0 flex items-center justify-center bg-neutral-100 dark:bg-neutral-900 animate-pulse">
                                 <FaWaveSquare className="text-violet-500/20" size={40} />
@@ -89,7 +88,7 @@ export default function AnalysisSection({ sourceImage, productName, isLoading }:
                         )}
                     </div>
 
-                    <div className="p-8 rounded-4xl bg-violet-50/50 dark:bg-violet-950/10 border border-violet-100/50 dark:border-violet-500/10 space-y-4">
+                    <div className="p-8 rounded-4xl bg-violet-50/50 dark:bg-violet-950/10 border-2 border-violet-100/50 dark:border-violet-500/20 space-y-4">
                         <div className="flex items-center gap-2 mb-2">
                             <div className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse" />
                             <span className="text-[9px] font-bold uppercase tracking-widest text-violet-600 dark:text-violet-400">Embedding Extraction</span>
@@ -104,7 +103,7 @@ export default function AnalysisSection({ sourceImage, productName, isLoading }:
                 <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-10">
 
                     {/* Radar Chart Section */}
-                    <div className="bg-white dark:bg-neutral-900/50 rounded-4xl p-8 border border-neutral-200 dark:border-white/5 shadow-sm space-y-6">
+                    <div className="bg-white dark:bg-neutral-900/50 rounded-4xl p-8 border-2 border-neutral-100 dark:border-white/10 shadow-sm space-y-6">
                         <h4 className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500">Style Projection Radar</h4>
                         <div className="h-64 w-full">
                             {!isMounting && (
@@ -127,7 +126,7 @@ export default function AnalysisSection({ sourceImage, productName, isLoading }:
                     </div>
 
                     {/* Bar Chart Section */}
-                    <div className="bg-white dark:bg-neutral-900/50 rounded-4xl p-8 border border-neutral-200 dark:border-white/5 shadow-sm space-y-6">
+                    <div className="bg-white dark:bg-neutral-900/50 rounded-4xl p-8 border-2 border-neutral-100 dark:border-white/10 shadow-sm space-y-6">
                         <h4 className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500">Visual Attribute Distribution</h4>
                         <div className="h-64 w-full">
                             {!isMounting && (
