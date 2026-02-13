@@ -5,7 +5,7 @@ import { FaCloudArrowUp, FaXmark, FaMagnifyingGlass, FaCircleInfo, FaExpand, FaF
 import Image from 'next/image';
 import { RecommendData } from '@/types/ProductType';
 import { getRecommendList } from '@/app/api/productService/productapi';
-import { postImage } from '@/app/api/imageService/Imageapi';
+import { postImage } from '@/app/api/imageservice/imageapi';
 
 interface UploadPanelProps {
   onResultFound: (results: any[] | null) => void;
