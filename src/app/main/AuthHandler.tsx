@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSetAtom } from 'jotai';
 import { authUserAtom } from '@/jotai/loginjotai';
-import { getUserInfoAPI } from '@/app/api/memberService/memberapi';
+import { getUserInfoAPI } from '@/app/api/memberservice/memberapi';
 
 /**
  * OAuth2 인증 처리 컴포넌트

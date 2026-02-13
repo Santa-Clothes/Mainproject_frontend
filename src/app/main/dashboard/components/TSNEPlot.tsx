@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { FaCircleInfo, FaArrowsRotate, FaTriangleExclamation, FaExpand } from "react-icons/fa6";
-import { getTSNEPoints, TSNEPoint } from "@/app/api/trendService/tsneapi";
+import { getTSNEPoints, TSNEPoint } from "@/app/api/trendservice/tsneapi";
 import { motion, AnimatePresence } from "framer-motion";
 
 /**

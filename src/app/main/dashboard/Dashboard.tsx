@@ -11,10 +11,10 @@ import SearchRankCard from './components/SearchRankCard';
 import StyleDistributionCard from './components/StyleDistributionCard';
 import BestSellersCard from './components/BestSellersCard';
 import DashboardCard from './components/DashboardCard';
-import { getShoppingTrends } from '@/app/api/trendService/trendapi';
-import { getSalesRanking, SalesRankItem } from '@/app/api/salesService/salesapi';
+import { getShoppingTrends } from '@/app/api/trendservice/trendapi';
+import { getSalesRanking, SalesRankItem } from '@/app/api/salesservice/salesapi';
 import TSNEPlot from './components/TSNEPlot';
-import { getInternalProductCount, getNaverProductCount } from '@/app/api/productService/productapi';
+import { getInternalProductCount, getNaverProductCount } from '@/app/api/productservice/productapi';
 import { SiNaver } from "react-icons/si";
 
 

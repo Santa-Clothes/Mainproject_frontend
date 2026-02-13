@@ -5,7 +5,7 @@ import { FaArrowRotateLeft, FaArrowsRotate, FaCheck, FaFingerprint, FaMagnifying
 import { ProductData, RecommendData } from '@/types/ProductType';
 import Image from 'next/image';
 import ProductCard from './ProductCard';
-import { getProductList, getRecommendList } from '@/app/api/productService/productapi';
+import { getProductList, getRecommendList } from '@/app/api/productservice/productapi';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 interface SelectionPanelProps {

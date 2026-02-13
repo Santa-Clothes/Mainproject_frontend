@@ -18,7 +18,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAtom } from 'jotai';
 import { authUserAtom } from '@/jotai/loginjotai';
-import { logoutAPI, getUserInfoAPI } from '../api/memberService/memberapi';
+import { logoutAPI, getUserInfoAPI } from '../api/memberservice/memberapi';
 import Image from 'next/image';
 import Wizard from '@/assets/wizard.svg';
 

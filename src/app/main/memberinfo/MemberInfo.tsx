@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAtom } from 'jotai';
 import { authUserAtom } from '@/jotai/loginjotai';
-import { updateMemberInfoAPI, deleteMemberAPI, updateProfileImg, getUserInfoAPI } from '@/app/api/memberService/memberapi';
+import { updateMemberInfoAPI, deleteMemberAPI, updateProfileImg, getUserInfoAPI } from '@/app/api/memberservice/memberapi';
 import { useRouter } from 'next/navigation';
 import { FaUser, FaLock, FaTrash, FaCamera, FaCircleCheck, FaTriangleExclamation, FaXmark } from 'react-icons/fa6';
 import Image from 'next/image';

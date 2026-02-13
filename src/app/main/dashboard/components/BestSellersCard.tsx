@@ -3,7 +3,7 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import DashboardCard from './DashboardCard';
-import { SalesRankItem } from '@/app/api/salesService/salesapi';
+import { SalesRankItem } from '@/app/api/salesservice/salesapi';
 
 interface Props {
     sales: SalesRankItem[];

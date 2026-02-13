@@ -6,7 +6,7 @@ import { SiNaver, SiKakaotalk } from "react-icons/si";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
-import { loginAPI } from "@/app/api/memberService/memberapi";
+import { loginAPI } from "@/app/api/memberservice/memberapi";
 import { useSetAtom } from "jotai";
 import { authUserAtom } from "@/jotai/loginjotai";
 
