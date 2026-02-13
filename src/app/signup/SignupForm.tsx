@@ -96,13 +96,16 @@ export default function SignupForm() {
     setAuth(null);
 
     try {
-      await signupAPI({
+      const result = await signupAPI({
         id: id,
         nickname: nickname,
         password: password,
         profileImg: fileToUpload
       });
-      router.push("/login");
+      if (result)
+        router.push("/login");
+      else
+        alert("회원가입에 실패했습니다.");
     } catch (error) {
       console.error("회원가입 실패:", error);
       alert("회원가입에 실패했습니다.");

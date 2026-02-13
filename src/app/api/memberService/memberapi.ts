@@ -57,14 +57,13 @@ export const logoutAPI = async (authInfo: AuthUser) => {
 
         if (!response.ok) {
             console.error(`HTTP error! status: ${response.status}`);
-            return [];
         }
 
         // const data = await response.json();
-        return;// data;
+        return response.ok;
     } catch (error) {
         console.error("Login API error:", error);
-        return [];
+        return false;
     }
 };
 
@@ -94,14 +93,13 @@ export const signupAPI = async (JoinRequest: JoinRequest) => {
 
         if (!response.ok) {
             console.error(`HTTP error! status: ${response.status}`);
-            return [];
         }
 
         // const data = await response.json();
-        return;// data;
+        return response.ok;
     } catch (error) {
         console.error("Login API error:", error);
-        return [];
+        return false;
     }
 };
 
@@ -173,8 +171,8 @@ export const updateMemberInfoAPI = async (token: string, data: { nickname?: stri
             body: JSON.stringify(data),
         });
 
-        if (!response.ok) return null;
-        return await response.json();
+        // if (!response.ok) return null;
+        return await response.ok;
     } catch (error) {
         console.error("UpdateMember Error:", error);
         return null;
@@ -197,8 +195,8 @@ export const deleteMemberAPI = async (token: string, id: string, password: strin
             body: JSON.stringify({ id, password })
         });
 
-        if (!response.ok) return null;
-        return await response;
+        // if (!response.ok) return null;
+        return await response.ok;
     } catch (error) {
         console.error("DeleteMember Error:", error);
         return null;

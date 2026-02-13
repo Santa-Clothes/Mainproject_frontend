@@ -107,11 +107,14 @@ export default function Header() {
   const handleLogout = async () => {
     if (!authInfo) return;
     try {
-      await logoutAPI(authInfo);
-      setAuthInfo(null); // 로컬 스토리지 정보도 자동 초기화됨
-      setIsProfileOpen(false);
-      alert("로그아웃 되었습니다.");
-      router.push("/main");
+      const result = await logoutAPI(authInfo);
+      if (result) {
+        setAuthInfo(null); // 로컬 스토리지 정보도 자동 초기화됨
+        setIsProfileOpen(false);
+        alert("로그아웃 되었습니다.");
+        router.push("/main");
+      } else
+        alert("로그아웃에 실패했습니다.");
     } catch (error) {
       console.error("로그아웃 실패:", error);
     }
