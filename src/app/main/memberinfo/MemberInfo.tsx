@@ -192,25 +192,29 @@ export default function MemberInfo() {
         <div className="lg:col-span-1 space-y-6">
           <div className="flex flex-col gap-4">
             <div className="relative group mx-auto w-48 h-48 lg:w-full lg:h-auto aspect-square rounded-[3rem] overflow-hidden bg-neutral-100 dark:bg-neutral-800 border-4 border-white dark:border-neutral-900 shadow-2xl transition-transform hover:scale-[1.02]">
-              {profileImage ? (
-                /* src 뒤에 항상 타임스탬프를 붙여 캐시 방지 */
-                <Image
-                  src={
-                    profileImage.startsWith('data:')
-                      ? profileImage
-                      : (profileImage.includes('?') ? `${profileImage}&t=${Date.now()}` : `${profileImage}?t=${Date.now()}`)
-                  }
-                  alt="Profile"
-                  fill
-                  priority
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  className="object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-neutral-300">
-                  <FaUser size={60} />
-                </div>
-              )}
+              {(() => {
+                const isValid = typeof profileImage === 'string' && (profileImage.startsWith('http') || profileImage.startsWith('data:'));
+                return isValid ? (
+                  /* src 뒤에 항상 타임스탬프를 붙여 캐시 방지 (단, data: 미리보기는 제외) */
+                  <Image
+                    src={
+                      profileImage.startsWith('data:')
+                        ? profileImage
+                        : (profileImage.includes('?') ? `${profileImage}&t=${Date.now()}` : `${profileImage}?t=${Date.now()}`)
+                    }
+                    alt="Profile"
+                    fill
+                    priority
+                    unoptimized
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-neutral-300">
+                    <FaUser size={60} />
+                  </div>
+                );
+              })()}
               {/* input을 감싸는 label로 변경: 클릭 안정성 확보 */}
               <label className="absolute inset-0 z-10 bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm cursor-pointer">
                 <FaCamera size={30} className="text-white mb-2" />

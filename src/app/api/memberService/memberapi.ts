@@ -25,13 +25,11 @@ export const loginAPI = async (email: string, password: string) => {
         });
 
         if (!response.ok) {
-            // const errorData = await response.json().catch(() => ({}));
             console.error(`HTTP error! status: ${response.status}`);
             return [];
         }
 
         const data = await response.json();
-        console.log("[API result] Status:", data);
         return data;
     } catch (error) {
         console.error("Login API error:", error);
@@ -79,32 +77,19 @@ export const signupAPI = async (JoinRequest: JoinRequest) => {
     const reqUrl = `${BASEURL}/api/members/signup`;
 
     try {
-        let body: any;
-        let headers: any = {};
+        // 이미지가 있으면 FormData로 전송
+        const formData = new FormData();
+        formData.append('id', JoinRequest.id);
+        formData.append('nickname', JoinRequest.nickname);
+        formData.append('password', JoinRequest.password);
 
         if (JoinRequest.profileImg) {
-            // 이미지가 있으면 FormData로 전송
-            const formData = new FormData();
-            formData.append('id', JoinRequest.id);
-            formData.append('nickname', JoinRequest.nickname);
-            formData.append('password', JoinRequest.password);
             formData.append('file', JoinRequest.profileImg);
-            body = formData;
-            // FormData는 브라우저가 자동으로 multipart Content-Type을 설정하므로 headers설정을 비우거나 fetch에게 맡김
-        } else {
-            // 이미지가 없으면 기존 방식(JSON)으로 전송
-            headers['Content-Type'] = 'application/json';
-            body = JSON.stringify({
-                "id": JoinRequest.id,
-                "nickname": JoinRequest.nickname,
-                "password": JoinRequest.password,
-            });
         }
 
         const response = await fetch(reqUrl, {
             method: 'POST',
-            headers: headers,
-            body: body,
+            body: formData
         });
 
         if (!response.ok) {
@@ -195,30 +180,6 @@ export const updateMemberInfoAPI = async (token: string, data: { nickname?: stri
         return null;
     }
 };
-
-// /**
-//  * 비밀번호 변경 API: 로컬 계정 전용.
-//  */
-// export const updatePasswordAPI = async (token: string, password: string) => {
-//     const reqUrl = `${BASEURL}/api/members/update`;
-
-//     try {
-//         const response = await fetch(reqUrl, {
-//             method: 'PATCH',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//                 'Authorization': `Bearer ${token}`,
-//             },
-//             body: JSON.stringify({ password }),
-//         });
-
-//         if (!response.ok) return null;
-//         return await response.json();
-//     } catch (error) {
-//         console.error("UpdatePassword Error:", error);
-//         return null;
-//     }
-// };
 
 /**
  * 회원 탈퇴 API

@@ -11,5 +11,5 @@ export interface JoinRequest {
     id: string;
     nickname: string;
     password: string;
-    profileImg?: File;
+    profileImg?: File | null;
 }

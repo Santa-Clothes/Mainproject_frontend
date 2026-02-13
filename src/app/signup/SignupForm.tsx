@@ -55,23 +55,52 @@ export default function SignupForm() {
       return;
     }
 
+    let fileToUpload = selectedFile;
+
     if (!selectedFile) {
-      const proceed = confirm("프로필 이미지를 선택하지 않았습니다. 기본 프로필 이미지로 가입하시겠습니까?");
+      const proceed = confirm("프로필 이미지를 선택하지 않았습니다. 기본 프로필 이미지(PNG)로 가입하시겠습니까?");
       if (!proceed) return;
+
+      // FaUser 아이콘의 SVG 데이터를 PNG 이미지 파일로 변환 (Canvas 활용)
+      const svgString = `<svg stroke="currentColor" fill="#D1D5DB" stroke-width="0" viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg" width="512" height="512"><path d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6 32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-41.6c0-74.2-60.2-134.4-134.4-134.4z"></path></svg>`;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 512;
+      const ctx = canvas.getContext('2d');
+
+      const img = new window.Image();
+      const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(svgBlob);
+
+      const pngBlob = await new Promise<Blob | null>((resolve) => {
+        img.onload = () => {
+          ctx?.clearRect(0, 0, 512, 512); // 배경 투명 처리
+          ctx?.drawImage(img, 0, 0, 512, 512);
+          URL.revokeObjectURL(url);
+          canvas.toBlob((blob) => resolve(blob), 'image/png');
+        };
+        img.onerror = () => {
+          URL.revokeObjectURL(url);
+          resolve(null);
+        };
+        img.src = url;
+      });
+
+      if (pngBlob) {
+        fileToUpload = new File([pngBlob], 'default_avatar01.png', { type: 'image/png' });
+      }
     }
 
     setIsSubmitting(true);
     setAuth(null);
 
     try {
-      // API call with profile image if necessary
-      // Note: If the backend expects FormData for profile image during signup, 
-      // we should update signupAPI to handle it.
       await signupAPI({
         id: id,
         nickname: nickname,
         password: password,
-        profileImg: selectedFile || undefined
+        profileImg: fileToUpload
       });
       router.push("/login");
     } catch (error) {

@@ -39,12 +39,9 @@ export default function Header() {
   const [isMounted, setIsMounted] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
 
+  // 초기 마운트 및 테마 설정 확인
   useEffect(() => {
     setIsMounted(true);
-  }, []);
-
-  // 초기 테마 설정 확인
-  useEffect(() => {
     const savedTheme = localStorage.getItem('atelier_theme');
     if (savedTheme === 'dark') {
       setIsDarkMode(true);
@@ -117,7 +114,7 @@ export default function Header() {
           {/* 1. 좌측: 브랜드 로고 */}
           <Link href="/" className="flex flex-row gap-2 items-center px-3 py-1 hover:opacity-70 transition-opacity shrink-0">
             <div className="relative w-10 h-10 md:w-11 md:h-11">
-              <Image src={Wizard} alt="Logo" fill className="object-contain" priority unoptimized />
+              <Image src={Wizard} alt="Logo" fill className="object-contain" unoptimized />
             </div>
             <h1 className="hidden md:block text-lg lg:text-2xl font-sans font-black tracking-widest lg:tracking-[0.4em] uppercase text-neutral-900 dark:text-white leading-none">
               <span className="text-yellow-400"> Wizard</span> of <span className='text-purple-700'>Ounce</span>
@@ -150,41 +147,63 @@ export default function Header() {
           <div className="flex items-center shrink-0 pr-1 md:pr-2" ref={profileRef}>
 
             {/* 로그인 상태 정보 (Desktop) */}
-            {isMounted && authInfo && (
-              <div className="hidden sm:flex items-center gap-3 pl-3 pr-2 border-l border-gray-200 dark:border-white/10 mr-1 animate-in fade-in slide-in-from-right-4 duration-500">
-                <div className="flex flex-col text-right font-sans shrink-0">
-                  <span className="text-[10px] font-black leading-none uppercase tracking-wider text-neutral-900 dark:text-white">
-                    {authInfo.name}
-                  </span>
+            {isMounted && authInfo && (() => {
+              const profile = authInfo.profile;
+              const hasValidUrl = typeof profile === 'string' && (profile.startsWith("http") || profile.startsWith("data:"));
+
+              return (
+                <div className="hidden sm:flex items-center gap-3 pl-3 pr-2 border-l border-gray-200 dark:border-white/10 mr-1 animate-in fade-in slide-in-from-right-4 duration-500">
+                  <div className="flex flex-col text-right font-sans shrink-0">
+                    <span className="text-[10px] font-black leading-none uppercase tracking-wider text-neutral-900 dark:text-white">
+                      {authInfo.name}
+                    </span>
+                  </div>
+                  <div
+                    onClick={() => setIsProfileOpen(!isProfileOpen)}
+                    className="relative w-8 h-8 md:w-9 md:h-9 rounded-full bg-violet-600 p-0.5 border border-white/10 shadow-sm overflow-hidden shrink-0 cursor-pointer hover:ring-2 ring-violet-500 transition-all active:scale-95"
+                  >
+                    {hasValidUrl ? (
+                      <Image
+                        src={profile.startsWith('data:') ? profile : (profile.includes('?') ? `${profile}&t=${Date.now()}` : `${profile}?t=${Date.now()}`)}
+                        alt="profile"
+                        fill
+                        className="object-cover rounded-full"
+                        unoptimized
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-white">
+                        <FaUser size={12} />
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div
-                  onClick={() => setIsProfileOpen(!isProfileOpen)}
-                  className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-violet-600 p-0.5 border border-white/10 shadow-sm overflow-hidden shrink-0 cursor-pointer hover:ring-2 ring-violet-500 transition-all active:scale-95"
-                >
-                  {authInfo.profile ? (
-                    <img src={authInfo.profile} alt="profile" className="w-full h-full object-cover rounded-full" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-white">
-                      <FaUser size={12} />
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
+              );
+            })()}
 
             {/* 모바일 전용 프로필 (로그인 시) */}
-            {isMounted && authInfo && (
-              <div
-                onClick={() => setIsProfileOpen(!isProfileOpen)}
-                className="sm:hidden w-8 h-8 rounded-full bg-violet-600 p-0.5 border-2 border-white/20 shadow-sm overflow-hidden flex items-center justify-center cursor-pointer active:scale-90 transition-transform shrink-0"
-              >
-                {authInfo.profile ? (
-                  <img src={authInfo.profile} alt="profile" className="w-full h-full object-cover rounded-full" />
-                ) : (
-                  <FaUser size={10} className="text-white" />
-                )}
-              </div>
-            )}
+            {isMounted && authInfo && (() => {
+              const profile = authInfo.profile;
+              const hasValidUrl = typeof profile === 'string' && (profile.startsWith("http") || profile.startsWith("data:"));
+
+              return (
+                <div
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  className="relative sm:hidden w-8 h-8 rounded-full bg-violet-600 p-0.5 border-2 border-white/20 shadow-sm overflow-hidden flex items-center justify-center cursor-pointer active:scale-90 transition-transform shrink-0"
+                >
+                  {hasValidUrl ? (
+                    <Image
+                      src={profile.startsWith('data:') ? profile : (profile.includes('?') ? `${profile}&t=${Date.now()}` : `${profile}?t=${Date.now()}`)}
+                      alt="profile"
+                      fill
+                      className="object-cover rounded-full"
+                      unoptimized
+                    />
+                  ) : (
+                    <FaUser size={10} className="text-white" />
+                  )}
+                </div>
+              );
+            })()}
 
             {/* 톱니바퀴 (최우측 고정) */}
             <button

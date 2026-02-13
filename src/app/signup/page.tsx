@@ -1,6 +1,6 @@
 'use client';
 
-import { FaArrowLeft, FaCompass, FaMoon, FaSun } from 'react-icons/fa6';
+import { FaArrowLeft, FaMoon, FaSun } from 'react-icons/fa6';
 import Link from 'next/link';
 import SignupForm from './SignupForm';
 import { useEffect, useState } from 'react';
@@ -10,7 +10,6 @@ export default function SignupPage() {
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('atelier_theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     if (savedTheme === 'light') {
       setIsDarkMode(false);
       document.documentElement.classList.remove('dark');
