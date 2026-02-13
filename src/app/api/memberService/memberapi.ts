@@ -79,18 +79,32 @@ export const signupAPI = async (JoinRequest: JoinRequest) => {
     const reqUrl = `${BASEURL}/api/members/signup`;
 
     try {
-        console.log("회원가입 정보 :", { id: JoinRequest.id, nickname: JoinRequest.nickname, password: JoinRequest.password });
-        const response = await fetch(reqUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
+        let body: any;
+        let headers: any = {};
+
+        if (JoinRequest.profileImg) {
+            // 이미지가 있으면 FormData로 전송
+            const formData = new FormData();
+            formData.append('id', JoinRequest.id);
+            formData.append('nickname', JoinRequest.nickname);
+            formData.append('password', JoinRequest.password);
+            formData.append('file', JoinRequest.profileImg);
+            body = formData;
+            // FormData는 브라우저가 자동으로 multipart Content-Type을 설정하므로 headers설정을 비우거나 fetch에게 맡김
+        } else {
+            // 이미지가 없으면 기존 방식(JSON)으로 전송
+            headers['Content-Type'] = 'application/json';
+            body = JSON.stringify({
                 "id": JoinRequest.id,
                 "nickname": JoinRequest.nickname,
                 "password": JoinRequest.password,
-            }
-            ),
+            });
+        }
+
+        const response = await fetch(reqUrl, {
+            method: 'POST',
+            headers: headers,
+            body: body,
         });
 
         if (!response.ok) {

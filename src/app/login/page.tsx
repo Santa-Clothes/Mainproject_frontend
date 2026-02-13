@@ -9,7 +9,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('atelier_theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    // const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     if (savedTheme === 'light') {
       setIsDarkMode(false);
       document.documentElement.classList.remove('dark');
@@ -59,13 +59,6 @@ export default function LoginPage() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,var(--tw-gradient-stops))] from-violet-900/10 via-transparent to-transparent opacity-50 dark:from-violet-900/20 dark:via-neutral-950 dark:to-neutral-950 dark:opacity-90" />
       <div className="absolute -top-[10%] -left-[10%] h-[40%] w-[40%] rounded-full bg-violet-600/5 blur-[150px] dark:bg-violet-600/10" />
 
-      {/* 3. 장식적 메타데이터: 버튼과 겹치지 않게 하단 혹은 반대편으로 이동 가능하나, 
-          여기서는 텍스트 가독성을 위해 opacity를 더 조절함 */}
-      {/* <div className="absolute top-24 right-12 hidden space-y-2 opacity-30 lg:block dark:opacity-20">
-        <p className="font-mono text-[8px] uppercase tracking-[0.3em] text-violet-600 dark:text-violet-400">Protocol: AES-256-GCM</p>
-        <p className="font-mono text-[8px] uppercase tracking-[0.3em] text-violet-600 dark:text-violet-400">Access Point: SEOUL_NODE_01</p>
-      </div> */}
-
       {/* 4. 뒤로 가기 네비게이션 */}
       <div className="absolute top-6 left-6 z-20 md:top-10 md:left-10">
         <Link
@@ -90,10 +83,6 @@ export default function LoginPage() {
           <div className="mb-4 inline-flex rounded-3xl border border-violet-100 bg-violet-50 p-4 dark:border-violet-500/20 dark:bg-violet-600/10">
             <FaKey className="text-violet-600 dark:text-violet-500/50" size={18} />
           </div>
-          {/* <div className="space-y-4">
-            <h1 className="translate-x-[0.3em] font-serif text-4xl italic uppercase tracking-[0.6em] text-neutral-900 dark:text-white"></h1>
-            <p className="text-[9px] font-bold uppercase tracking-[0.8em] text-violet-600 dark:text-violet-500/60">Secure Neural Access</p>
-          </div> */}
         </div>
         <LoginForm />
       </div>
