@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAtom } from 'jotai';
 import { authUserAtom } from '@/jotai/loginjotai';
-import { updateMemberAPI, updatePasswordAPI, deleteMemberAPI, updateProfileImg } from '@/app/api/memberService/memberapi';
+import { updateMemberInfoAPI, deleteMemberAPI, updateProfileImg } from '@/app/api/memberService/memberapi';
 import { useRouter } from 'next/navigation';
 import { FaUser, FaLock, FaTrash, FaCamera, FaCircleCheck, FaTriangleExclamation, FaXmark } from 'react-icons/fa6';
 import Image from 'next/image';
@@ -95,54 +95,41 @@ export default function MemberInfo() {
     }
   };
 
-  // 닉네임 업데이트 핸들러
-  const handleUpdateNickname = async (e: React.FormEvent) => {
+  // 멤버 정보 업데이트 핸들러
+  const handleUpdateMemberInfo = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!auth) return;
+
+    // 전송할 데이터 객체 생성
+    const updateData: { nickname?: string; password?: string } = {
+      nickname: nickname
+    };
+
+    // 비밀번호 변경 시도 시 검증 (로컬 계정 전용)
+    if (!isOAuth2 && newPassword) {
+      if (newPassword !== confirmPassword) {
+        setMessage({ type: 'error', text: 'Passwords confirmation do not match.' });
+        return;
+      }
+      updateData.password = newPassword;
+    }
 
     setIsSubmitting(true);
     setMessage(null);
 
     try {
-      const result = await updateMemberAPI(auth.accessToken, {
-        nickname
-      });
+      const result = await updateMemberInfoAPI(auth.accessToken, updateData);
 
       if (result) {
         setAuth({ ...auth, name: nickname });
-        setMessage({ type: 'success', text: 'Nickname updated.' });
-      } else {
-        setMessage({ type: 'error', text: 'Failed to update nickname.' });
-      }
-    } catch (error) {
-      setMessage({ type: 'error', text: 'Error occurred.' });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  // 비밀번호 변경 (로컬 계정 전용)
-  const handleUpdatePassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!auth || isOAuth2) return;
-
-    if (newPassword !== confirmPassword) {
-      setMessage({ type: 'error', text: 'Passwords do not match.' });
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      const result = await updatePasswordAPI(auth.accessToken, newPassword);
-      if (result) {
-        setMessage({ type: 'success', text: 'Password changed successfully.' });
+        setMessage({ type: 'success', text: 'Member information updated successfully.' });
         setNewPassword('');
         setConfirmPassword('');
       } else {
-        setMessage({ type: 'error', text: 'Failed to change password.' });
+        setMessage({ type: 'error', text: 'Failed to update member information.' });
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'Error Occurred.' });
+      setMessage({ type: 'error', text: 'An unexpected error occurred.' });
     } finally {
       setIsSubmitting(false);
     }
@@ -215,6 +202,8 @@ export default function MemberInfo() {
                   }
                   alt="Profile"
                   fill
+                  priority
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   className="object-cover"
                 />
               ) : (
@@ -264,76 +253,74 @@ export default function MemberInfo() {
         <div className="lg:col-span-2 space-y-8">
           {/* 닉네임 수정 섹션 */}
           <section className="p-8 rounded-[2.5rem] bg-white dark:bg-neutral-900 shadow-xl border border-neutral-100 dark:border-white/5">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="p-2.5 rounded-2xl bg-violet-600 text-white shadow-lg shadow-violet-600/20">
-                <FaUser size={14} />
+            <form onSubmit={handleUpdateMemberInfo} className="space-y-12">
+              {/* 1. Identity Section */}
+              <div className="space-y-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 rounded-2xl bg-violet-600 text-white shadow-lg shadow-violet-600/20">
+                    <FaUser size={14} />
+                  </div>
+                  <h2 className="text-xl font-normal italic text-neutral-900 dark:text-white">Neural Designation</h2>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold text-neutral-500 uppercase tracking-[0.2em] ml-1">Public Nickname</label>
+                  <input
+                    type="text"
+                    value={nickname}
+                    onChange={(e) => setNickname(e.target.value)}
+                    className="w-full px-6 py-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-white/5 outline-none focus:border-violet-500 transition-all text-sm tracking-widest font-bold"
+                    placeholder="Enter Curator Handle"
+                  />
+                </div>
               </div>
-              <h2 className="text-xl font-normal italic text-neutral-900 dark:text-white">Nickname</h2>
-            </div>
 
-            <form onSubmit={handleUpdateNickname} className="space-y-6">
-              <div className="space-y-2">
-                <input
-                  type="text"
-                  value={nickname}
-                  onChange={(e) => setNickname(e.target.value)}
-                  className="w-full px-6 py-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-white/5 outline-none focus:border-violet-500 transition-all text-sm tracking-widest font-bold"
-                  placeholder="Enter Curators Name"
-                />
-              </div>
+              {/* 2. Security Section (Local only) */}
+              {!isOAuth2 && (
+                <div className="space-y-8 pt-8 border-t border-neutral-100 dark:border-white/5">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 rounded-2xl bg-violet-600 text-white shadow-lg shadow-violet-600/20">
+                      <FaLock size={14} />
+                    </div>
+                    <h2 className="text-xl font-normal italic text-neutral-900 dark:text-white">Access Credentials</h2>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-neutral-500 uppercase tracking-[0.2em] ml-1">New Security Key</label>
+                      <input
+                        type="password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        className="w-full px-6 py-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-white/5 outline-none focus:border-violet-500 transition-all text-sm tracking-widest font-bold"
+                        placeholder="••••••••"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-neutral-500 uppercase tracking-[0.2em] ml-1">Confirm Key</label>
+                      <input
+                        type="password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        className="w-full px-6 py-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-white/5 outline-none focus:border-violet-500 transition-all text-sm tracking-widest font-bold"
+                        placeholder="••••••••"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Action Button: 하단 고정 */}
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-4 rounded-2xl bg-neutral-900 dark:bg-violet-600 text-white text-[10px] font-bold uppercase tracking-[0.4em] shadow-xl hover:bg-violet-600 transition-all disabled:opacity-50"
+                className="w-full py-5 rounded-3xl bg-neutral-900 dark:bg-violet-600 text-white text-[10px] font-bold uppercase tracking-[0.4em] shadow-2xl hover:bg-violet-600 dark:hover:bg-violet-500 transition-all disabled:opacity-50 active:scale-[0.98]"
               >
-                {isSubmitting ? 'Processing...' : 'Update Nickname'}
+                {isSubmitting ? 'Updating Neural Grid...' : 'Commit Protocol Changes'}
               </button>
             </form>
           </section>
 
-          {/* 비밀번호 수정 섹션 (로컬 전용) */}
-          {!isOAuth2 && (
-            <section className="p-8 rounded-[2.5rem] bg-white dark:bg-neutral-900 shadow-xl border border-neutral-100 dark:border-white/5 animate-in fade-in slide-in-from-bottom-4">
-              <div className="flex items-center gap-3 mb-8">
-                <div className="p-2.5 rounded-2xl bg-violet-600 text-white shadow-lg shadow-violet-600/20">
-                  <FaLock size={14} />
-                </div>
-                <h2 className="text-xl font-normal italic text-neutral-900 dark:text-white">Password</h2>
-              </div>
 
-              <form onSubmit={handleUpdatePassword} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-neutral-500 uppercase tracking-[0.2em] ml-1">New Password</label>
-                    <input
-                      type="password"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      className="w-full px-6 py-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-white/5 outline-none focus:border-violet-500 transition-all text-sm tracking-widest font-bold"
-                      placeholder="••••••••"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-neutral-500 uppercase tracking-[0.2em] ml-1">Confirm Password</label>
-                    <input
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="w-full px-6 py-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-white/5 outline-none focus:border-violet-500 transition-all text-sm tracking-widest font-bold"
-                      placeholder="••••••••"
-                    />
-                  </div>
-                </div>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full py-4 rounded-2xl bg-neutral-900 dark:bg-violet-600 text-white text-[10px] font-bold uppercase tracking-[0.4em] shadow-xl hover:bg-violet-600 transition-all disabled:opacity-50"
-                >
-                  {isSubmitting ? 'Processing...' : 'Update Security Key'}
-                </button>
-              </form>
-            </section>
-          )}
 
           {/* 소셜 계정 안내 */}
           {isOAuth2 && (
@@ -351,17 +338,17 @@ export default function MemberInfo() {
       </div>
 
       {/* 하단 탈퇴 버튼 섹션 */}
-      <div className="pt-10 border-t border-neutral-100 dark:border-white/5 flex flex-col items-center gap-6">
-        <div className="text-center space-y-2">
-          <p className="text-[9px] font-bold text-neutral-400 uppercase tracking-[0.5em]">Emergency Extraction Protocol</p>
-          <p className="text-xs text-neutral-500">Permanently terminate your curator session and remove all synced data from the neural grid.</p>
+      <div className="max-w-2xl mx-auto p-4 px-6 rounded-2xl bg-red-50/30 dark:bg-red-950/5 border-2 border-red-200/50 dark:border-red-900/30 flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10">
+        <div className="space-y-1 text-center sm:text-left">
+          <p className="text-[10px] font-black text-red-500 uppercase tracking-widest">Withdrawal Status</p>
+          <p className="text-xs text-neutral-500">Permanently remove your account and all associated data.</p>
         </div>
         <button
           onClick={handleDeleteAccount}
-          className="group flex items-center gap-4 px-8 py-4 rounded-2xl border border-red-100 dark:border-red-900/20 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all active:scale-95"
+          className="flex items-center gap-2 px-6 py-3 rounded-xl bg-red-500 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-red-600 transition-all active:scale-95 shrink-0 shadow-lg shadow-red-500/10"
         >
-          <FaTrash size={14} className="group-hover:animate-bounce" />
-          <span className="text-[10px] font-black uppercase tracking-[0.3em]">Withdraw</span>
+          <FaTrash size={12} />
+          Withdraw
         </button>
       </div>
 

@@ -83,7 +83,9 @@ const StyleDistributionCard: React.FC<Props> = ({ data, isLoading, error, onRetr
                         </PieChart>
                     </ResponsiveContainer>
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
-                        <Image src={Wizard} alt="Style Distribution" width={75} height={75} className='opacity-50' />
+                        <div className="relative w-20 h-20 opacity-50">
+                            <Image src={Wizard} alt="Style Distribution" fill className="object-contain" />
+                        </div>
                     </div>
                 </div>
 

@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { FaArrowRight, FaFingerprint, FaShieldHalved } from "react-icons/fa6";
+import { FaArrowRight, FaShieldHalved } from "react-icons/fa6";
 import { useRouter } from "next/navigation";
 import { signupAPI } from "@/app/api/memberService/memberapi";
 import { useRef } from "react";
@@ -64,9 +64,9 @@ export default function SignupForm() {
           {/* 1. 닉네임 (nickname) 입력 */}
           {/* border-neutral-300: 라이트모드에서 뚜렷한 회색 선 */}
           {/* dark:border-white/10: 다크모드에서 은은한 흰색 선 */}
-          <div className="group relative border-b border-neutral-300 py-3 transition-all duration-500 focus-within:border-violet-500 dark:border-white/10">
+          <div className="group relative border-b-2 border-neutral-200 py-3 transition-all duration-500 focus-within:border-violet-500 dark:border-white/10">
             <label className="absolute -top-6 left-0 text-[9px] font-bold uppercase tracking-[0.3em] text-neutral-500 transition-colors group-focus-within:text-violet-600 dark:group-focus-within:text-violet-400">
-              Full Designation
+              닉네임
             </label>
             <input
               ref={nicknameRef}
@@ -80,9 +80,9 @@ export default function SignupForm() {
           </div>
 
           {/* 2. 사용자 ID 입력 */}
-          <div className="group relative border-b border-neutral-300 py-3 transition-all duration-500 focus-within:border-violet-500 dark:border-white/10">
+          <div className="group relative border-b-2 border-neutral-200 py-3 transition-all duration-500 focus-within:border-violet-500 dark:border-white/10">
             <label className="absolute -top-6 left-0 text-[9px] font-bold uppercase tracking-[0.3em] text-neutral-500 transition-colors group-focus-within:text-violet-600 dark:group-focus-within:text-violet-400">
-              Requested ID
+              아이디
             </label>
             <input
               ref={userIdRef}
@@ -94,9 +94,9 @@ export default function SignupForm() {
           </div>
 
           {/* 3. 비밀번호 입력 */}
-          <div className="group relative border-b border-neutral-300 py-3 transition-all duration-500 focus-within:border-violet-500 dark:border-white/10">
+          <div className="group relative border-b-2 border-neutral-200 py-3 transition-all duration-500 focus-within:border-violet-500 dark:border-white/10">
             <label className="absolute -top-6 left-0 text-[9px] font-bold uppercase tracking-[0.3em] text-neutral-500 transition-colors group-focus-within:text-violet-600 dark:group-focus-within:text-violet-400">
-              Security Key
+              비밀번호
             </label>
             <input
               ref={passwordRef}
@@ -121,13 +121,6 @@ export default function SignupForm() {
             <Link href="/login" className="border-b border-transparent pb-1 text-[9px] font-bold uppercase tracking-[0.4em] text-neutral-500 transition-colors hover:border-violet-500 hover:text-violet-600 dark:hover:text-violet-400">
               Existing Curator? Log In
             </Link>
-            <div className="flex items-center gap-4 rounded-full border border-neutral-200 bg-white/50 px-6 py-3 dark:border-white/5 dark:bg-white/5">
-              <FaShieldHalved size={12} className="text-violet-500/50" />
-              <span className="text-[8px] font-bold uppercase tracking-[0.4em] text-neutral-500">End-to-End Encryption Enabled</span>
-            </div>
-            <div className="flex items-center gap-3 pt-4 font-mono text-[8px] uppercase tracking-widest text-neutral-400 dark:text-neutral-600">
-              <FaFingerprint size={12} /> SECURE_REGISTRY_V2
-            </div>
           </div>
         </div>
       </form>

@@ -103,7 +103,7 @@ export default function LoginForm() {
       <form onSubmit={handleSubmit} className="space-y-10">
         <div className="space-y-8">
           {/* 아이디 입력 필드 */}
-          <div className="group relative border-b border-neutral-300 py-3 transition-all duration-500 focus-within:border-violet-500 dark:border-white/10">
+          <div className="group relative border-b-2 border-neutral-200 py-3 transition-all duration-500 focus-within:border-violet-500 dark:border-white/10">
             <label className="absolute -top-6 left-0 text-[9px] font-bold uppercase tracking-[0.3em] text-neutral-500 transition-colors group-focus-within:text-violet-600 dark:group-focus-within:text-violet-400">
               Identifier
             </label>
@@ -117,7 +117,7 @@ export default function LoginForm() {
           </div>
 
           {/* 비밀번호 입력 필드 */}
-          <div className="group relative border-b border-neutral-300 py-3 transition-all duration-500 focus-within:border-violet-500 dark:border-white/10">
+          <div className="group relative border-b-2 border-neutral-200 py-3 transition-all duration-500 focus-within:border-violet-500 dark:border-white/10">
             <label className="absolute -top-6 left-0 text-[9px] font-bold uppercase tracking-[0.3em] text-neutral-500 transition-colors group-focus-within:text-violet-600 dark:group-focus-within:text-violet-400">
               Security Key
             </label>
@@ -142,16 +142,16 @@ export default function LoginForm() {
 
           {/* 소셜 로그인 구분선 */}
           <div className="relative flex items-center justify-center py-2 gap-4">
-            <div className="flex-1 border-t border-neutral-300 dark:border-white/10"></div>
+            <div className="flex-1 border-t-2 border-neutral-200 dark:border-white/10"></div>
             <span className="text-[9px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 shrink-0">
               Or Access With
             </span>
-            <div className="flex-1 border-t border-neutral-300 dark:border-white/10"></div>
+            <div className="flex-1 border-t-2 border-neutral-200 dark:border-white/10"></div>
           </div>
 
           {/* 소셜 로그인 버튼 그룹 */}
           <div className="flex justify-center gap-6 pt-2">
-            <button type="button" onClick={() => handleSocialLogin('Google')} className="flex h-12 w-12 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-800 shadow-sm transition-all hover:scale-110 hover:border-neutral-300 hover:bg-neutral-50 dark:border-white/10 dark:bg-neutral-900 dark:hover:bg-neutral-800">
+            <button type="button" onClick={() => handleSocialLogin('Google')} className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-neutral-100 bg-white text-neutral-800 shadow-sm transition-all hover:scale-110 hover:border-violet-200 dark:border-white/10 dark:bg-neutral-900 dark:hover:bg-neutral-800">
               <FcGoogle size={24} />
             </button>
             <button type="button" onClick={() => handleSocialLogin('Naver')} className="flex h-12 w-12 items-center justify-center rounded-full bg-[#03C75A] text-white transition-transform hover:scale-110">

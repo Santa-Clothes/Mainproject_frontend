@@ -161,8 +161,8 @@ export const updateProfileImg = async (token: string, id: string, profileImg: Fi
 /**
  * 내 정보 수정 API: 닉네임 또는 프로필 이미지를 업데이트합니다.
  */
-export const updateMemberAPI = async (token: string, data: { nickname?: string; profile?: string }) => {
-    const reqUrl = `${BASEURL}/api/members/me`;
+export const updateMemberInfoAPI = async (token: string, data: { nickname?: string; password?: string }) => {
+    const reqUrl = `${BASEURL}/api/members/update`;
 
     try {
         const response = await fetch(reqUrl, {
@@ -182,29 +182,29 @@ export const updateMemberAPI = async (token: string, data: { nickname?: string; 
     }
 };
 
-/**
- * 비밀번호 변경 API: 로컬 계정 전용.
- */
-export const updatePasswordAPI = async (token: string, password: string) => {
-    const reqUrl = `${BASEURL}/api/members/update`;
+// /**
+//  * 비밀번호 변경 API: 로컬 계정 전용.
+//  */
+// export const updatePasswordAPI = async (token: string, password: string) => {
+//     const reqUrl = `${BASEURL}/api/members/update`;
 
-    try {
-        const response = await fetch(reqUrl, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify({ password }),
-        });
+//     try {
+//         const response = await fetch(reqUrl, {
+//             method: 'PATCH',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 'Authorization': `Bearer ${token}`,
+//             },
+//             body: JSON.stringify({ password }),
+//         });
 
-        if (!response.ok) return null;
-        return await response.json();
-    } catch (error) {
-        console.error("UpdatePassword Error:", error);
-        return null;
-    }
-};
+//         if (!response.ok) return null;
+//         return await response.json();
+//     } catch (error) {
+//         console.error("UpdatePassword Error:", error);
+//         return null;
+//     }
+// };
 
 /**
  * 회원 탈퇴 API

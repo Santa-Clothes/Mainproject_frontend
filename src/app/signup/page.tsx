@@ -38,8 +38,8 @@ export default function SignupPage() {
       라이트모드: bg-[#EBEBEF] -> 너무 희지 않은, 차분하고 묵직한 라이트 그레이 (콘크리트 톤)
       다크모드: bg-[#0D0C12] -> 깊은 블랙
     */
-    <main className="relative flex h-screen w-full flex-col overflow-hidden bg-[#EBEBEF] transition-colors duration-700 dark:bg-[#0D0C12] lg:flex-row">
-      
+    <main className="relative flex min-h-screen w-full flex-col bg-[#EBEBEF] transition-colors duration-700 dark:bg-[#0D0C12] lg:flex-row lg:h-screen lg:overflow-hidden">
+
       {/* 테마 토글 버튼 */}
       <div className="absolute top-10 right-10 z-50">
         <button
@@ -48,7 +48,7 @@ export default function SignupPage() {
           /* 버튼 배경도 너무 희지 않게 조정 */
           className="relative w-24 h-10 bg-neutral-200/50 dark:bg-neutral-900/40 backdrop-blur-xl border border-white/20 dark:border-white/10 rounded-full shadow-lg cursor-pointer overflow-hidden transition-colors hover:border-violet-400 outline-none"
         >
-          <div className={`absolute top-1 w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center text-white transition-transform duration-500 ease-in-out z-20 shadow-md ${isDarkMode ? 'translate-x-[58px]' : 'translate-x-1'
+          <div className={`absolute top-1 w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center text-white transition-transform duration-500 ease-in-out z-20 shadow-md ${isDarkMode ? 'translate-x-14.5' : 'translate-x-1'
             }`}>
             {isDarkMode ? <FaMoon size={10} /> : <FaSun size={10} />}
           </div>
@@ -64,7 +64,7 @@ export default function SignupPage() {
       {/* 1. 좌측: 비주얼 아카이브 섹션 */}
       {/* border-r 색상을 투명도 있는 검정/흰색으로 처리하여 자연스럽게 경계 형성 */}
       <div className="relative hidden h-full w-1/2 overflow-hidden border-r border-black/5 dark:border-white/5 lg:block">
-        
+
         {/* [핵심 변경] 이미지 톤 유지 전략 */}
         {/* 라이트 모드라고 해서 이미지를 밝게(opacity-80) 만들지 않고, 
             오히려 약간 어둡게(opacity-60) 눌러주어 우측의 밝은 폼과 '대비'를 줍니다. 
@@ -73,13 +73,14 @@ export default function SignupPage() {
           src="https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=1976&auto=format&fit=crop"
           alt="Registry Aesthetic"
           fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 50vw"
           priority
           className="scale-105 object-cover transition-all duration-[20s] hover:scale-100 opacity-60 dark:opacity-50"
         />
-        
+
         {/* 오버레이: 흰색 그라데이션 제거. 
             대신 '검은색' 그라데이션의 농도만 조절하여 깊이감을 유지합니다. */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/10 to-black/40 dark:from-violet-950/20 dark:to-neutral-950" />
+        <div className="absolute inset-0 bg-linear-to-r from-black/10 to-black/40 dark:from-violet-950/20 dark:to-neutral-950" />
 
         <div className="absolute bottom-24 left-24 right-24 space-y-10">
           <div className="flex h-16 w-16 items-center justify-center rounded-4xl border border-white/20 bg-black/10 backdrop-blur-md dark:border-white/10 dark:bg-white/5">
@@ -105,23 +106,25 @@ export default function SignupPage() {
 
       {/* 2. 우측: 회원가입 폼 섹션 */}
       {/* 배경색: 상위 main 태그의 색상(#EBEBEF)을 그대로 따라가도록 투명하게 두거나, 명시적으로 같은 색 사용 */}
-      <div className="relative flex h-full flex-1 flex-col items-center justify-center overflow-y-auto p-8 transition-colors duration-500 lg:p-24">
-        
+      <div className="relative flex flex-1 flex-col items-center justify-center overflow-y-auto p-6 md:p-8 transition-colors duration-500 lg:p-24 min-h-screen lg:min-h-0">
+
         {/* 뒤로 가기 네비게이션 */}
-        <div className="absolute top-12 left-12 z-20 lg:left-24">
+        <div className="absolute top-6 left-6 z-20 md:top-10 md:left-10">
           <Link
             href="/main"
-            className="group flex items-center gap-5 text-[10px] font-bold uppercase tracking-[0.4em] text-neutral-500 transition-all hover:text-violet-600 dark:text-neutral-500 dark:hover:text-white"
+            className="group flex flex-col items-start gap-1 text-[9px] font-bold uppercase tracking-[0.4em] text-neutral-500 transition-all hover:text-violet-600 dark:text-neutral-500 dark:hover:text-white"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-neutral-300 transition-all group-hover:border-violet-500/50 dark:border-white/5">
+            <span className="opacity-0 transition-all -translate-y-2 group-hover:translate-y-0 group-hover:opacity-100 whitespace-nowrap">
+              Cancel Registry
+            </span>
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-neutral-200 transition-all group-hover:border-violet-500/50 dark:border-white/10">
               <FaArrowLeft className="text-neutral-500 transition-transform group-hover:-translate-x-1 group-hover:text-violet-600 dark:text-white/30 dark:group-hover:text-violet-400" size={14} />
             </div>
-            <span className="opacity-0 transition-all lg:group-hover:opacity-100">Cancel Registry</span>
           </Link>
         </div>
 
-        <div className="w-full max-w-md space-y-14 py-20 lg:py-0">
-          <header className="space-y-6 border-b border-neutral-300 pb-10 dark:border-white/5">
+        <div className="w-full max-w-md space-y-14 pt-32 pb-20 lg:py-0">
+          <header className="space-y-6 border-b-2 border-neutral-200 pb-10 dark:border-white/10">
             {/* 텍스트 색상: 완전 검정(#000) 대신 #1A1A1A 정도의 부드러운 블랙 사용 */}
             <h1 className="translate-x-[0.25em] font-serif text-4xl italic uppercase tracking-[0.5em] text-neutral-800 dark:text-white">Registry</h1>
             <div className="flex items-center gap-3">
@@ -129,7 +132,7 @@ export default function SignupPage() {
               <div className="h-px flex-1 bg-violet-300 dark:bg-violet-900/30" />
             </div>
           </header>
-          
+
           <SignupForm />
 
         </div>
