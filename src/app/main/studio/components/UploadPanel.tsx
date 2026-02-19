@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { RecommendData } from '@/types/ProductType';
 import { getRecommendList } from '@/app/api/productService/productapi';
 import { postImage } from '@/app/api/imageService/imageapi';
+import { searchByImage, FashionSearchResponse } from '@/app/api/imageService/fashionSearch';
 
 interface UploadPanelProps {
   onResultFound: (results: any[] | null) => void;
@@ -63,12 +64,21 @@ export default function UploadPanel({ onResultFound, onAnalysisStart, onAnalysis
 
       try {
         // 2. 이미지 서버로 업로드 (Server Action 호출)
-        const uploadResult = await postImage(selectedFile);
+        const uploadResult = await searchByImage(selectedFile);
         console.log("Upload Success:", uploadResult);
-        if (uploadResult && uploadResult.success) {
+        if (uploadResult /* && uploadResult.success */) {
           // 3. 분석 결과를 바탕으로 유사 상품 추천 리스트 조회
-          const results: RecommendData[] = await getRecommendList("AKA3CA001");
-
+          const results: RecommendData[] = uploadResult.results.map((item) => {
+            return {
+              productId: item.product_id,
+              title: item.title,
+              price: item.price,
+              productLink: '',
+              imageUrl: item.image_url,
+              similarityScore: item.score
+            };
+          });
+          console.log("Upload Success:", uploadResult);
           onResultFound(results);
         } else {
           alert("이미지 업로드에 실패했습니다.");
@@ -78,6 +88,24 @@ export default function UploadPanel({ onResultFound, onAnalysisStart, onAnalysis
         console.error("검색 실패:", e);
         onResultFound(null); // 실패 시 초기 상태로
       }
+
+      // try {
+      //   // 2. 이미지 서버로 업로드 (Server Action 호출)
+      //   const uploadResult = await postImage(selectedFile);
+      //   console.log("Upload Success:", uploadResult);
+      //   if (uploadResult && uploadResult.success) {
+      //     // 3. 분석 결과를 바탕으로 유사 상품 추천 리스트 조회
+      //     const results: RecommendData[] = await getRecommendList("AKA3CA001");
+
+      //     onResultFound(results);
+      //   } else {
+      //     alert("이미지 업로드에 실패했습니다.");
+      //     onResultFound(null);
+      //   }
+      // } catch (e) {
+      //   console.error("검색 실패:", e);
+      //   onResultFound(null); // 실패 시 초기 상태로
+      // }
     });
   };
 

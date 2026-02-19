@@ -210,51 +210,79 @@ export default function Dashboard({
       error: errorNaverProductCount,
       onRetry: () => fetchNaverProductCount(true)
     },
-    { label: 'Curation Rate', value: '820/d', sub: '-4% from avg', icon: <FaWaveSquare />, color: 'violet', isLoading: false, error: null },
-    { label: 'Active Metadata', value: '45.2K', sub: 'Optimal indexing', icon: <FaTags />, color: 'violet', isLoading: false, error: null },
+    // { label: 'Curation Rate', value: '820/d', sub: '-4% from avg', icon: <FaWaveSquare />, color: 'violet', isLoading: false, error: null },
+    // { label: 'Active Metadata', value: '45.2K', sub: 'Optimal indexing', icon: <FaTags />, color: 'violet', isLoading: false, error: null },
   ];
 
   return (
     <div className="space-y-8 pb-20">
-      {/* 1. 상단 주요 지표 요약 섹션 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {mainMetrics.map((metric, i) => (
-          <DashboardCard
-            key={i}
-            isMetric={true}
-            subtitle={metric.label}
-            title={metric.value}
-            isLoading={metric.isLoading}
-            error={metric.error}
-            onRetry={metric.onRetry || (() => { })}
-            lgColSpan={1}
-            className="hover:border-violet-100 dark:hover:border-violet-800 transition-colors group h-44 flex flex-col justify-between"
-            topRight={
-              <div className={`w-10 h-10 rounded-2xl flex items-center justify-center text-white text-sm shadow-lg transform group-hover:scale-110 transition-transform ${METRIC_COLORS[metric.color] || METRIC_COLORS.black}`}>
-                {metric.icon}
-              </div>
-            }
-          >
-            <div className="flex justify-between items-center">
-              <p className="text-[9px] text-gray-400 dark:text-gray-600 uppercase tracking-widest leading-none">{metric.sub}</p>
-            </div>
-          </DashboardCard>
-        ))}
+
+      {/* Top Section: Metrics, Style Distribution, and Side Rankings */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-stretch">
+
+        {/* Left Section: 2 Columns for Metrics and Style Distribution */}
+        <div className="lg:col-span-2 flex flex-col gap-6">
+          {/* Top Row: 2 Metric Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {mainMetrics.map((metric, i) => (
+              <DashboardCard
+                key={i}
+                isMetric={true}
+                subtitle={metric.label}
+                title={metric.value}
+                isLoading={metric.isLoading}
+                error={metric.error}
+                onRetry={metric.onRetry || (() => { })}
+                lgColSpan={1}
+                className="hover:border-violet-100 dark:hover:border-violet-800 transition-colors group h-44 flex flex-col justify-between"
+                topRight={
+                  <div className={`w-10 h-10 rounded-2xl flex items-center justify-center text-white text-sm shadow-lg transform group-hover:scale-110 transition-transform ${METRIC_COLORS[metric.color] || METRIC_COLORS.black}`}>
+                    {metric.icon}
+                  </div>
+                }
+              >
+                <div className="flex justify-between items-center">
+                  <p className="text-[9px] text-gray-400 dark:text-gray-600 uppercase tracking-widest leading-none">{metric.sub}</p>
+                </div>
+              </DashboardCard>
+            ))}
+          </div>
+
+          {/* Bottom Row: Style Distribution (occupies remaining height) */}
+          <StyleDistributionCard
+            data={data}
+            isLoading={isLoading}
+            error={error}
+            onRetry={() => fetchData(true)}
+            className="flex-1"
+          />
+        </div>
+
+        {/* Middle-Right Section: Search Rank Card (Vertical) */}
+        <div className="lg:col-span-1">
+          <SearchRankCard
+            trends={data as any}
+            isLoading={isLoading}
+            error={error}
+            onRetry={() => fetchData(true)}
+            className="h-full"
+          />
+        </div>
+
+        {/* Far-Right Section: Best Sellers Card (Vertical) */}
+        <div className="lg:col-span-1">
+          <BestSellersCard
+            sales={sales}
+            isLoading={isLoadingSales}
+            error={errorSales}
+            onRetry={() => fetchSales(true)}
+            className="h-full"
+          />
+        </div>
       </div>
 
+      {/* Bottom Section: t-SNE Neural Map (Full Width) */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* 1열: 사용자 검색 순위 리스트 (ColSpan: 1) */}
-        <SearchRankCard trends={data as any} isLoading={isLoading} error={error} onRetry={() => fetchData(true)} />
-
-        {/* 2-3열: 미적 분포(Style Distribution) 레이더 차트 (ColSpan: 2) */}
-        <StyleDistributionCard data={data} isLoading={isLoading} error={error} onRetry={() => fetchData(true)} />
-
-        {/* 4열: 베스트 셀러 상품 랭킹 바 차트 (ColSpan: 1) */}
-        <BestSellersCard sales={sales} isLoading={isLoadingSales} error={errorSales} onRetry={() => fetchSales(true)} />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* t-SNE 스타일 투영 산점도 (ColSpan: 4 - Full Width) */}
         <TSNEPlot />
       </div>
     </div>

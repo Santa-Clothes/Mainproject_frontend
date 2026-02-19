@@ -43,15 +43,15 @@ const DashboardCard: React.FC<Props> = ({
                     {topRight}
                 </div>
             ) : (
-                /* [Standard Mode Header] 소제목, 제목, 아이콘 포함 */
-                <div className="flex justify-between items-start relative z-10 mb-6">
-                    <div className="space-y-3">
+                /* [Standard Mode Header] 소제목 줄에 필터 배치, 제목은 아래로 */
+                <div className="relative z-10 mb-6 space-y-3">
+                    <div className="flex justify-between items-center">
                         <span className="text-[9px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-[0.4em]">{subtitle}</span>
-                        <h3 className="text-5xl font-serif italic text-black dark:text-white tracking-tight flex items-center gap-3">
-                            {title}
-                        </h3>
+                        {topRight}
                     </div>
-                    {topRight}
+                    <h3 className={`${lgColSpan === 1 ? 'text-4xl' : 'text-5xl'} font-normal italic text-black dark:text-white tracking-tight flex items-center gap-3`}>
+                        {title}
+                    </h3>
                 </div>
             )}
 

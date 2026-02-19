@@ -15,27 +15,30 @@ interface Props {
     isLoading: boolean;
     error: string | null;
     onRetry: () => void;
+    className?: string;
 }
 
 /**
  * SearchRankCard: 사용자 검색량 기준 상위 5개 트렌드를 순위 리스트 형태로 표시합니다.
  * 수치를 배제하고 명칭과 순위 위주의 깔끔한 UI를 제공합니다.
  */
-const SearchRankCard: React.FC<Props> = ({ trends, isLoading, error, onRetry }) => {
+const SearchRankCard: React.FC<Props> = ({ trends, isLoading, error, onRetry, className = "" }) => {
     return (
         <DashboardCard
             title="Search Rank"
-            subtitle="Top 5 Trends"
+            subtitle="Naver Top 5 Trends"
             isLoading={isLoading}
             error={error}
             onRetry={onRetry}
             lgColSpan={1}
-            className="min-h-72"
+            className={`${className} min-h-72`}
             topRight={
-                <div className="flex items-center gap-1.5 px-2.5 py-1 bg-violet-600 rounded-full shadow-md">
+                <>
+                    {/* <div className="flex items-center gap-1.5 px-2.5 py-1 bg-violet-600 rounded-full shadow-md">
                     <FaArrowTrendUp size={9} className="text-white" />
                     <span className="text-[7px] font-bold text-white uppercase tracking-widest">Rank</span>
-                </div>
+                </div> */}
+                </>
             }
         >
             <div className="flex flex-col h-full space-y-2">

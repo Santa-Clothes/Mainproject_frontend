@@ -21,13 +21,14 @@ interface Props {
     isLoading: boolean;
     error: string | null;
     onRetry: () => void;
+    className?: string;
 }
 
 /**
  * StyleDistributionCard: 전체 스타일 비중을 도넛 차트(PieChart)로 시각화합니다.
  * Recharts를 사용하여 데이터를 렌더링하며, 상세 범례를 포함합니다.
  */
-const StyleDistributionCard: React.FC<Props> = ({ data, isLoading, error, onRetry }) => {
+const StyleDistributionCard: React.FC<Props> = ({ data, isLoading, error, onRetry, className = "" }) => {
     // 차트 각 섹션에 순차적으로 적용될 컬러 팔레트
     const CHART_COLORS = [
         '#8B5CF6', '#3B82F6', '#EC4899', '#818CF8',
@@ -44,12 +45,12 @@ const StyleDistributionCard: React.FC<Props> = ({ data, isLoading, error, onRetr
     return (
         <DashboardCard
             title="Style"
-            subtitle="Distribution"
+            subtitle="9oz Distribution"
             isLoading={isLoading}
             error={error}
             onRetry={onRetry}
             lgColSpan={2}
-            className="min-h-72"
+            className={`${className} min-h-72`}
         >
             <div className="flex flex-col md:flex-row items-center gap-4 h-full">
                 {/* 차트 영역: 왼쪽 배치 (이전 상태 복구) */}

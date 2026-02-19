@@ -6,7 +6,7 @@
  */
 
 const BASEURL = process.env.NEXT_PUBLIC_BACK_API_URL;
-
+const TESTURL = process.env.NEXT_PUBLIC_FASHION_SEARCH_API;
 /**
  * 사용자로부터 전달받은 파일을 이미지 서버로 업로드합니다.
  * 에러 발생 시 throw 대신 null을 반환하여 페이지 멈춤을 방지합니다.
@@ -59,3 +59,24 @@ export const getImages = async () => {
         return []; // 에러 시 빈 배열 반환하여 UI 깨짐 방지
     }
 }
+
+// export const testAnalyze = async () => {
+//     const reqUrl = `${TESTURL}/api/imageupload/testAnalyze`;
+
+//     try {
+//         const response = await fetch(reqUrl, {
+//             method: 'GET',
+//         });
+
+//         if (!response.ok) {
+//             console.error("Server error:", response.status, response.statusText);
+//             return []; // 실패 시 빈 배열 반환
+//         }
+
+//         const data = await response.json();
+//         return data;
+//     } catch (error) {
+//         console.error("testAnalyze error:", error);
+//         return []; // 에러 시 빈 배열 반환하여 UI 깨짐 방지
+//     }
+// }
