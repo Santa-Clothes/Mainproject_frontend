@@ -7,14 +7,10 @@ export default function DashboardPage() {
       <div className="space-y-4">
         <div className="flex items-center gap-4">
           <span className="w-10 h-px bg-black/10"></span>
-          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.5em]">Analytics Module</span>
+          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.5em]">Analytics Page</span>
         </div>
         <div className="flex justify-between items-end">
-          <h2 className="text-6xl font-serif italic tracking-tighter">Insights Archive</h2>
-          {/* <div className="text-right">
-            <p className="text-[10px] font-bold text-black uppercase tracking-[0.3em]">Neural Engine Sync</p>
-            <p className="text-[8px] font-bold text-gray-300 uppercase tracking-[0.3em] mt-1">High-Fidelity Interface</p>
-          </div> */}
+          <h2 className="text-6xl font-normal italic tracking-tighter">Insights Archive</h2>
         </div>
       </div>
 

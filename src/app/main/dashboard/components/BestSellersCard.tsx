@@ -1,15 +1,12 @@
 'use client';
 
 import React from 'react';
-// import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import DashboardCard from './DashboardCard';
 import { SalesRankItem } from '@/app/api/salesservice/salesapi';
 
 interface Props {
-    sales: SalesRankItem[];
-    isLoading: boolean;
-    error: string | null;
-    onRetry: () => void;
+    initialSales: SalesRankItem[];
+    fetchSalesFn: (shop: string, startDate: string, endDate: string) => Promise<SalesRankItem[]>;
     className?: string;
 }
 
@@ -41,7 +38,10 @@ const shopList = [
  * BestSellersCard: 가장 많이 팔린 상품들을 시각화하는 카드 컴포넌트입니다.
  * 왼쪽에는 Recharts BarChart를, 오른쪽에는 상세 상품 리스트를 표시합니다.
  */
-const BestSellersCard: React.FC<Props> = ({ sales, isLoading, error, onRetry, className = "" }) => {
+const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, className = "" }) => {
+    const [sales, setSales] = React.useState<SalesRankItem[]>(initialSales);
+    const [isLoading, setIsLoading] = React.useState(false);
+    const [error, setError] = React.useState<string | null>(null);
     /**
      * 상품명 가공 함수: 하이픈(-)으로 연결된 이름 중 브랜드명 등을 제외한 실제 상품명만 추출합니다.
      */
@@ -75,9 +75,39 @@ const BestSellersCard: React.FC<Props> = ({ sales, isLoading, error, onRetry, cl
     }, [sales]);
 
     // 필터 상태 관리 (지점, 시작일, 종료일)
+    // 기본값: '전체' 지점, 날짜는 비워두어 전체 기간 검색 유도 (또는 기본값 할당)
     const [selectedShop, setSelectedShop] = React.useState('전체');
     const [startDate, setStartDate] = React.useState('');
     const [endDate, setEndDate] = React.useState('');
+
+    // 필터 값이 바뀔 때마다 외부에서 주입받은 API 조회 함수 실행
+    React.useEffect(() => {
+        const loadFilteredData = async () => {
+            // 날짜가 둘 다 입력되었거나, 아예 선택을 안 한 경우에만 실행 (선택 중 에러 방지)
+            if ((startDate && !endDate) || (!startDate && endDate)) return;
+
+            setIsLoading(true);
+            setError(null);
+
+            try {
+                const result = await fetchSalesFn(
+                    selectedShop === '전체' ? '' : selectedShop,
+                    startDate,
+                    endDate
+                );
+                setSales(result);
+            } catch (err) {
+                console.error("Filter fetch failed:", err);
+                setError("Data loading failed.");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        // 초기 로드가 아닌 경우에만 트리거되도록 딜레이나 조건 추가 가능하지만 즉시 실행
+        // (주의: 최초 렌더링 시에도 initialSales가 있지만 useEffect가 돌아서 한번 더 fetch될 수 있음)
+        loadFilteredData();
+    }, [selectedShop, startDate, endDate, fetchSalesFn]);
 
     // 날짜 표시 형식 가공 (예: 2024-02-19 -> 02.19)
     const formatDateDisplay = (dateStr: string) => {
@@ -96,7 +126,10 @@ const BestSellersCard: React.FC<Props> = ({ sales, isLoading, error, onRetry, cl
             subtitle="9oz Sales"
             isLoading={isLoading}
             error={error}
-            onRetry={onRetry}
+            onRetry={() => {
+                setError(null);
+                setSales(initialSales); // 에러시 재시도 로직 (초기화)
+            }}
             lgColSpan={1}
             className={`${className} min-h-72`}
             topRight={

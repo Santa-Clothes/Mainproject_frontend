@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
 import dynamic from "next/dynamic";
-import { FaCircleInfo, FaArrowsRotate, FaTriangleExclamation, FaExpand } from "react-icons/fa6";
-import { getTSNEPoints, TSNEPoint } from "@/app/api/trendservice/tsneapi";
+import { FaArrowsRotate, FaTriangleExclamation, FaExpand } from "react-icons/fa6";
+import { LuChartScatter } from "react-icons/lu";
+import { TSNEPoint } from "@/app/api/trendservice/tsneapi";
 import { motion, AnimatePresence } from "framer-motion";
 
 /**
@@ -18,7 +19,23 @@ const Plot = dynamic<PlotParams>(() => import("react-plotly.js"), {
     </div>
 });
 
-export default function TSNEPlot() {
+export interface TSNEPlotProps {
+    title?: string;
+    subtitle?: string;
+    description?: string;
+    bottomTextFormat?: string;
+    className?: string;
+    fetchDataFn: () => Promise<TSNEPoint[]>;
+}
+
+export default function TSNEPlot({
+    title = "T-SNE Neural Map",
+    subtitle = "Style Projection",
+    description = "해당 모델의 클러스터링 결과를 2차원 평면에 시각화한 맵입니다.",
+    bottomTextFormat = "Visualizing {count} neural vectors across aesthetic manifold.",
+    className = "lg:col-span-4",
+    fetchDataFn
+}: TSNEPlotProps) {
     const [data, setData] = useState<TSNEPoint[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -44,7 +61,7 @@ export default function TSNEPlot() {
 
             // 실제 데이터 요청과 타임아웃 경합
             const points = await Promise.race([
-                getTSNEPoints(),
+                fetchDataFn(),
                 timeoutPromise
             ]) as TSNEPoint[];
 
@@ -117,8 +134,8 @@ export default function TSNEPlot() {
             return {
                 x: points.map(d => Number(d.xcoord)),
                 y: points.map(d => Number(d.ycoord)),
-                text: points.map(d => d.productName),
-                name: style, // 범례에 표시될 이름
+                text: points.map(d => `<b>${d.productName}</b>`), // 툴팁 텍스트 굵게
+                name: `<b>${style}</b>`, // 범례 이름 굵게
                 mode: 'markers' as const,
                 type: 'scatter' as const,
                 marker: {
@@ -130,7 +147,7 @@ export default function TSNEPlot() {
                 hoverlabel: {
                     bgcolor: '#171717',
                     bordercolor: color,
-                    font: { color: '#ffffff', size: 11, family: 'Inter' }
+                    font: { color: '#ffffff', size: 14, family: 'Inter' }
                 }
             };
         });
@@ -138,34 +155,23 @@ export default function TSNEPlot() {
 
     const [isExpanded, setIsExpanded] = useState(false);
 
-    // ... (existing code)
-
     return (
         <>
-            <div className={`lg:col-span-4 bg-white dark:bg-neutral-900/50 rounded-4xl border border-neutral-200 dark:border-white/5 p-8 space-y-8 shadow-sm transition-colors overflow-hidden flex flex-col min-h-87.5 relative ${isExpanded ? 'invisible' : ''}`}>
+            <div className={`${className} bg-white dark:bg-neutral-900/50 rounded-4xl border border-neutral-200 dark:border-white/5 p-8 space-y-8 shadow-sm overflow-hidden flex flex-col min-h-87.5 relative ${isExpanded ? 'invisible' : ''}`}>
                 <div className="flex justify-between items-end relative z-10">
                     <div className="space-y-2">
-                        <span className="text-[9px] font-bold text-gray-300 dark:text-gray-600 uppercase tracking-[0.4em]">Style Projection</span>
-                        <h3 className="text-3xl font-serif italic text-black dark:text-white tracking-tight">T-SNE Neural Map</h3>
+                        <span className="text-[9px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-[0.4em]">{subtitle}</span>
+                        <h3 className="text-3xl font-normal italic text-black dark:text-white tracking-tight">{title}</h3>
                     </div>
                     <div className="flex items-center gap-3">
-                        <button onClick={() => setIsExpanded(true)} className="p-3 rounded-full bg-neutral-100 dark:bg-white/5 text-gray-400 hover:text-violet-500 transition-all" title="Expand View">
-                            <FaExpand />
-                        </button>
                         <button onClick={fetchData} disabled={isLoading} className="p-3 rounded-full bg-neutral-100 dark:bg-white/5 text-gray-400 hover:text-violet-500 transition-all">
                             <FaArrowsRotate className={isLoading ? 'animate-spin' : ''} />
                         </button>
-                        <div className="px-5 py-2 bg-violet-50 dark:bg-violet-950/30 rounded-full border border-violet-100 dark:border-violet-900/40">
-                            <span className="text-[9px] font-bold text-violet-600 dark:text-violet-400 uppercase tracking-widest flex items-center gap-2">
-                                <FaCircleInfo className="text-xs" />
-                                Neural Aesthetics Mapping
-                            </span>
-                        </div>
                     </div>
                 </div>
 
                 {/* 그래프 컨테이너 (축소 상태) */}
-                <div className="w-full flex-1 min-h-100 rounded-3xl overflow-hidden border border-neutral-300 dark:border-white/10 bg-gray-50/10 dark:bg-black/20 relative shadow-inner cursor-pointer" onClick={() => setIsExpanded(true)}>
+                <div className="w-full flex-1 min-h-100 rounded-3xl overflow-hidden border border-neutral-300 dark:border-white/10 bg-gray-50/10 dark:bg-black/20 relative shadow-inner cursor-pointer group" onClick={() => setIsExpanded(true)}>
                     <AnimatePresence>
                         {isLoading && (
                             <motion.div
@@ -185,28 +191,28 @@ export default function TSNEPlot() {
                         )}
                     </AnimatePresence>
 
-                    <div className="w-full h-100 relative z-10 bg-white/5 pointer-events-none">
-                        <Plot
-                            data={plotData}
-                            layout={{
-                                autosize: true,
-                                margin: { l: 40, r: 40, b: 40, t: 40 },
-                                showlegend: false,
-                                hovermode: false,
-                                paper_bgcolor: 'rgba(0,0,0,0)',
-                                plot_bgcolor: 'rgba(0,0,0,0)',
-                                xaxis: { showgrid: true, gridcolor: '#f3f4f6', zeroline: false, showticklabels: false, autorange: true },
-                                yaxis: { showgrid: true, gridcolor: '#f3f4f6', zeroline: false, showticklabels: false, autorange: true },
-                            }}
-                            config={{ displayModeBar: false, responsive: true, staticPlot: true }}
-                            useResizeHandler={true}
-                            style={{ width: '100%', height: '100%' }}
-                        />
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/5 hover:bg-black/10 transition-colors group">
-                            <span className="px-6 py-3 bg-white/80 dark:bg-black/80 backdrop-blur-md rounded-full text-xs font-bold uppercase tracking-widest shadow-lg opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0">
-                                Click to Interact
-                            </span>
+                    {/* 최적화: 메인 화면에서는 무거운 Plotly 대신 퍼포먼스 가벼운 CSS 플레이스홀더를 띄웁니다. */}
+                    <div className="w-full h-100 relative z-10 flex flex-col items-center justify-center gap-6 bg-linear-to-b from-transparent to-neutral-100/50 dark:to-white/5 transition-colors">
+
+                        {/* CSS 렌더링 추상 신경망 */}
+                        <div className="relative w-40 h-40 flex items-center justify-center">
+                            <div className="absolute inset-0 bg-violet-400/20 dark:bg-violet-600/20 rounded-full blur-2xl group-hover:bg-violet-500/40 transition-colors duration-500"></div>
+                            <div className="absolute inset-4 bg-indigo-400/20 dark:bg-indigo-600/20 rounded-full blur-xl group-hover:bg-indigo-500/40 transition-colors duration-500 delay-75"></div>
+                            <div className="absolute inset-10 bg-pink-400/20 dark:bg-pink-600/20 rounded-full blur-md group-hover:bg-pink-500/40 transition-colors duration-500 delay-150"></div>
+
+                            <LuChartScatter className="text-5xl text-violet-600 dark:text-violet-400 relative z-10 group-hover:scale-125 transition-transform duration-500 drop-shadow-lg" />
                         </div>
+
+                        <div className="text-center space-y-2 z-10">
+                            <h4 className="text-xl font-bold text-neutral-800 dark:text-gray-200">Interactive Map Ready</h4>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 max-w-sm mx-auto leading-relaxed px-4">
+                                {description}
+                            </p>
+                        </div>
+
+                        <span className="mt-2 px-8 py-3 bg-black dark:bg-white text-white dark:text-black rounded-full text-[10px] font-bold uppercase tracking-widest shadow-xl group-hover:scale-105 group-hover:shadow-violet-500/20 transition-all z-10">
+                            Show t-SNE Map
+                        </span>
                     </div>
 
                     {error && !isLoading && (
@@ -218,8 +224,8 @@ export default function TSNEPlot() {
                 </div>
 
                 <div className="pt-6 border-t border-gray-100 dark:border-white/5 relative z-10">
-                    <p className="text-[9px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest leading-relaxed">
-                        Visualizing {data.length} neural vectors across aesthetic manifold.
+                    <p className="text-[12px] font-medium text-gray-500 dark:text-gray-500 uppercase tracking-widest leading-relaxed">
+                        {bottomTextFormat.replace('{count}', data.length.toString())}
                     </p>
                 </div>
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-125 h-125 bg-violet-600/5 rounded-full blur-[120px] pointer-events-none"></div>
@@ -237,7 +243,7 @@ export default function TSNEPlot() {
                         <div className="flex justify-between items-center mb-8">
                             <div className="space-y-2">
                                 <span className="text-[10px] font-bold text-violet-500 uppercase tracking-widest">Interactive Mode</span>
-                                <h2 className="text-4xl font-serif italic text-black dark:text-white">Full Scale Analysis</h2>
+                                <h2 className="text-4xl font-normal italic text-black dark:text-white">Full Scale Analysis</h2>
                             </div>
                             <button
                                 onClick={() => setIsExpanded(false)}
@@ -247,14 +253,19 @@ export default function TSNEPlot() {
                             </button>
                         </div>
 
-                        <div className="flex-1 rounded-[3rem] border border-neutral-200 dark:border-white/10 overflow-hidden bg-gray-50/50 dark:bg-black/20 shadow-2xl relative">
+                        <div className="flex-1 rounded-3xl border border-neutral-200 dark:border-white/10 overflow-hidden bg-gray-50/50 dark:bg-black/20 shadow-2xl relative p-2 md:p-4">
                             <Plot
                                 data={plotData}
                                 layout={{
                                     autosize: true,
-                                    margin: { l: 60, r: 60, b: 60, t: 60 },
+                                    margin: { l: 60, r: 60, b: 80, t: 60 },
                                     showlegend: true,
-                                    legend: { orientation: 'h', y: -0.1 },
+                                    legend: {
+                                        orientation: 'h',
+                                        y: -0.15,
+                                        font: { size: 14, family: 'Inter', color: '#6b7280' },
+                                        itemsizing: 'constant'
+                                    },
                                     hovermode: 'closest',
                                     paper_bgcolor: 'rgba(0,0,0,0)',
                                     plot_bgcolor: 'rgba(0,0,0,0)',

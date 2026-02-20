@@ -12,7 +12,8 @@ import StyleDistributionCard from './components/StyleDistributionCard';
 import BestSellersCard from './components/BestSellersCard';
 import DashboardCard from './components/DashboardCard';
 import { getShoppingTrends } from '@/app/api/trendservice/trendapi';
-import { getSalesRanking, SalesRankItem } from '@/app/api/salesservice/salesapi';
+import { getSalesRanking, getSalesRankingByShopAndDate, SalesRankItem } from '@/app/api/salesservice/salesapi';
+import { getTSNEPoints } from '@/app/api/trendservice/tsneapi';
 import TSNEPlot from './components/TSNEPlot';
 import { getInternalProductCount, getNaverProductCount } from '@/app/api/productservice/productapi';
 import { SiNaver } from "react-icons/si";
@@ -189,6 +190,25 @@ export default function Dashboard({
     }
   };
 
+  const fetchSalesByShopAndDate = async (isRetry = false) => {
+    if (!isRetry && hasAttemptedSalesFetch) return;
+    setHasAttemptedSalesFetch(true);
+    setIsLoadingSales(true);
+    setErrorSales(null);
+
+    try {
+      const result = await getSalesRankingByShopAndDate('9oz', '2022-01-01', '2022-12-31');
+      const sortedSales = result.sort((a, b) => b.saleQuantity - a.saleQuantity);
+      setSales(sortedSales);
+    } catch (err) {
+      console.error('Failed to fetch sales:', err);
+      setErrorSales('Connection Failed');
+    } finally {
+      setIsLoadingSales(false);
+    }
+  };
+
+
   useEffect(() => {
     if (initialData.length === 0 && !hasAttemptedFetch) fetchData();
     if (initialSales.length === 0 && !hasAttemptedSalesFetch) fetchSales();
@@ -200,7 +220,7 @@ export default function Dashboard({
   // 대시보드 메트릭 카드 정의
   const mainMetrics = [
     {
-      label: 'Internal Inventory',
+      label: '9oz Inventory',
       value: internalProductCount,
       sub: 'Total Products',
       icon: <FaBoxesStacked />,
@@ -219,8 +239,6 @@ export default function Dashboard({
       error: errorNaverProductCount,
       onRetry: () => fetchNaverProductCount(true)
     },
-    // { label: 'Curation Rate', value: '820/d', sub: '-4% from avg', icon: <FaWaveSquare />, color: 'violet', isLoading: false, error: null },
-    // { label: 'Active Metadata', value: '45.2K', sub: 'Optimal indexing', icon: <FaTags />, color: 'violet', isLoading: false, error: null },
   ];
 
   return (
@@ -238,7 +256,7 @@ export default function Dashboard({
                 key={i}
                 isMetric={true}
                 subtitle={metric.label}
-                title={metric.value}
+                title={`${metric.value}개`}
                 isLoading={metric.isLoading}
                 error={metric.error}
                 onRetry={metric.onRetry || (() => { })}
@@ -251,7 +269,7 @@ export default function Dashboard({
                 }
               >
                 <div className="flex justify-between items-center">
-                  <p className="text-[9px] text-gray-400 dark:text-gray-600 uppercase tracking-widest leading-none">{metric.sub}</p>
+                  <p className="text-[10px] text-gray-400 dark:text-gray-600 uppercase tracking-widest leading-none">{metric.sub}</p>
                 </div>
               </DashboardCard>
             ))}
@@ -281,10 +299,8 @@ export default function Dashboard({
         {/* Far-Right Section: Best Sellers Card (Vertical) */}
         <div className="lg:col-span-1">
           <BestSellersCard
-            sales={sales}
-            isLoading={isLoadingSales}
-            error={errorSales}
-            onRetry={() => fetchSales(true)}
+            initialSales={sales}
+            fetchSalesFn={getSalesRankingByShopAndDate}
             className="h-full"
           />
         </div>
@@ -292,7 +308,14 @@ export default function Dashboard({
 
       {/* Bottom Section: t-SNE Neural Map (Full Width) */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <TSNEPlot />
+        <TSNEPlot
+          title="9oz Style Clusters"
+          subtitle="t-SNE Projection"
+          description="스타일별로 클러스터링된 제품들을 t-SNE 알고리즘을 통해 2차원 평면에 시각화한 맵입니다."
+          bottomTextFormat="총 {count}개의 데이터가 매핑되었습니다."
+          className="lg:col-span-4"
+          fetchDataFn={getTSNEPoints}
+        />
       </div>
     </div>
   );

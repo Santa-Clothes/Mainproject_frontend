@@ -35,18 +35,18 @@ const DashboardCard: React.FC<Props> = ({
     const colSpanClass = lgColSpan === 2 ? 'lg:col-span-2' : lgColSpan === 3 ? 'lg:col-span-3' : '';
 
     return (
-        <div className={`${colSpanClass} bg-white dark:bg-neutral-900/50 rounded-3xl border-2 border-neutral-100 dark:border-white/10 p-7 flex flex-col shadow-sm transition-colors relative overflow-hidden ${className}`}>
+        <div className={`${colSpanClass} bg-white dark:bg-neutral-900/50 rounded-3xl border-2 border-neutral-100 dark:border-white/10 p-7 flex flex-col shadow-sm relative overflow-hidden ${className}`}>
             {isMetric ? (
                 /* [Metric Mode Header] 소제목과 아이콘만 상단에 고정 */
                 <div className="flex justify-between items-center relative z-10">
-                    <span className="text-[9px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-[0.4em]">{subtitle}</span>
+                    <span className="text-[11px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-[0.4em]">{subtitle}</span>
                     {topRight}
                 </div>
             ) : (
                 /* [Standard Mode Header] 소제목 줄에 필터 배치, 제목은 아래로 */
                 <div className="relative z-10 mb-6 space-y-3">
                     <div className="flex justify-between items-center">
-                        <span className="text-[9px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-[0.4em]">{subtitle}</span>
+                        <span className="text-[11px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-[0.4em]">{subtitle}</span>
                         {topRight}
                     </div>
                     <h3 className={`${lgColSpan === 1 ? 'text-4xl' : 'text-5xl'} font-normal italic text-black dark:text-white tracking-tight flex items-center gap-3`}>
@@ -89,7 +89,7 @@ const DashboardCard: React.FC<Props> = ({
                     <div className="flex-1 flex flex-col">
                         {isMetric && (
                             <div className="relative z-10 flex-1 flex flex-col justify-center py-2">
-                                <h3 className="text-5xl font-serif italic text-black dark:text-white tracking-tight flex items-center gap-3">
+                                <h3 className="text-5xl font-normal italic text-black dark:text-white tracking-tight flex items-center gap-3">
                                     {title}
                                 </h3>
                             </div>
