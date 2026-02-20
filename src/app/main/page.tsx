@@ -24,9 +24,9 @@ export default function MainPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
 
-        {/* Card 1: Archive Studio */}
+        {/* Card 1: Upload Page */}
         <Link
-          href="/main/studio"
+          href="/main/uploadpage"
           className="lg:col-span-2 group relative h-[560px] bg-neutral-900 rounded-[3rem] overflow-hidden border-2 border-neutral-100 dark:border-white/10 transition-shadow hover:shadow-xl"
         >
           <div className="absolute inset-0 bg-neutral-900 overflow-hidden">

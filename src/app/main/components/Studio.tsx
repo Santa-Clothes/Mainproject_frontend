@@ -1,13 +1,11 @@
 "use client"
 import React, { useState, useTransition } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
 
 // UI 컴포넌트 임포트
-import ResultGrid from './components/ResultGrid';
-import ModeTabs from './components/ModeTabs';
-import SelectionPanel from './components/SelectionPanel';
-import UploadPanel from './components/UploadPanel';
-import AnalysisSection from './components/AnalysisSection';
+import ResultGrid from './ResultGrid';
+import SelectionPanel from './SelectionPanel';
+import UploadPanel from './UploadPanel';
+import AnalysisSection from './AnalysisSection';
 
 import { RecommendData } from '@/types/ProductType';
 
@@ -18,14 +16,7 @@ export type StudioMode = 'imageInput' | 'imageSelection';
  * 두 가지 모드(기존 데이터 탐색 / 이미지 직접 업로드)를 관리하며,
  * 분석 결과 발생 시 세련된 2-Card 레이아웃으로 결과를 표시합니다.
  */
-export default function Studio() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  // URL 파라미터를 통한 모드 관리
-  const modeParam = searchParams.get('mode');
-  const mode: StudioMode = modeParam ? modeParam === 'imageInput' ? 'imageInput' : 'imageSelection' : 'imageInput';
-
+export default function Studio({ mode }: { mode: StudioMode }) {
   // React 18 Transition을 사용한 매끄러운 상태 전환
   const [isPending, startTransition] = useTransition();
 
@@ -62,14 +53,6 @@ export default function Studio() {
 
   return (
     <div className="space-y-6 lg:space-y-10 max-w-7xl mx-auto w-full px-4 lg:px-0">
-
-      {/* 1. 모드 전환 탭 (결과 화면이 아닐 때만 노출) */}
-      {!results && (
-        <ModeTabs mode={mode} onModeChange={(newMode) => {
-          setResults(null);
-          router.push(`/main/studio?mode=${newMode}`, { scroll: false });
-        }} />
-      )}
 
       {/* 2. 메인 컨텐츠 영역 */}
       {results ? (

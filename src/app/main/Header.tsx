@@ -10,7 +10,9 @@ import {
   FaSun,
   FaMoon,
   FaUser,
-  FaShirt
+  FaShirt,
+  FaCamera,
+  FaMagnifyingGlass
 } from 'react-icons/fa6';
 import { IoSettingsSharp } from "react-icons/io5";
 
@@ -123,7 +125,8 @@ export default function Header() {
   // 네비게이션 아이템 정의
   const navItems = [
     { id: 'home', label: 'Overview', icon: <FaHouse size={20} />, path: '/main' },
-    { id: 'studio', label: 'Studio', icon: <FaShirt size={20} />, path: '/main/studio' },
+    { id: 'studio', label: 'Studio', icon: <FaCamera size={20} />, path: '/main/studio' },
+    { id: 'selection', label: 'Selection', icon: <FaMagnifyingGlass size={20} />, path: '/main/selectionpage' },
     { id: 'dashboard', label: 'Dashboard', icon: <FaChartLine size={20} />, path: '/main/dashboard' },
   ];
 

@@ -2,7 +2,6 @@
 
 import React from 'react';
 import DashboardCard from './DashboardCard';
-import { FaArrowTrendUp } from 'react-icons/fa6';
 import { SiNaver } from 'react-icons/si';
 
 interface Trend {

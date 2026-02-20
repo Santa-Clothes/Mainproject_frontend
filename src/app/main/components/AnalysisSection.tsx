@@ -9,8 +9,8 @@ import { FaWaveSquare, FaCircleCheck } from 'react-icons/fa6';
 import { getNaverProductCount } from '@/app/api/productservice/productapi';
 import { getShoppingTrends } from '@/app/api/trendservice/trendapi';
 import { SiNaver } from 'react-icons/si';
-import DashboardCard from '../../dashboard/components/DashboardCard';
-import SearchRankCard from '../../dashboard/components/SearchRankCard';
+import DashboardCard from '../dashboard/components/DashboardCard';
+import SearchRankCard from '../dashboard/components/SearchRankCard';
 
 interface AnalysisData {
     name: string;
@@ -23,15 +23,6 @@ interface AnalysisSectionProps {
     productName?: string;
     isLoading?: boolean;
 }
-
-// const mockRadarData: AnalysisData[] = [
-//     { name: 'Minimalism', value: 85, fullMark: 100 },
-//     { name: 'Elegance', value: 72, fullMark: 100 },
-//     { name: 'Vibrancy', value: 45, fullMark: 100 },
-//     { name: 'Avant-Garde', value: 30, fullMark: 100 },
-//     { name: 'Heritage', value: 90, fullMark: 100 },
-//     { name: 'Technical', value: 65, fullMark: 100 },
-// ];
 
 const mockBarData = [
     { name: 'Texture', val: 78 },
