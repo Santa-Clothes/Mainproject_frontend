@@ -1,5 +1,7 @@
 "use client"
-import React, { useState, useTransition } from 'react';
+import React, { useState, useTransition, useEffect } from 'react';
+import { useAtom } from 'jotai';
+import { analysisHistoryAtom, activeHistoryAtom, HistoryItem } from '@/jotai/historyJotai';
 
 // UI 컴포넌트 임포트
 import ResultGrid from './ResultGrid';
@@ -26,12 +28,41 @@ export default function Studio({ mode }: { mode: StudioMode }) {
   const [analysisName, setAnalysisName] = useState<string | undefined>(undefined); // 현재 분석 대상 상품명
   const [isAnalyzing, setIsAnalyzing] = useState(false); // 분석 중 로딩 상태
 
+  const [history, setHistory] = useAtom(analysisHistoryAtom);
+  const [activeHistory, setActiveHistory] = useAtom(activeHistoryAtom);
+
+  // [히스토리 로드] activeHistory 가 설정된 경우 해당 값을 화면에 곧바로 띄움
+  useEffect(() => {
+    if (activeHistory) {
+      setAnalysisImage(activeHistory.sourceImage);
+      setAnalysisName(activeHistory.productName);
+      setResults(activeHistory.results);
+      setIsAnalyzing(false);
+    }
+  }, [activeHistory]);
+
   /**
    * 결과 수신 핸들러: 분석이 완료되었을 때 호출
    */
   const handleSearchResult = (data: RecommendData[] | null) => {
     setResults(data);
     setIsAnalyzing(false);
+
+    // 데이터가 성공적으로 있으면 히스토리에 기록 (중복 검사 등 추가 가능)
+    if (data && data.length > 0 && analysisImage) {
+      setHistory((prev) => {
+        const newItem: HistoryItem = {
+          id: Date.now().toString(),
+          type: mode,
+          sourceImage: analysisImage,
+          productName: analysisName,
+          timestamp: Date.now(),
+          results: data,
+        };
+        // 최근 3개만 유지
+        return [newItem, ...prev].slice(0, 3);
+      });
+    }
   };
 
   /**
@@ -49,6 +80,7 @@ export default function Studio({ mode }: { mode: StudioMode }) {
   const handleBackToSearch = () => {
     setResults(null);
     setIsAnalyzing(false);
+    setActiveHistory(null); // 뒤로 갈 때 active 상태도 초기화
   };
 
   return (
@@ -74,15 +106,30 @@ export default function Studio({ mode }: { mode: StudioMode }) {
             />
           </div>
 
-          {/* Card 2: 추천 결과 그리드 섹션 */}
+          {/* Card 2: 첫 번째 추천 결과 그리드 섹션 */}
           <div className="bg-white dark:bg-neutral-900/50 rounded-4xl lg:rounded-[2.5rem] border-2 border-neutral-100 dark:border-white/10 shadow-xl p-6 lg:p-12 h-200 lg:h-225 flex flex-col">
             <ResultGrid
               isActive={true}
               isPending={isPending}
               products={results}
-              title="Recommendations"
+              title="Primary Recommendations"
               onProductClick={(product: RecommendData) => {
                 // 추천 상품 클릭 시 상세 페이지(상품 링크)로 이동
+                if (product.productLink) {
+                  window.open(product.productLink, '_blank');
+                }
+              }}
+            />
+          </div>
+
+          {/* Card 3: 두 번째 추천 결과 그리드 섹션 (추가) */}
+          <div className="bg-white dark:bg-neutral-900/50 rounded-4xl lg:rounded-[2.5rem] border-2 border-neutral-100 dark:border-white/10 shadow-xl p-6 lg:p-12 h-200 lg:h-225 flex flex-col">
+            <ResultGrid
+              isActive={true}
+              isPending={isPending}
+              products={results} // TODO: 두 번째 리스트용 별도 데이터(results2 등)가 준비되면 교체
+              title="Secondary Recommendations / Similar Styles"
+              onProductClick={(product: RecommendData) => {
                 if (product.productLink) {
                   window.open(product.productLink, '_blank');
                 }

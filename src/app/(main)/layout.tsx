@@ -2,6 +2,7 @@ import Header from './Header';
 import Footer from './Footer';
 import AuthHandler from './AuthHandler';
 import { Suspense } from 'react';
+import FloatingHistory from './components/FloatingHistory';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
     return (
@@ -55,6 +56,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                 {children}
             </main>
             <Footer />
+            <FloatingHistory />
         </div>
     );
 }
