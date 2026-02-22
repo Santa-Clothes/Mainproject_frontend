@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaArrowRight, FaMicrochip, FaChartLine, FaShieldHalved } from 'react-icons/fa6';
+import { FaArrowRight, FaChartLine } from 'react-icons/fa6';
 import Link from 'next/link';
 import Image from 'next/image';
 

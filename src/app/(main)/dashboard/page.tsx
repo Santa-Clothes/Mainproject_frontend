@@ -14,7 +14,6 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* 클라이언트 중심의 독립적 데이터 로딩을 위해 데이터를 넘기지 않음 */}
       <Dashboard />
     </div>
   );

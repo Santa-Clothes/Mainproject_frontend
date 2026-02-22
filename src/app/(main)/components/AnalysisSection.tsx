@@ -114,10 +114,10 @@ export default function AnalysisSection({ sourceImage, productName, isLoading }:
             <div className="flex flex-col md:flex-row justify-between items-end gap-6 border-b-2 border-neutral-100 dark:border-white/10 pb-8">
                 <div className="space-y-2">
                     <div className="flex items-center gap-2 text-neutral-400 dark:text-neutral-500">
-                        <span className="text-[9px] font-bold uppercase tracking-widest">Neural Analysis Dashboard</span>
+                        <span className="text-[9px] font-bold uppercase tracking-widest">Style Analysis Dashboard</span>
                     </div>
                     <h3 className="font-serif text-4xl italic tracking-tighter text-neutral-900 dark:text-white">
-                        {isLoading ? "Analyzing DNA..." : `Product Analysis: ${productName || "Reference Item"}`}
+                        {isLoading ? "Analyzing Style..." : `Style Analysis: ${productName || "Reference Item"}`}
                     </h3>
                 </div>
             </div>

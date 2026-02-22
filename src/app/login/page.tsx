@@ -5,11 +5,10 @@ import LoginForm from './LoginForm';
 import { useEffect, useState } from 'react';
 
 export default function LoginPage() {
-  const [isDarkMode, setIsDarkMode] = useState(true); // 기본 다크 고정이었으므로 true
+  const [isDarkMode, setIsDarkMode] = useState(true);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('atelier_theme');
-    // const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     if (savedTheme === 'light') {
       setIsDarkMode(false);
       document.documentElement.classList.remove('dark');

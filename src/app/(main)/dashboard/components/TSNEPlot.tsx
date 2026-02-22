@@ -209,10 +209,6 @@ export default function TSNEPlot({
                                 {description}
                             </p>
                         </div>
-
-                        {/* <span className="mt-2 px-8 py-3 bg-black dark:bg-white text-white dark:text-black rounded-full text-[10px] font-bold uppercase tracking-widest shadow-xl group-hover:scale-105 group-hover:shadow-violet-500/20 transition-all z-10">
-                            Show t-SNE Map
-                        </span> */}
                     </div>
 
                     {error && !isLoading && (

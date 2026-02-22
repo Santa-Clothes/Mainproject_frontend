@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect } from 'react';
 import {
-  FaHouse,
   FaArrowRightFromBracket,
   FaGear,
   FaArrowRight,
@@ -10,9 +9,9 @@ import {
   FaSun,
   FaMoon,
   FaUser,
-  FaShirt,
   FaCamera,
-  FaMagnifyingGlass
+  FaMagnifyingGlass,
+  FaHouse
 } from 'react-icons/fa6';
 import { IoSettingsSharp } from "react-icons/io5";
 

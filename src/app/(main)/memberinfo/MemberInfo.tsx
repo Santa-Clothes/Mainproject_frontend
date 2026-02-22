@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAtom } from 'jotai';
 import { authUserAtom } from '@/jotai/loginjotai';
 import { updateMemberInfoAPI, deleteMemberAPI, updateProfileImg, getUserInfoAPI } from '@/app/api/memberservice/memberapi';
