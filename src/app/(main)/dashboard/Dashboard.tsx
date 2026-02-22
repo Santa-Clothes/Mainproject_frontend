@@ -183,7 +183,6 @@ export default function Dashboard({
     if (initialData.length === 0 && !hasAttemptedTSNEFetch) fetchTSNEData();
     if (initialSales.length === 0 && !hasAttemptedSalesFetch) fetchSales();
     if (internalStyles.length === 0 && !hasAttemptedInternalStylesFetch) fetchInternalStyles();
-    // if (naverProductCount === 0 && !hasAttemptedNaverProductCount) fetchNaverProductCount();
 
   }, []);
 

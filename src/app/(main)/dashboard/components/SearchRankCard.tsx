@@ -58,7 +58,6 @@ const SearchRankCard: React.FC<Props> = ({ trends, isLoading, error, onRetry, cl
                                 <span className="text-[11px] font-bold text-neutral-900 dark:text-white uppercase tracking-widest group-hover:text-violet-600 transition-colors">
                                     {trend?.style || 'Analysis Pending'}
                                 </span>
-                                {/* <span className="text-[10px] font-medium text-gray-400 uppercase tracking-tighter">Style DNA Matrix</span> */}
                             </div>
                         </div>
                     </div>

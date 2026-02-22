@@ -20,15 +20,6 @@ export default function UploadPage() {
           <h2 className="text-5xl md:text-6xl font-serif italic tracking-tighter text-neutral-900 dark:text-white">
             Upload Studio
           </h2>
-
-          {/* <div className="text-left md:text-right">
-            <p className="text-[10px] font-bold text-neutral-900 dark:text-neutral-300 uppercase tracking-widest">
-              Version 2.0
-            </p>
-            <p className="text-[8px] font-bold text-neutral-400 dark:text-neutral-600 uppercase tracking-widest mt-1">
-              Manual Curation Active
-            </p>
-          </div> */}
         </div>
       </div>
 

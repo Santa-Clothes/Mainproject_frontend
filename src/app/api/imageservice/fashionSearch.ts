@@ -1,4 +1,6 @@
 /**
+ * 별개의 임시 API. AI model fastAPI와 직접 연결
+ * 
  * Fashion Search API Client
  * =========================
  *

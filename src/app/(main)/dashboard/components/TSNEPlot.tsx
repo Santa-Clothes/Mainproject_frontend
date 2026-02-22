@@ -42,7 +42,7 @@ export default function TSNEPlot({
     const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
 
     const loadingMessages = [
-        "잠재벡터 분석중...",
+        "잠재벡터 2차원 투영중...",
         /* "비교 분석중...",
         "스타일 공간 투영중...",
         "스타일 클러스터링중...",
