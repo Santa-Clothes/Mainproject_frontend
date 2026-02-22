@@ -26,14 +26,14 @@ export const postImage = async (file: File) => {
         });
 
         if (!response.ok) {
-            console.log("Server error:", response.status, response.statusText);
+            console.error("Server error:", response.status, response.statusText);
             return null; // 에러 발생 시 null 반환하여 호출부에서 처리하게 함
         }
 
         const data = await response.json();
         return data;
     } catch (error) {
-        console.log("postImage error:", error);
+        console.error("postImage error:", error);
         return null; // 네트워크 에러 등 발생 시에도 null 반환하여 중단 방지
     }
 }
@@ -74,7 +74,7 @@ export const imageAnalyze = async (file: File) => {
         });
 
         if (!response.ok) {
-            console.log("Server error:", response.status, response.statusText);
+            console.error("Server error:", response.status, response.statusText);
             return []; // 실패 시 빈 배열 반환
         }
         console.log("response", response);
@@ -82,7 +82,7 @@ export const imageAnalyze = async (file: File) => {
 
         return data;
     } catch (error) {
-        console.log("imageAnalyze error:", error);
+        console.error("imageAnalyze error:", error);
         return []; // 에러 시 빈 배열 반환하여 UI 깨짐 방지
     }
 }

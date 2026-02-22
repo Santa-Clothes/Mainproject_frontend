@@ -51,7 +51,7 @@ export default function LoginForm() {
           success: result.success,
           provider: 'local'
         });
-        router.push("/main");
+        router.push("/");
       } else {
         alert("인증 정보가 올바르지 않습니다.");
       }
@@ -73,8 +73,8 @@ export default function LoginForm() {
       return;
     }
 
-    // 프론트엔드로 돌아올 리다이렉트 주소를 동적으로 생성 (현재 도메인/main)
-    const frontendRedirectUrl = encodeURIComponent(`${window.location.origin}/main`);
+    // 프론트엔드로 돌아올 리다이렉트 주소를 동적으로 생성 (현재 도메인/)
+    const frontendRedirectUrl = encodeURIComponent(`${window.location.origin}/`);
 
     let endpoint = "";
     switch (provider) {

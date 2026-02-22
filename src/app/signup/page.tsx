@@ -61,7 +61,7 @@ export default function SignupPage() {
       {/* 뒤로 가기 네비게이션 */}
       <div className="absolute top-6 left-6 z-20 md:top-10 md:left-10">
         <Link
-          href="/main"
+          href="/"
           className="group flex flex-col items-start gap-1 text-[9px] font-bold uppercase tracking-[0.4em] text-neutral-500 transition-all hover:text-violet-600 dark:text-neutral-500 dark:hover:text-white"
         >
           <span className="opacity-0 transition-all -translate-y-2 group-hover:translate-y-0 group-hover:opacity-100 whitespace-nowrap">

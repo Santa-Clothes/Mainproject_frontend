@@ -114,7 +114,7 @@ export default function Header() {
         setAuthInfo(null); // 로컬 스토리지 정보도 자동 초기화됨
         setIsProfileOpen(false);
         alert("로그아웃 되었습니다.");
-        router.push("/main");
+        router.push("/");
       } else
         alert("로그아웃에 실패했습니다.");
     } catch (error) {
@@ -124,10 +124,10 @@ export default function Header() {
 
   // 네비게이션 아이템 정의
   const navItems = [
-    { id: 'home', label: 'Overview', icon: <FaHouse size={20} />, path: '/main' },
-    { id: 'uploadpage', label: 'Upload Studio', icon: <FaCamera size={20} />, path: '/main/uploadpage' },
-    { id: 'selectionpage', label: 'Explore', icon: <FaMagnifyingGlass size={20} />, path: '/main/selectionpage' },
-    { id: 'dashboard', label: 'Dashboard', icon: <FaChartLine size={20} />, path: '/main/dashboard' },
+    { id: 'home', label: 'Overview', icon: <FaHouse size={20} />, path: '/' },
+    { id: 'uploadpage', label: 'Upload Studio', icon: <FaCamera size={20} />, path: '/uploadpage' },
+    { id: 'selectionpage', label: 'Selection Studio', icon: <FaMagnifyingGlass size={20} />, path: '/selectionpage' },
+    { id: 'dashboard', label: 'Dashboard', icon: <FaChartLine size={20} />, path: '/dashboard' },
   ];
 
   return (
@@ -276,7 +276,7 @@ export default function Header() {
                   ) : (
                     <div className="px-2 py-2 space-y-1">
                       <p className="text-[7px] font-bold text-gray-400 uppercase tracking-[0.3em] ml-3 mb-2 pt-2">Account Actions</p>
-                      <Link href="/main/memberinfo" onClick={() => setIsProfileOpen(false)} className="flex items-center gap-3 px-4 py-3 text-[9px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:bg-neutral-100 dark:hover:bg-white/5 hover:text-violet-600 rounded-xl transition-colors">
+                      <Link href="/memberinfo" onClick={() => setIsProfileOpen(false)} className="flex items-center gap-3 px-4 py-3 text-[9px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:bg-neutral-100 dark:hover:bg-white/5 hover:text-violet-600 rounded-xl transition-colors">
                         <FaGear size={11} /> Configuration
                       </Link>
                       <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-[9px] font-bold uppercase tracking-widest text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-colors">

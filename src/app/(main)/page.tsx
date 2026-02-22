@@ -26,7 +26,7 @@ export default function MainPage() {
 
         {/* Card 1: Upload Page */}
         <Link
-          href="/main/uploadpage"
+          href="/uploadpage"
           className="lg:col-span-2 group relative h-[560px] bg-neutral-900 rounded-[3rem] overflow-hidden border-2 border-neutral-100 dark:border-white/10 transition-shadow hover:shadow-xl"
         >
           <div className="absolute inset-0 bg-neutral-900 overflow-hidden">
@@ -60,7 +60,7 @@ export default function MainPage() {
 
         {/* Card 2: Analytics Dashboard */}
         <Link
-          href="/main/dashboard"
+          href="/dashboard"
           suppressHydrationWarning
           className="relative flex flex-col justify-between overflow-hidden rounded-[3rem] border-2 border-neutral-100 bg-white p-10 dark:border-white/10 dark:bg-neutral-900/50 md:p-14 group shadow-sm transition-[border-color,box-shadow,transform] duration-300 hover:border-violet-500/40"
         >

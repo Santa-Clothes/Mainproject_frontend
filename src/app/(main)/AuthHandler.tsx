@@ -43,7 +43,7 @@ export default function AuthHandler() {
 
                         // 주소창에서 토큰을 지우기 위해 쿼리 없이 현재 경로로 이동
                         // replace를 사용하여 히스토리에 토큰이 남지 않게 함
-                        router.replace('/main');
+                        router.replace('/');
                     }
                 } catch (error) {
                     console.error("Failed to fetch user info in AuthHandler:", error);

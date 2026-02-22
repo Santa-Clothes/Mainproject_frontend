@@ -1,4 +1,4 @@
-import Header from '@/app/main/Header';
+import Header from './Header';
 import Footer from './Footer';
 import AuthHandler from './AuthHandler';
 import { Suspense } from 'react';

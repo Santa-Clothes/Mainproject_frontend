@@ -20,7 +20,7 @@ export default function Footer() {
 
           {/* Brand Section: col-span-2로 공간 확보 */}
           <div className="col-span-1 space-y-6 md:col-span-2">
-            <Link href="/main" className="group flex flex-col items-start">
+            <Link href="/" className="group flex flex-col items-start">
               <h2 className="font-sans text-xl font-black uppercase tracking-[0.4em] text-neutral-900 transition-colors group-hover:text-violet-600 dark:text-white dark:group-hover:text-violet-400">
                 WIZARD of OUNCE
               </h2>
@@ -38,10 +38,10 @@ export default function Footer() {
             <h4 className="text-[9px] font-bold uppercase tracking-[0.4em] text-violet-600 dark:text-violet-500">System</h4>
             <ul className="space-y-3">
               {[
-                { name: 'Overview', path: '/main' },
-                { name: 'Upload Studio', path: '/main/uploadpage' },
-                { name: 'Explore', path: '/main/selectionpage' },
-                { name: 'Dashboard', path: '/main/dashboard' }
+                { name: 'Overview', path: '/' },
+                { name: 'Upload Studio', path: '/uploadpage' },
+                { name: 'Explore', path: '/selectionpage' },
+                { name: 'Dashboard', path: '/dashboard' }
               ].map((item) => (
                 <li key={item.name}>
                   <Link
@@ -64,14 +64,8 @@ export default function Footer() {
             </span>
             <div className="flex items-center gap-4">
               <div className="h-1 w-1 animate-pulse rounded-full bg-violet-600"></div>
-              {/* <span className="text-[8px] font-bold uppercase tracking-[0.4em] text-neutral-400 dark:text-violet-900/60">
-                temp
-              </span> */}
             </div>
           </div>
-          {/* <div className="text-[8px] font-bold uppercase tracking-[0.4em] text-neutral-400 dark:text-violet-950">
-            temp
-          </div> */}
         </div>
       </div>
     </footer>

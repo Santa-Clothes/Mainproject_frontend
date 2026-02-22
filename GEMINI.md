@@ -36,3 +36,4 @@
 - Always define API response types in `src/types` before implementation.
 - Maintain consistency with the existing dashboard layout in `Dashboard.tsx`.
 - Follow the established pattern for API services in `src/app/api/`.
+- **File/Folder Modification Protocol (Windows)**: Due to Windows file locking issues with VS Code and dev servers (`npm run dev`), the AI agent should **NOT** use terminal commands to delete, rename, or move files and folders. Instead, clearly instruct the USER to perform these structural changes manually via the VS Code GUI, and ask the USER to notify the agent once completed so the agent can update the code accordingly.
