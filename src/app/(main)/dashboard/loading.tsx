@@ -89,7 +89,7 @@ export default function Loading() {
             {/* Loading Message */}
             <div className="flex flex-col items-center justify-center py-10 space-y-4">
                 <div className="h-6 w-6 border-2 border-violet-600 border-t-transparent rounded-full animate-spin"></div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400">Synchronizing Analysis Engine</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400">Synchronizing</p>
             </div>
         </div>
     );

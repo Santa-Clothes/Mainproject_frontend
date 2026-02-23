@@ -9,12 +9,13 @@ interface ProductCardProps {
     index?: number;
     selected?: boolean; // 선택 상태 추가
     onClick?: () => void;
+    showCartButton?: boolean; // 장바구니 버튼 표시 여부
 }
 
 /**
  * ProductCard: Upload Studio 및 Explore Catalog의 검색/분석 결과로 반환된 추천 상품을 표시하는 개별 아이템 카드 컴포넌트입니다.
  */
-export default function ProductCard({ product, index = 0, selected = false, onClick }: ProductCardProps) {
+export default function ProductCard({ product, index = 0, selected = false, showCartButton = false, onClick }: ProductCardProps) {
     // ... 기존 포맷팅 로직 생략 (유지에 주의)
     const formattedScore = typeof product.similarityScore === 'number'
         ? `${(product.similarityScore * 100).toFixed(1)}%`
@@ -66,14 +67,16 @@ export default function ProductCard({ product, index = 0, selected = false, onCl
                 <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-all" />
 
                 {/* 우측 상단 장바구니 버튼 */}
-                <button
-                    onClick={toggleCart}
-                    title={isInCart ? 'Remove from Cart' : 'Add to Cart'}
-                    className={`absolute top-4 right-4 z-20 w-8 h-8 rounded-full flex items-center justify-center transition-all bg-white shadow-xl ${isInCart ? 'text-violet-600 scale-110 shadow-violet-500/20' : 'text-neutral-300 hover:text-violet-500 hover:scale-110'
-                        }`}
-                >
-                    <FaCartArrowDown size={14} className={isInCart ? 'animate-bounce' : ''} />
-                </button>
+                {showCartButton && (
+                    <button
+                        onClick={toggleCart}
+                        title={isInCart ? 'Remove from Cart' : 'Add to Cart'}
+                        className={`absolute top-4 right-4 z-20 w-8 h-8 rounded-full flex items-center justify-center transition-all bg-white shadow-xl ${isInCart ? 'text-violet-600 scale-110 shadow-violet-500/20' : 'text-neutral-300 hover:text-violet-500 hover:scale-110'
+                            }`}
+                    >
+                        <FaCartArrowDown size={14} className={isInCart ? 'animate-bounce' : ''} />
+                    </button>
+                )}
             </div>
 
             {/* 2. 상품 정보 컨테이너 */}

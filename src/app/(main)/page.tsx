@@ -45,8 +45,8 @@ export default function MainPage() {
 
           <div className="absolute bottom-12 left-10 right-10 space-y-6">
             <div className="space-y-4">
-              <h3 className="text-4xl md:text-5xl font-serif italic text-white tracking-tighter leading-none">Upload Studio</h3>
-              <p className="text-sm md:text-base font-light text-violet-100/60 leading-relaxed font-serif italic">
+              <h3 className="text-4xl md:text-5xl font-serif italic text-white tracking-tighter leading-none">Upload <br /> Studio</h3>
+              <p className="text-sm md:text-base text-violet-100/60 leading-relaxed font-normal">
                 Analyze your own style.
               </p>
             </div>
@@ -77,9 +77,9 @@ export default function MainPage() {
 
           <div className="absolute bottom-12 left-10 right-10 space-y-6">
             <div className="space-y-4">
-              <h3 className="text-4xl md:text-5xl font-serif italic text-white tracking-tighter leading-none">Select Product</h3>
-              <p className="text-sm md:text-base font-light text-violet-100/60 leading-relaxed font-serif italic">
-                Select your product.
+              <h3 className="text-4xl md:text-5xl font-serif italic text-white tracking-tighter leading-none">Selection <br /> Studio</h3>
+              <p className="text-sm md:text-base text-violet-100/60 leading-relaxed font-normal">
+                Recommend from our products.
               </p>
             </div>
             <div className="flex items-center gap-4 text-[10px] sm:text-[11px] font-bold text-white uppercase tracking-widest transition-all group-hover:gap-6">
@@ -88,13 +88,13 @@ export default function MainPage() {
           </div>
         </Link>
 
-        {/* Card 2: Analytics Dashboard */}
+        {/* Card 3: Analytics Dashboard */}
         <Link
           href="/dashboard"
           suppressHydrationWarning
           className="relative flex flex-col justify-between overflow-hidden rounded-[3rem] border-2 border-neutral-100 bg-white p-10 dark:border-white/10 dark:bg-neutral-900/50 md:p-14 group shadow-sm transition-[border-color,box-shadow,transform] duration-300 hover:border-violet-500/40"
         >
-          <div className="relative z-10 space-y-12">
+          {/* <div className="relative z-10 space-y-12">
             <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-violet-600 shadow-lg group-hover:bg-violet-500">
               <FaChartLine className="text-white text-2xl" />
             </div>
@@ -105,16 +105,17 @@ export default function MainPage() {
                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">analytics</span>
               </div>
             </div>
-          </div>
+          </div> */}
 
-          <div className="relative z-10 flex flex-col gap-6 border-t border-neutral-200 pt-12 dark:border-white/5">
-            <div className="flex items-center gap-4">
-              {/* animate-pulse는 Tailwind 공식 기본 클래스입니다. (완전 제거를 원하시면 이 줄의 animate-pulse만 지우세요) */}
-              <div className="h-2 w-2 rounded-full bg-violet-500 animate-pulse"></div>
-              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest dark:text-violet-700">Sync Active</p>
+          <div className="absolute bottom-12 left-10 right-10 space-y-6">
+            <div className="space-y-4">
+              <h3 className="text-4xl md:text-5xl font-serif italic text-white tracking-tighter leading-none">Analytics <br /> Dashboard</h3>
+              <p className="text-sm md:text-base text-violet-100/60 leading-relaxed font-normal">
+                Analyze Current Products.
+              </p>
             </div>
-            <div className="flex items-center gap-4 text-[11px] font-bold text-neutral-900 uppercase tracking-widest dark:text-violet-100">
-              View Analytics <FaArrowRight className="transition-transform group-hover:translate-x-2" />
+            <div className="flex items-center gap-4 text-[10px] sm:text-[11px] font-bold text-white uppercase tracking-widest transition-all group-hover:gap-6">
+              View Analytics <FaArrowRight className="text-violet-400 transition-transform group-hover:translate-x-2" />
             </div>
           </div>
 

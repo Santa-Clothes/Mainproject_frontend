@@ -65,7 +65,9 @@ export default function FloatingHistory() {
                                 title={`Recent analysis ${history.length - idx}`}
                             >
                                 <Image
-                                    src={item.sourceImage.includes('?') ? `${item.sourceImage}&t=${item.timestamp}` : `${item.sourceImage}?t=${item.timestamp}`}
+                                    src={(item.sourceImage.startsWith('data:') || item.sourceImage.startsWith('blob:'))
+                                        ? item.sourceImage
+                                        : (item.sourceImage.includes('?') ? `${item.sourceImage}&t=${item.timestamp}` : `${item.sourceImage}?t=${item.timestamp}`)}
                                     alt="history"
                                     fill
                                     className="object-cover group-hover:scale-110 transition-transform duration-500"

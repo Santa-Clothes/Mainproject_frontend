@@ -109,6 +109,7 @@ const ResultGrid: React.FC<ResultGridProps> = ({
                                 key={item.productId}
                                 product={item}
                                 index={idx}
+                                showCartButton={true}
                                 onClick={() => onProductClick?.(item)}
                             />
                         ))}

@@ -72,12 +72,12 @@ export default function TSNEPlot({
             // 타임아웃인지 일반 에러인지에 따라 메시지 분기 가능
             const isTimeout = err.message === 'TIMEOUT';
             setError(isTimeout
-                ? `backend connection timed out. Please click ${<FaArrowsRotate className="inline-block" />} button.`
-                : `backend offline. Please click ${<FaArrowsRotate className="inline-block" />} button.`
+                ? `backend connection timed out. Please click reset button.`
+                : `backend offline. Please click reset button.`
             );
 
             // 데모용 샘플 데이터 생성 (실패 시에도 UI 흐름 유지를 위함)
-            const mockPoints: TSNEPoint[] = Array.from({ length: 300 }, (_, i) => ({
+            const mockPoints: TSNEPoint[] = Array.from({ length: 0 }, (_, i) => ({
                 xcoord: Math.random() * 20 - 10,
                 ycoord: Math.random() * 20 - 10,
                 productName: `Style Item #${i + 1}`,
@@ -157,16 +157,22 @@ export default function TSNEPlot({
 
     return (
         <>
-            <div className={`${className} bg-white dark:bg-neutral-900/50 rounded-4xl border border-neutral-200 dark:border-white/5 p-6 space-y-4 shadow-sm overflow-hidden flex flex-col min-h-72 relative ${isExpanded ? 'invisible' : ''}`}>
+            <div className={`${className} bg-white dark:bg-neutral-900/50 rounded-3xl border-2 border-neutral-100 dark:border-white/10 p-6 space-y-4 shadow-sm overflow-hidden flex flex-col min-h-72 relative ${isExpanded ? 'invisible' : ''}`}>
                 <div className="flex justify-between items-end relative z-10">
                     <div className="space-y-2">
                         <span className="text-[9px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-[0.4em]">{subtitle}</span>
                         <h3 className="text-3xl font-normal italic text-black dark:text-white tracking-tight">{title}</h3>
                     </div>
                     <div className="flex items-center gap-3">
-                        <button onClick={fetchData} disabled={isLoading} className="p-3 rounded-full bg-neutral-100 dark:bg-white/5 text-gray-400 hover:text-violet-500 transition-all">
-                            <FaArrowsRotate className={isLoading ? 'animate-spin' : ''} />
-                        </button>
+                        <div className="relative group">
+                            <button onClick={fetchData} disabled={isLoading} className="p-3 rounded-full border-2 border-neutral-200 dark:border-white/5 bg-neutral-100 dark:bg-white/5 text-gray-400 hover:text-violet-500 hover:border-2 hover:border-violet-500 flex items-center justify-center">
+                                <FaArrowsRotate className={isLoading ? 'animate-spin' : ''} />
+                            </button>
+                            <div className="absolute bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 px-2.5 py-1.5 bg-neutral-800 dark:bg-white text-white dark:text-black text-[9px] font-bold uppercase tracking-widest rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 whitespace-nowrap shadow-lg z-50">
+                                RESET
+                                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-neutral-800 dark:bg-white rotate-45"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

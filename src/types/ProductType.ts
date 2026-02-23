@@ -28,3 +28,9 @@ export interface InternalStyleCount {
   styleName: string;
   count: number;
 }
+
+export interface AnalysisResult {
+  dimension: number,
+  similarProducts: RecommendData[],
+  embedding: number[]
+}

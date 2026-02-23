@@ -40,7 +40,7 @@ export default function Footer() {
               {[
                 { name: 'Overview', path: '/' },
                 { name: 'Upload Studio', path: '/uploadpage' },
-                { name: 'Explore', path: '/selectionpage' },
+                { name: 'Selection Studio', path: '/selectionpage' },
                 { name: 'Dashboard', path: '/dashboard' }
               ].map((item) => (
                 <li key={item.name}>
