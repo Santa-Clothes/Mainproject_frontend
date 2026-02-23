@@ -12,13 +12,13 @@ export default function MainPage() {
     <div className="max-w-7xl mx-auto space-y-16">
 
       {/* Header: justify-between은 이미 flex를 포함하므로 block 제거 */}
-      <div className="flex flex-col md:flex-row justify-between items-end gap-6 border-b border-gray-100 dark:border-violet-900/20 pb-10">
+      <div className="flex flex-col md:flex-row justify-between items-end gap-6 pb-10">
         <div className="space-y-3">
           <div className="flex items-center gap-3">
             <span className="text-[10px] font-bold text-violet-600 dark:text-violet-500 uppercase tracking-widest">Central Console</span>
             <div className="h-px w-12 bg-violet-200 dark:bg-violet-800"></div>
           </div>
-          <h2 className="text-6xl font-serif italic tracking-tighter text-neutral-900 dark:text-white">Overview</h2>
+          <h2 className="text-6xl font-normal italic tracking-tighter text-neutral-900 dark:text-white">Overview</h2>
         </div>
       </div>
 
@@ -45,7 +45,7 @@ export default function MainPage() {
 
           <div className="absolute bottom-12 left-10 right-10 space-y-6">
             <div className="space-y-4">
-              <h3 className="text-4xl md:text-5xl font-serif italic text-white tracking-tighter leading-none">Upload <br /> Studio</h3>
+              <h3 className="text-4xl md:text-5xl font-normal italic text-white tracking-tighter leading-none">Upload <br /> Studio</h3>
               <p className="text-sm md:text-base text-violet-100/60 leading-relaxed font-normal">
                 Analyze your own style.
               </p>
@@ -77,7 +77,7 @@ export default function MainPage() {
 
           <div className="absolute bottom-12 left-10 right-10 space-y-6">
             <div className="space-y-4">
-              <h3 className="text-4xl md:text-5xl font-serif italic text-white tracking-tighter leading-none">Selection <br /> Studio</h3>
+              <h3 className="text-4xl md:text-5xl font-normal italic text-white tracking-tighter leading-none">Selection <br /> Studio</h3>
               <p className="text-sm md:text-base text-violet-100/60 leading-relaxed font-normal">
                 Recommend from our products.
               </p>
@@ -109,17 +109,17 @@ export default function MainPage() {
 
           <div className="absolute bottom-12 left-10 right-10 space-y-6">
             <div className="space-y-4">
-              <h3 className="text-4xl md:text-5xl font-serif italic text-white tracking-tighter leading-none">Analytics <br /> Dashboard</h3>
-              <p className="text-sm md:text-base text-violet-100/60 leading-relaxed font-normal">
+              <h3 className="text-4xl md:text-5xl font-normal italic text-neutral-900 dark:text-white tracking-tighter leading-none">Analytics <br /> Dashboard</h3>
+              <p className="text-sm md:text-base text-neutral-500 dark:text-violet-100/60 leading-relaxed font-normal">
                 Analyze Current Products.
               </p>
             </div>
-            <div className="flex items-center gap-4 text-[10px] sm:text-[11px] font-bold text-white uppercase tracking-widest transition-all group-hover:gap-6">
-              View Analytics <FaArrowRight className="text-violet-400 transition-transform group-hover:translate-x-2" />
+            <div className="flex items-center gap-4 text-[10px] sm:text-[11px] font-bold text-neutral-900 dark:text-white uppercase tracking-widest transition-all group-hover:gap-6">
+              View Analytics <FaArrowRight className="text-violet-600 dark:text-violet-400 transition-transform group-hover:translate-x-2" />
             </div>
           </div>
 
-          <div className="absolute -right-24 -bottom-24 pointer-events-none opacity-5 transition-transform duration-1000 group-hover:rotate-12 dark:text-white">
+          <div className="absolute -right-24 -bottom-24 pointer-events-none opacity-5 transition-transform duration-1000 group-hover:rotate-12 text-neutral-900 dark:text-white">
             <FaChartLine size={400} />
           </div>
         </Link>

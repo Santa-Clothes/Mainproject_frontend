@@ -49,34 +49,32 @@ const StyleDistributionCard: React.FC<Props> = ({ data, isLoading, error, onRetr
             <div className="flex flex-col md:flex-row items-center gap-4 h-full">
                 {/* 차트 영역: 왼쪽 배치 */}
                 <div className="relative w-48 h-48 shrink-0">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                            <Pie
-                                data={data.slice(0, 8).map(t => ({ score: t?.count || 0, name: t?.styleName || 'Unknown' }))}
-                                cx="50%"
-                                cy="50%"
-                                innerRadius={55}
-                                outerRadius={75}
-                                paddingAngle={6}
-                                dataKey="score"
-                                nameKey="name"
-                                stroke="none"
-                            >
-                                {data.slice(0, 8).map((_, index) => (
-                                    <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
-                                ))}
-                            </Pie>
-                            <Tooltip
-                                contentStyle={{
-                                    backgroundColor: 'white',
-                                    borderRadius: '12px',
-                                    border: 'none',
-                                    fontSize: '8px',
-                                    fontWeight: 'bold'
-                                }}
-                            />
-                        </PieChart>
-                    </ResponsiveContainer>
+                    <PieChart width={192} height={192}>
+                        <Pie
+                            data={data.slice(0, 8).map(t => ({ score: t?.count || 0, name: t?.styleName || 'Unknown' }))}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={55}
+                            outerRadius={75}
+                            paddingAngle={6}
+                            dataKey="score"
+                            nameKey="name"
+                            stroke="none"
+                        >
+                            {data.slice(0, 8).map((_, index) => (
+                                <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                            ))}
+                        </Pie>
+                        <Tooltip
+                            contentStyle={{
+                                backgroundColor: 'white',
+                                borderRadius: '12px',
+                                border: 'none',
+                                fontSize: '8px',
+                                fontWeight: 'bold'
+                            }}
+                        />
+                    </PieChart>
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
                         <div className="relative w-20 h-20 opacity-50">
                             <Image src={Wizard} alt="Style Distribution" fill className="object-contain" />

@@ -203,35 +203,10 @@ export default function Dashboard({
 
   return (
     <div className="space-y-8 pb-20">
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-stretch">
-        <div className="lg:col-span-2 flex flex-col gap-6">
 
-          {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {mainMetrics.map((metric, i) => (
-              <DashboardCard
-                key={i}
-                isMetric={true}
-                subtitle={metric.label}
-                title={`${metric.value}개`}
-                isLoading={metric.isLoading}
-                error={metric.error}
-                onRetry={metric.onRetry || (() => { })}
-                lgColSpan={1}
-                className="hover:border-violet-100 dark:hover:border-violet-800 transition-colors group h-44 flex flex-col justify-between"
-                topRight={
-                  <div className={`w-10 h-10 rounded-2xl flex items-center justify-center text-white text-sm shadow-lg transform group-hover:scale-110 transition-transform ${METRIC_COLORS[metric.color] || METRIC_COLORS.black}`}>
-                    {metric.icon}
-                  </div>
-                }
-              >
-                <div className="flex justify-between items-center">
-                  <p className="text-[10px] text-gray-400 dark:text-gray-600 uppercase tracking-widest leading-none">{metric.sub}</p>
-                </div>
-              </DashboardCard>
-            ))}
-          </div> */}
-
-
+      {/* Top Side-by-Side Grid: Strategy / Plot */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+        <div className="flex flex-col gap-6">
           <StyleDistributionCard
             data={internalStyles}
             isLoading={isLoadingInternalStyles}
@@ -241,27 +216,25 @@ export default function Dashboard({
           />
         </div>
 
-
-        <div className="lg:col-span-1">
-          <BestSellersCard
-            initialSales={sales}
-            fetchSalesFn={getSalesRanking}
-            className="h-full"
-          />
-        </div>
-
-        <div className="lg:col-span-1">
+        <div className="flex flex-col gap-6">
           <TSNEPlot
             title="9oz Style Clusters"
             subtitle="t-SNE Projection"
             description="스타일별로 클러스터링된 제품들을 t-SNE 알고리즘을 통해 2차원 평면에 시각화한 맵입니다."
             bottomTextFormat="총 {count}개의 데이터가 매핑되었습니다."
-            className="h-full"
+            className="flex-1 h-full"
             fetchDataFn={getTSNEPoints}
           />
         </div>
       </div>
 
+      {/* Bottom Full Width Block: Best Sellers */}
+      <div className="w-full">
+        <BestSellersCard
+          initialSales={sales}
+          fetchSalesFn={getSalesRanking}
+        />
+      </div>
 
     </div>
   );

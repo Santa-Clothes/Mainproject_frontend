@@ -40,6 +40,7 @@ export default function FloatingHistory() {
                 {/* Top Section: Cart (Basket) */}
                 <div className="flex flex-col items-center w-full pb-3 border-b-2 border-dashed border-neutral-100 dark:border-white/10 mb-2">
                     <div
+                        title="장바구니"
                         onClick={() => router.push('/cart')}
                         className="relative w-12 h-12 flex items-center justify-center rounded-2xl bg-violet-50 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 mb-1 cursor-pointer hover:bg-violet-100 transition-colors shadow-inner"
                     >
@@ -54,7 +55,7 @@ export default function FloatingHistory() {
 
                 {/* Center Section: History Icon */}
                 <div className="text-violet-400 dark:text-violet-500 mb-2">
-                    <FaClockRotateLeft size={16} title="Recent Analysis History" />
+                    <FaClockRotateLeft size={16} title="조회기록" />
                 </div>
 
                 {/* Bottom Section: History Items */}
