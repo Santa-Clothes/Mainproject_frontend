@@ -37,8 +37,8 @@ const StyleDistributionCard: React.FC<Props> = ({ data, isLoading, error, onRetr
 
     return (
         <DashboardCard
-            title="Style"
-            subtitle="9oz Distribution"
+            title="스타일 차트"
+            subtitle="9oz 스타일 비율"
             isLoading={isLoading}
             error={error}
             onRetry={onRetry}
@@ -92,7 +92,7 @@ const StyleDistributionCard: React.FC<Props> = ({ data, isLoading, error, onRetr
                                     {item.styleName || 'Unknown'}
                                 </span>
                             </div>
-                            <span className="text-[10px] font-medium text-gray-400">{((item.count / totalCnt) * 100).toFixed(0)}%</span>
+                            <span className="text-[10px] font-medium text-gray-400">{((item.count / totalCnt) * 100).toFixed(1)}%</span>
                         </div>
                     ))}
                 </div>

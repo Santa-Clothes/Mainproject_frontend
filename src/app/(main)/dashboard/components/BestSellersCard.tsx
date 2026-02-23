@@ -3,31 +3,24 @@
 import React from 'react';
 import DashboardCard from './DashboardCard';
 import { SalesRankItem } from '@/app/api/salesservice/salesapi';
-import { FaRegCalendarAlt } from 'react-icons/fa';
+import { FaRegCalendarAlt, FaTimes } from 'react-icons/fa';
+import { getShopList, ShopInfo } from '@/app/api/salesservice/salesapi';
 
 interface Props {
     initialSales: SalesRankItem[];
     fetchSalesFn: (shop: string, startDate: string, endDate: string) => Promise<SalesRankItem[]>;
     className?: string;
+    isLoading?: boolean;
 }
 
-const mockFetchShopList = async (): Promise<string[]> => {
+const fetchShopList = async (): Promise<ShopInfo[]> => {
     // 임시 모의 API: 향후 백엔드 API로 교체 가능
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve([
-                '전체', 'HP김포풍무점', 'HP서울방학점', 'HP서울시흥점', 'HP센텀시티점',
-                '대구반야월점', '대구태전점', '부산구서점(직)', '부산당감점', '부산두실점(직)',
-                '부산만덕점(직)', '부산모라점(직)', '부산연지점(직)', '부산하단점',
-                '서울목동점(행복한백화점)', '씨엔에스컴퍼니', '양산웅상점', '온라인',
-                '일산주엽점(그랜드백화점)', '제주일도점'
-            ]);
-        }, 600);
-    });
+    const shopList = await getShopList();
+    return shopList;
 };
 
-const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, className = "" }) => {
-    const [shopList, setShopList] = React.useState<string[]>([]);
+const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, className = "", isLoading = false }) => {
+    const [shopList, setShopList] = React.useState<ShopInfo[]>([]);
     const [isShopListLoading, setIsShopListLoading] = React.useState(true);
     const [searchTerm, setSearchTerm] = React.useState('');
 
@@ -46,12 +39,37 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
     // 이전 날짜 필터 기억용 Ref
     const prevDateRef = React.useRef(`${startDate}_${endDate}`);
 
+    // 부모(Dashboard)에서 비동기로 넘어오는 initialSales (전체 랭킹) 업데이트 동기화
+    React.useEffect(() => {
+        if (initialSales && initialSales.length > 0) {
+            setSalesMap(prev => ({
+                ...prev,
+                '전체': initialSales
+            }));
+        }
+    }, [initialSales]);
+
     // 초기 마운트 시 지점 리스트 받아오기
     React.useEffect(() => {
         let isMounted = true;
-        mockFetchShopList().then(list => {
+        fetchShopList().then(list => {
             if (isMounted) {
-                setShopList(list);
+                // 온라인이 들어간 지점들을 "온라인" 키워드 하나로 통합해서 보여주기 위해 중복 제거
+                const unifiedList: ShopInfo[] = [];
+                let hasOnline = false;
+
+                for (const shop of list) {
+                    if (shop.storeName.includes('온라인')) {
+                        if (!hasOnline) {
+                            unifiedList.push({ storeId: 'S', storeName: '온라인' });
+                            hasOnline = true;
+                        }
+                    } else {
+                        unifiedList.push(shop);
+                    }
+                }
+
+                setShopList(unifiedList);
                 setIsShopListLoading(false);
             }
         });
@@ -125,13 +143,19 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
 
             try {
                 const results = await Promise.all(
-                    shopsToFetch.map(async (shop) => {
+                    shopsToFetch.map(async (shopName) => {
+                        let fetchParam = '';
+                        if (shopName !== '전체') {
+                            const targetShop = shopList.find(s => s.storeName === shopName);
+                            fetchParam = targetShop ? targetShop.storeId : shopName;
+                        }
+
                         const data = await fetchSalesFn(
-                            shop === '전체' ? '' : shop,
+                            fetchParam,
                             startDate,
                             endDate
                         );
-                        return { shop, data };
+                        return { shop: shopName, data };
                     })
                 );
 
@@ -172,8 +196,8 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
 
     return (
         <DashboardCard
-            title="Best Sellers Ranking"
-            subtitle="Shop Comparison"
+            title="판매량 순위"
+            subtitle="지점별 비교"
             error={error}
             onRetry={() => {
                 setError(null);
@@ -196,7 +220,7 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
                                     className="w-full bg-neutral-100 dark:bg-white/5 border border-neutral-200 dark:border-white/10 rounded-full px-4 py-2 text-[11px] font-bold text-neutral-800 dark:text-white placeholder:text-neutral-400 focus:ring-2 focus:ring-violet-500 outline-none transition-all"
                                 />
                             </div>
-                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest hidden sm:block shrink-0">Max 3 Compare Shops</span>
+                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest hidden sm:block shrink-0">최대 3개 지점 선택 가능</span>
                         </div>
                         <div className="flex items-center gap-4 w-full sm:w-auto">
                             <div className="flex items-center gap-1.5 bg-white dark:bg-neutral-900 rounded-full border border-neutral-200 dark:border-white/10 p-1 shadow-sm w-full sm:max-w-64 shrink-0 transition-all hover:border-violet-300 dark:hover:border-violet-500/50">
@@ -251,18 +275,18 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
                         ) : (
                             <div className="flex items-center gap-2 overflow-x-auto pb-2 custom-scrollbar">
                                 {shopList
-                                    .filter(s => s !== '전체')
-                                    .filter(s => s.toLowerCase().includes(searchTerm.toLowerCase()))
+                                    .filter(s => s.storeName !== '전체')
+                                    .filter(s => s.storeName.toLowerCase().includes(searchTerm.toLowerCase()))
                                     .map((shop) => (
                                         <button
-                                            key={shop}
-                                            onClick={() => handleShopToggle(shop)}
+                                            key={shop.storeId}
+                                            onClick={() => handleShopToggle(shop.storeName)}
                                             className={`whitespace-nowrap px-4 py-1.5 rounded-full text-[12px] font-bold tracking-widest uppercase transition-all shrink-0 border
-                                            ${selectedShops.includes(shop)
+                                            ${selectedShops.includes(shop.storeName)
                                                     ? 'bg-violet-600 text-white shadow-md border-transparent'
                                                     : 'bg-white dark:bg-neutral-900 text-neutral-500 border-neutral-200 dark:border-white/10 hover:border-violet-300 dark:hover:border-violet-500/50'}`}
                                         >
-                                            {shop.replace('HP', '').replace('(직)', '').replace('(행복한백화점)', '').replace('(그랜드백화점)', '')}
+                                            {shop.storeName}
                                         </button>
                                     ))}
                             </div>
@@ -280,15 +304,15 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
                             <div className="flex items-center gap-3 border-b border-neutral-100 dark:border-white/10 pb-2">
                                 <div className="w-1.5 h-4 bg-violet-500 rounded-full"></div>
                                 <h4 className="text-xs font-bold text-neutral-800 dark:text-gray-200 uppercase tracking-widest truncate">
-                                    Total Sales Rating
+                                    전체 지점
                                 </h4>
-                                {loadingShops['전체'] && (
+                                {(loadingShops['전체'] || isLoading) && (
                                     <div className="w-4 h-4 rounded-full border-2 border-violet-500 border-t-transparent animate-spin ml-auto"></div>
                                 )}
                             </div>
 
                             {(() => {
-                                const isLoadingShopData = loadingShops['전체'];
+                                const isLoadingShopData = loadingShops['전체'] || isLoading;
                                 const items = aggregatedDataByShop['전체'] || [];
                                 const maxQ = items[0]?.quantity || 1;
 
@@ -341,7 +365,7 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
                                         <div className="flex items-center gap-3 border-b border-dashed border-neutral-200 dark:border-white/10 pb-2">
                                             <div className="w-1.5 h-4 bg-neutral-200 dark:bg-neutral-800 rounded-full"></div>
                                             <h4 className="text-xs font-bold text-neutral-400 dark:text-gray-600 uppercase tracking-widest truncate">
-                                                Compare slot
+                                                비교 지점 선택
                                             </h4>
                                         </div>
                                         <div className="flex-1 min-h-50 flex flex-col items-center justify-center text-center p-6 bg-neutral-50 dark:bg-white/5 rounded-xl border border-dashed border-neutral-200 dark:border-white/10">
@@ -349,7 +373,7 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
                                                 <span className="text-xl text-neutral-300 dark:text-neutral-600">+</span>
                                             </div>
                                             <span className="text-[11px] font-bold text-neutral-400 dark:text-neutral-500">
-                                                Select a shop above<br />to compare
+                                                지점 선택 후 비교
                                             </span>
                                         </div>
                                     </div>
@@ -363,11 +387,18 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
 
                             return (
                                 <div key={shop} className="flex flex-col space-y-4 col-span-1 fade-in">
-                                    <div className="flex items-center gap-3 border-b border-neutral-100 dark:border-white/10 pb-2">
+                                    <div className="flex items-center gap-3 border-b border-neutral-100 dark:border-white/10 pb-2 group/header relative">
                                         <div className="w-1.5 h-4 bg-indigo-500 rounded-full"></div>
-                                        <h4 className="text-xs font-bold text-neutral-800 dark:text-gray-200 uppercase tracking-widest truncate">
+                                        <h4 className="text-xs font-bold text-neutral-800 dark:text-gray-200 uppercase tracking-widest truncate max-w-[calc(100%-40px)]">
                                             {shop}
                                         </h4>
+                                        <button
+                                            onClick={() => handleShopToggle(shop)}
+                                            className="absolute right-0 p-1 rounded-full text-neutral-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                                            title="선택 해제"
+                                        >
+                                            <FaTimes size={10} />
+                                        </button>
                                         {isLoadingShopData && (
                                             <div className="w-4 h-4 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin ml-auto"></div>
                                         )}

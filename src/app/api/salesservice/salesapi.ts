@@ -26,8 +26,10 @@ export const getSalesRanking = async (): Promise<SalesRankItem[]> => {
             console.error(`서버 에러: ${response.status}`);
             return []; // 빈 배열을 반환해서 UI가 깨지지 않게 함
         }
+        const data = await response.json();
+        // console.log("Ranking", data);
 
-        return await response.json();
+        return data
     } catch (error) {
         console.error("fetchSalesRanking error:", error);
         return [];
@@ -37,7 +39,35 @@ export const getSalesRanking = async (): Promise<SalesRankItem[]> => {
 
 export const getSalesRankingByShopAndDate = async (shop: string, startDate: string, endDate: string): Promise<SalesRankItem[]> => {
     try {
-        const response = await fetch(`${BASEURL}/api/sales/rank?shop=${shop}&startDate=${startDate}&endDate=${endDate}`, {
+        const response = await fetch(`${BASEURL}/api/sales/rank?storeId=${shop}&startDate=${startDate}&endDate=${endDate}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            cache: 'no-store'
+        });
+
+        if (!response.ok) {
+            console.error(`서버 에러: ${response.status}`);
+            return []; // 빈 배열을 반환해서 UI가 깨지지 않게 함
+        }
+        const data = await response.json();
+
+        return data;
+    } catch (error) {
+        console.error("fetchSalesRankingByShop error:", error);
+        return [];
+    }
+};
+
+export interface ShopInfo {
+    storeId: string;
+    storeName: string;
+}
+
+export const getShopList = async (): Promise<ShopInfo[]> => {
+    try {
+        const response = await fetch(`${BASEURL}/api/store/list`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -52,7 +82,7 @@ export const getSalesRankingByShopAndDate = async (shop: string, startDate: stri
 
         return await response.json();
     } catch (error) {
-        console.error("fetchSalesRankingByShop error:", error);
+        console.error("fetchShopList error:", error);
         return [];
     }
 };

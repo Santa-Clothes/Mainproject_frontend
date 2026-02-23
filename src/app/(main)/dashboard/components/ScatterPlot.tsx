@@ -19,7 +19,7 @@ const Plot = dynamic<PlotParams>(() => import("react-plotly.js"), {
     </div>
 });
 
-export interface TSNEPlotProps {
+export interface ScatterPlotProps {
     title?: string;
     subtitle?: string;
     description?: string;
@@ -28,14 +28,14 @@ export interface TSNEPlotProps {
     fetchDataFn: () => Promise<TSNEPoint[]>;
 }
 
-export default function TSNEPlot({
-    title = "T-SNE Clustering Map",
+export default function ScatterPlot({
+    title = "UMAP Clustering Map",
     subtitle = "Style Projection",
     description = "해당 모델의 클러스터링 결과를 2차원 평면에 시각화한 맵입니다.",
     bottomTextFormat = "Visualizing {count} Style Latent vectors.",
     className = "lg:col-span-4",
     fetchDataFn
-}: TSNEPlotProps) {
+}: ScatterPlotProps) {
     const [data, setData] = useState<TSNEPoint[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -56,7 +56,7 @@ export default function TSNEPlot({
 
             // 15초 타임아웃 설정 (충분한 대기 시간 확보)
             const timeoutPromise = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('TIMEOUT')), 15000)
+                setTimeout(() => reject(new Error('TIMEOUT')), 20000)
             );
 
             // 실제 데이터 요청과 타임아웃 경합
@@ -160,7 +160,7 @@ export default function TSNEPlot({
             <div className={`${className} bg-white dark:bg-neutral-900/50 rounded-3xl border-2 border-neutral-100 dark:border-white/10 p-6 space-y-4 shadow-sm overflow-hidden flex flex-col min-h-72 relative ${isExpanded ? 'invisible' : ''}`}>
                 <div className="flex justify-between items-end relative z-10">
                     <div className="space-y-2">
-                        <span className="text-[9px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-[0.4em]">{subtitle}</span>
+                        <span className="text-[12px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-[0.4em]">{subtitle}</span>
                         <h3 className="text-3xl font-normal italic text-black dark:text-white tracking-tight">{title}</h3>
                     </div>
                     <div className="flex items-center gap-3">
@@ -245,7 +245,12 @@ export default function TSNEPlot({
                         <div className="flex justify-between items-center mb-8">
                             <div className="space-y-2">
                                 <span className="text-[10px] font-bold text-violet-500 uppercase tracking-widest">Interactive Mode</span>
-                                <h2 className="text-4xl font-normal italic text-black dark:text-white">Full Scale Analysis</h2>
+                                <div className="flex items-end gap-4">
+                                    <h2 className="text-4xl font-normal italic text-black dark:text-white">Full Scale Analysis</h2>
+                                    <p className="text-[12px] font-bold text-gray-400 dark:text-gray-500 tracking-widest mb-1.5 bg-neutral-100 dark:bg-white/5 px-3 py-1 rounded-full">
+                                        {bottomTextFormat.replace('{count}', data.length.toLocaleString())}
+                                    </p>
+                                </div>
                             </div>
                             <button
                                 onClick={() => setIsExpanded(false)}

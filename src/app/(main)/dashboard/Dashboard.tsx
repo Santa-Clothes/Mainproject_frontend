@@ -11,7 +11,7 @@ import DashboardCard from './components/DashboardCard';
 import { getInternalStyleCount } from '@/app/api/productservice/productapi';
 import { getSalesRanking, getSalesRankingByShopAndDate, SalesRankItem } from '@/app/api/salesservice/salesapi';
 import { getTSNEPoints } from '@/app/api/trendservice/tsneapi';
-import TSNEPlot from './components/TSNEPlot';
+import ScatterPlot from './components/ScatterPlot';
 import { getInternalProductCount } from '@/app/api/productservice/productapi';
 import { InternalStyleCount } from '@/types/ProductType';
 
@@ -160,23 +160,23 @@ export default function Dashboard({
     }
   };
 
-  const fetchSalesByShopAndDate = async (isRetry = false) => {
-    if (!isRetry && hasAttemptedSalesFetch) return;
-    setHasAttemptedSalesFetch(true);
-    setIsLoadingSales(true);
-    setErrorSales(null);
+  // const fetchSalesByShopAndDate = async (isRetry = false) => {
+  //   if (!isRetry && hasAttemptedSalesFetch) return;
+  //   setHasAttemptedSalesFetch(true);
+  //   setIsLoadingSales(true);
+  //   setErrorSales(null);
 
-    try {
-      const result = await getSalesRankingByShopAndDate('9oz', '2022-01-01', '2022-12-31');
-      const sortedSales = result.sort((a, b) => b.saleQuantity - a.saleQuantity);
-      setSales(sortedSales);
-    } catch (err) {
-      console.error('Failed to fetch sales:', err);
-      setErrorSales('Connection Failed');
-    } finally {
-      setIsLoadingSales(false);
-    }
-  };
+  //   try {
+  //     const result = await getSalesRankingByShopAndDate('9oz', '2022-01-01', '2022-12-31');
+  //     const sortedSales = result.sort((a, b) => b.saleQuantity - a.saleQuantity);
+  //     setSales(sortedSales);
+  //   } catch (err) {
+  //     console.error('Failed to fetch sales:', err);
+  //     setErrorSales('Connection Failed');
+  //   } finally {
+  //     setIsLoadingSales(false);
+  //   }
+  // };
 
 
   useEffect(() => {
@@ -217,10 +217,10 @@ export default function Dashboard({
         </div>
 
         <div className="flex flex-col gap-6">
-          <TSNEPlot
-            title="9oz Style Clusters"
-            subtitle="t-SNE Projection"
-            description="스타일별로 클러스터링된 제품들을 t-SNE 알고리즘을 통해 2차원 평면에 시각화한 맵입니다."
+          <ScatterPlot
+            title="9oz 스타일 클러스터"
+            subtitle="Latent Projection"
+            description="스타일별로 고차원 제품 특징을 차원축소 알고리즘을 통해 2차원 평면에 압축하여 시각화한 맵입니다."
             bottomTextFormat="총 {count}개의 데이터가 매핑되었습니다."
             className="flex-1 h-full"
             fetchDataFn={getTSNEPoints}
@@ -232,7 +232,8 @@ export default function Dashboard({
       <div className="w-full">
         <BestSellersCard
           initialSales={sales}
-          fetchSalesFn={getSalesRanking}
+          fetchSalesFn={getSalesRankingByShopAndDate}
+          isLoading={isLoadingSales}
         />
       </div>
 
