@@ -10,12 +10,13 @@ interface ProductCardProps {
     selected?: boolean; // 선택 상태 추가
     onClick?: () => void;
     showCartButton?: boolean; // 장바구니 버튼 표시 여부
+    onCartClickOverride?: (e: React.MouseEvent) => void; // 장바구니 버튼 클릭 이벤트 오버라이드
 }
 
 /**
  * ProductCard: Upload Studio 및 Explore Catalog의 검색/분석 결과로 반환된 추천 상품을 표시하는 개별 아이템 카드 컴포넌트입니다.
  */
-export default function ProductCard({ product, index = 0, selected = false, showCartButton = false, onClick }: ProductCardProps) {
+export default function ProductCard({ product, index = 0, selected = false, showCartButton = false, onCartClickOverride, onClick }: ProductCardProps) {
     // ... 기존 포맷팅 로직 생략 (유지에 주의)
     const formattedScore = typeof product.similarityScore === 'number'
         ? `${(product.similarityScore * 100).toFixed(1)}%`
@@ -32,6 +33,10 @@ export default function ProductCard({ product, index = 0, selected = false, show
 
     const toggleCart = (e: React.MouseEvent) => {
         e.stopPropagation(); // 카드 자체의 클릭 이벤트(새 창 열기 등) 방지
+        if (onCartClickOverride) {
+            onCartClickOverride(e);
+            return;
+        }
         if (isInCart) {
             setCart(cart.filter((item) => item.productId !== product.productId));
         } else {

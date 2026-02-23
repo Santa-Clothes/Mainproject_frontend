@@ -121,11 +121,11 @@ export default function Header() {
     }
   };
 
-  // 네비게이션 아이템 정의 (Overview 메뉴 대신 로고 클릭 권장)
+  // 네비게이션 아이템 정의
   const navItems = [
-    { id: 'uploadpage', label: 'Upload Studio', icon: <FaCamera size={18} />, path: '/uploadpage' },
-    { id: 'selectionpage', label: 'Selection Studio', icon: <FaMagnifyingGlass size={18} />, path: '/selectionpage' },
-    { id: 'dashboard', label: 'Dashboard', icon: <FaChartLine size={18} />, path: '/dashboard' },
+    { id: 'uploadpage', label: '새 이미지 기반 추천', icon: <FaCamera size={18} />, path: '/uploadpage' },
+    { id: 'selectionpage', label: '보유 상품 기반 추천', icon: <FaMagnifyingGlass size={18} />, path: '/selectionpage' },
+    { id: 'dashboard', label: '대시보드', icon: <FaChartLine size={18} />, path: '/dashboard' },
   ];
 
   return (
@@ -139,7 +139,7 @@ export default function Header() {
             <div className="relative w-6 h-6 md:w-7 md:h-7 opacity-90 drop-shadow-sm shrink-0">
               <Image src={Wizard} alt="Logo" fill className="object-contain" unoptimized />
             </div>
-            <h1 className="hidden md:block text-base lg:text-xl font-sans font-black tracking-widest lg:tracking-[0.3em] uppercase text-neutral-900 dark:text-white leading-none truncate">
+            <h1 className="hidden md:block text-base lg:text-xl font-yangjin font-black tracking-widest lg:tracking-[0.3em] uppercase text-neutral-900 dark:text-white leading-normal whitespace-nowrap mt-0.5">
               <span className="text-yellow-400"> Wizard</span> of <span className='text-purple-700'>Ounce</span>
             </h1>
           </Link>
@@ -159,7 +159,7 @@ export default function Header() {
                     window.location.href = item.path;
                   }
                 }}
-                className={`px-2.5 sm:px-3 lg:px-4 py-2 rounded-full text-[9px] font-bold uppercase tracking-wider lg:tracking-[0.2em] flex items-center gap-1.5 md:gap-2 transition-all shrink-0 ${pathname === item.path
+                className={`px-2.5 sm:px-3 lg:px-4 py-2 rounded-full text-[12px] font-bold uppercase tracking-wider lg:tracking-[0.2em] flex items-center gap-1.5 md:gap-2 transition-all shrink-0 ${pathname === item.path
                   ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/30'
                   : 'text-gray-500 hover:text-violet-600 dark:text-gray-400 dark:hover:text-white bg-transparent hover:bg-neutral-50 dark:hover:bg-white/5'
                   }`}

@@ -6,6 +6,7 @@
   /* 폰트 설정 */
   --font-serif: "Bodoni Moda", serif;
   --font-sans: "Inter", sans-serif;
+  --font-yangjin: "yangjin", sans-serif;
 
   /* 컬러 설정 */
   --color-violet-50: #f5f3ff;
@@ -74,4 +75,11 @@
     caret-color: #a78bfa;
     /* 기본은 보라색 */
   }
+}
+
+@font-face {
+  font-family: 'yangjin';
+  src: url('https://cdn.jsdelivr.net/gh/supernovice-lab/font@0.9/yangjin.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
 }

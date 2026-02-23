@@ -1,17 +1,37 @@
 'use client';
-import React from 'react';
+import React, { useState } from 'react';
 import ProductCard from '../components/ProductCard';
 import { useAtom } from 'jotai';
 import { cartAtom } from '@/jotai/historyJotai';
-import { FaLayerGroup, FaCartShopping, FaTrashCan } from 'react-icons/fa6';
+import { FaLayerGroup, FaCartShopping, FaTrashCan, FaCheckDouble, FaXmark } from 'react-icons/fa6';
 
 export default function CartPage() {
     const [cart, setCart] = useAtom(cartAtom);
+    const [selectedIds, setSelectedIds] = useState<string[]>([]);
+    const [isEditMode, setIsEditMode] = useState(false);
 
     const handleClearCart = () => {
         if (confirm('Are you sure you want to completely empty your collection?')) {
             setCart([]);
+            setSelectedIds([]);
+            setIsEditMode(false);
         }
+    };
+
+    const handleRemoveSelected = () => {
+        if (confirm(`Are you sure you want to remove ${selectedIds.length} items from your collection?`)) {
+            setCart(cart.filter(item => !selectedIds.includes(item.productId)));
+            setSelectedIds([]);
+            setIsEditMode(false);
+        }
+    };
+
+    const toggleSelection = (productId: string) => {
+        setSelectedIds(prev =>
+            prev.includes(productId)
+                ? prev.filter(id => id !== productId)
+                : [...prev, productId]
+        );
     };
 
     return (
@@ -33,15 +53,38 @@ export default function CartPage() {
                         </h3>
                     </div>
 
-                    {cart.length > 0 && (
-                        <button
-                            onClick={handleClearCart}
-                            className="flex items-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-500 text-red-500 hover:text-white dark:bg-red-900/20 dark:hover:bg-red-600 transition-colors rounded-full text-[9px] font-bold uppercase tracking-widest group"
-                        >
-                            <FaTrashCan size={10} className="group-hover:animate-bounce" />
-                            Clear All
-                        </button>
-                    )}
+                    <div className="flex items-center gap-3">
+                        {isEditMode && selectedIds.length > 0 && (
+                            <button
+                                onClick={handleRemoveSelected}
+                                className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white transition-colors rounded-full text-[9px] font-bold uppercase tracking-widest shadow-md"
+                            >
+                                <FaTrashCan size={10} />
+                                Remove Selected ({selectedIds.length})
+                            </button>
+                        )}
+                        {cart.length > 0 && (
+                            <button
+                                onClick={() => {
+                                    setIsEditMode(!isEditMode);
+                                    if (isEditMode) setSelectedIds([]);
+                                }}
+                                className={`flex items-center gap-2 px-4 py-2 transition-colors rounded-full text-[9px] font-bold uppercase tracking-widest ${isEditMode ? 'bg-neutral-800 text-white dark:bg-white dark:text-black' : 'bg-neutral-100 dark:bg-white/10 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-white/20'}`}
+                            >
+                                {isEditMode ? <FaXmark size={12} /> : <FaCheckDouble size={12} />}
+                                {isEditMode ? 'Cancel Selection' : 'Select Items'}
+                            </button>
+                        )}
+                        {cart.length > 0 && !isEditMode && (
+                            <button
+                                onClick={handleClearCart}
+                                className="flex items-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-500 text-red-500 hover:text-white dark:bg-red-900/20 dark:hover:bg-red-600 transition-colors rounded-full text-[9px] font-bold uppercase tracking-widest group"
+                            >
+                                <FaTrashCan size={10} className="group-hover:animate-bounce" />
+                                Clear All
+                            </button>
+                        )}
+                    </div>
                 </div>
 
                 {/* 상품 리스트 영역 */}
@@ -57,10 +100,21 @@ export default function CartPage() {
                                     <ProductCard
                                         product={item}
                                         index={idx}
-                                        showCartButton={true} // 카트에서 직접 뺐다 꼈다 할 수 있도록 활성화
+                                        selected={selectedIds.includes(item.productId)}
+                                        showCartButton={!isEditMode} // 수정 시 개별 아이콘 감춤 (선택에 집중)
+                                        onCartClickOverride={(e) => {
+                                            e.stopPropagation();
+                                            if (confirm('Are you sure you want to remove this item from your collection?')) {
+                                                setCart(cart.filter(p => p.productId !== item.productId));
+                                            }
+                                        }}
                                         onClick={() => {
-                                            if (item.productLink) {
-                                                window.open(item.productLink, '_blank');
+                                            if (isEditMode) {
+                                                toggleSelection(item.productId);
+                                            } else {
+                                                if (item.productLink) {
+                                                    window.open(item.productLink, '_blank');
+                                                }
                                             }
                                         }}
                                     />

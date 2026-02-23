@@ -153,7 +153,17 @@ export default function SelectionPanel({
   };
 
   return (
-    <div className="flex flex-col h-full gap-y-8 overflow-hidden">
+    <div className="flex flex-col h-full gap-y-8 overflow-hidden relative">
+      {/* 전체 카드 로딩 오버레이 (초기 진입 시에만) */}
+      {isFetching && (
+        <div className="absolute inset-x-0 inset-y-0 z-50 flex flex-col items-center justify-center bg-white/70 dark:bg-neutral-900/70 backdrop-blur-md rounded-[3rem]">
+          <div className="w-20 h-20 bg-white dark:bg-black rounded-full shadow-2xl flex items-center justify-center border border-neutral-100 dark:border-white/10 mb-6">
+            <FaArrowsRotate className="animate-spin text-violet-600" size={32} />
+          </div>
+          <p className="text-[12px] font-black text-neutral-800 dark:text-white uppercase tracking-widest">Syncing Catalog...</p>
+          <p className="mt-2 text-[9px] font-bold text-neutral-500 uppercase tracking-widest">Please Wait</p>
+        </div>
+      )}
       {/* 1. 고정 영역: 카테고리 칩 및 검색 시작 버튼 */}
       <div className="flex-none space-y-6">
         <div className={`flex flex-wrap justify-center gap-3 transition-all duration-500 ${isFetching ? 'opacity-40 grayscale pointer-events-none' : 'opacity-100'}`}>
@@ -176,17 +186,17 @@ export default function SelectionPanel({
         <button
           onClick={startAnalysis}
           disabled={!selectedProductId || isPending}
-          className="w-full py-5 bg-violet-600 text-white text-[11px] font-bold uppercase tracking-[0.2em] rounded-full disabled:opacity-20 transition-all active:scale-[0.98] shadow-xl"
+          className="w-full py-5 bg-violet-600 text-white text-[16px] font-bold uppercase tracking-[0.2em] rounded-full disabled:opacity-20 transition-all active:scale-[0.98] shadow-xl"
         >
           {isPending ? (
             <div className="flex items-center justify-center gap-3">
               <FaArrowsRotate className="animate-spin" size={14} />
-              <span>Analyzing Neural Patterns...</span>
+              <span>스타일 분석중 ...</span>
             </div>
           ) : (
             <div className="flex items-center justify-center gap-3">
               <FaMagnifyingGlass size={14} />
-              <span>Scan Selected Product</span>
+              <span>선택한 상품 분석하기</span>
             </div>
           )}
         </button>
@@ -214,11 +224,11 @@ export default function SelectionPanel({
         onScroll={handleScroll}
         className="flex-1 overflow-y-auto pr-4 custom-scrollbar min-h-0 border-t border-neutral-200 dark:border-white/10"
       >
-        {isFetching || isFiltering ? (
-          /* 로딩 중 표시 */
+        {isFiltering ? (
+          /* 필터 갱신 중 표시 (하단 리스트 영역) */
           <div className="flex flex-col items-center justify-center h-full gap-4">
             <FaArrowsRotate className="animate-spin text-violet-600" size={32} />
-            <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">Caching Assets...</p>
+            <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">Updating View...</p>
           </div>
         ) : selectedCat ? (
           /* 상품 리스트 노출 */

@@ -41,6 +41,28 @@ export default function Studio({ mode }: { mode: StudioMode }) {
     }
   }, [activeHistory]);
 
+  // 브라우저 뒤로가기(popstate) 처리를 위한 Effect
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      // 뒤로가기를 눌렀을 때, 현재 URL에 view=result가 없다면 초기 화면으로 돌아간 것으로 간주
+      const urlParams = new URLSearchParams(window.location.search);
+      if (!urlParams.has('view')) {
+        setResults(null);
+        setIsAnalyzing(false);
+        setActiveHistory(null);
+      } else if (event.state && event.state.results) {
+        // 앞으로 가기로 다시 view=result 에 접근한 경우, state 값으로 복원 (재분석 안함)
+        setResults(event.state.results);
+        setAnalysisImage(event.state.analysisImage);
+        setAnalysisName(event.state.analysisName);
+        setIsAnalyzing(false);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [setActiveHistory]);
+
   /**
    * 결과 수신 핸들러: 분석이 완료되었을 때 호출
    */
@@ -48,20 +70,32 @@ export default function Studio({ mode }: { mode: StudioMode }) {
     setResults(data);
     setIsAnalyzing(false);
 
-    // 데이터가 성공적으로 있으면 히스토리에 기록 (중복 검사 등 추가 가능)
-    if (data && data.length > 0 && analysisImage) {
-      setHistory((prev) => {
-        const newItem: HistoryItem = {
-          id: Date.now().toString(),
-          type: mode,
-          sourceImage: analysisImage,
-          productName: analysisName,
-          timestamp: Date.now(),
-          results: data,
-        };
-        // 최근 3개만 유지
-        return [newItem, ...prev].slice(0, 3);
-      });
+    // 데이터가 있고 분석 모드로 전환되는 경우 브라우저 히스토리 스택 추가
+    if (data && data.length > 0) {
+      // 현재 URL에 view=result 파라미터 추가하여 가짜 페이지 이동 기록 생성
+      // 이 때, 이동 기록에 분석 결과까지 함께 저장해둡니다. (앞으로 가기 시 복원용)
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.set('view', 'result');
+      window.history.pushState({
+        results: data,
+        analysisImage: analysisImage,
+        analysisName: analysisName
+      }, '', newUrl.toString());
+
+      if (analysisImage) {
+        setHistory((prev) => {
+          const newItem: HistoryItem = {
+            id: Date.now().toString(),
+            type: mode,
+            sourceImage: analysisImage,
+            productName: analysisName,
+            timestamp: Date.now(),
+            results: data,
+          };
+          // 최근 3개만 유지
+          return [newItem, ...prev].slice(0, 3);
+        });
+      }
     }
   };
 
@@ -78,9 +112,9 @@ export default function Studio({ mode }: { mode: StudioMode }) {
    * 초기 화면으로 돌아가기 핸들러
    */
   const handleBackToSearch = () => {
-    setResults(null);
-    setIsAnalyzing(false);
-    setActiveHistory(null); // 뒤로 갈 때 active 상태도 초기화
+    // 이제 직접 상태를 지우는 대신 브라우저의 뒤로가기 기능을 동작시킵니다.
+    // 사용자가 뒤로 갈 때 브라우저 히스토리 스택 자체를 맞추기 위함입니다.
+    window.history.back();
   };
 
   return (
