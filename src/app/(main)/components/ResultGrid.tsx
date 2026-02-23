@@ -12,6 +12,7 @@ interface ResultGridProps {
     isPending?: boolean; // AI 분석 진행 여부
     products?: RecommendData[] | null; // 추천 상품 리스트
     onProductClick?: (product: RecommendData) => void;
+    showCartButton?: boolean; // 장바구니 버튼 표시 여부 제어
 }
 
 /**
@@ -24,6 +25,7 @@ const ResultGrid: React.FC<ResultGridProps> = ({
     isActive = false,
     isPending = false,
     products = null,
+    showCartButton = true, // 기본적으로 분석 결과에서는 보이도록 설정
     onProductClick
 }) => {
     /**
@@ -109,7 +111,7 @@ const ResultGrid: React.FC<ResultGridProps> = ({
                                 key={item.productId}
                                 product={item}
                                 index={idx}
-                                showCartButton={true}
+                                showCartButton={showCartButton}
                                 onClick={() => onProductClick?.(item)}
                             />
                         ))}

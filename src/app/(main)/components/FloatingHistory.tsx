@@ -39,7 +39,10 @@ export default function FloatingHistory() {
 
                 {/* Top Section: Cart (Basket) */}
                 <div className="flex flex-col items-center w-full pb-3 border-b-2 border-dashed border-neutral-100 dark:border-white/10 mb-2">
-                    <div className="relative w-12 h-12 flex items-center justify-center rounded-2xl bg-violet-50 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 mb-1 cursor-pointer hover:bg-violet-100 transition-colors shadow-inner">
+                    <div
+                        onClick={() => router.push('/cart')}
+                        className="relative w-12 h-12 flex items-center justify-center rounded-2xl bg-violet-50 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 mb-1 cursor-pointer hover:bg-violet-100 transition-colors shadow-inner"
+                    >
                         <FaCartShopping size={18} />
                         {cart.length > 0 && (
                             <div className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] bg-red-500 text-white rounded-full flex items-center justify-center text-[9px] font-bold px-1 ring-2 ring-white dark:ring-neutral-900 shadow-md animate-in zoom-in">

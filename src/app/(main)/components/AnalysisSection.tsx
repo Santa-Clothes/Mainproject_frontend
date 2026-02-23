@@ -137,6 +137,7 @@ export default function AnalysisSection({ sourceImage, productName, isLoading }:
                                 src={sourceImage}
                                 alt="Original Reference"
                                 fill
+                                sizes='(min-width: 1024px) 50vw, (min-width: 768px) 75vw, 100vw'
                                 className="object-cover"
                                 unoptimized={sourceImage.startsWith('data:')}
                             />
