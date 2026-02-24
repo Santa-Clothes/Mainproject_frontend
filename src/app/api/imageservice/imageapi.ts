@@ -63,7 +63,7 @@ export const getImages = async () => {
 }
 
 export const imageAnalyze = async (file: File) => {
-    const reqUrl = `${BASEURL}/api/imageupload/analyze`;
+    const reqUrl = `${BASEURL}/api/recommand/analyze`;
     const formData = new FormData();
     formData.append('file', file);
 
@@ -77,7 +77,7 @@ export const imageAnalyze = async (file: File) => {
             console.error("Server error:", response.status, response.statusText);
             return []; // 실패 시 빈 배열 반환
         }
-        console.log("response", response);
+
         const data = await response.json();
 
         return data;

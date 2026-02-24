@@ -129,7 +129,7 @@ export default function Header() {
   ];
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 px-8 py-6 transition-all duration-300 ${isScrolled ? '-translate-y-1' : 'translate-y-0'}`}>
+    <nav className="absolute top-0 left-0 right-0 z-50 px-8 py-6">
       <div className="max-w-7xl mx-auto">
         {/* 단일 통합 헤더 바: w-full로 아래 카드들과 길이를 맞춤 */}
         <div className="w-full flex items-center bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl p-1.5 rounded-full border-2 border-neutral-100 dark:border-white/10 shadow-xl transition-all">
@@ -251,7 +251,7 @@ export default function Header() {
               <div className="absolute top-[calc(100%+12px)] right-0 w-64 bg-white/95 dark:bg-neutral-950/95 backdrop-blur-2xl rounded-3xl shadow-2xl overflow-hidden z-50 border-2 border-neutral-100 dark:border-white/10 animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-200">
                 {/* 1. 테마 설정 섹션 */}
                 <div className="p-5 border-b border-neutral-100 dark:border-white/5 bg-neutral-50/50 dark:bg-white/5">
-                  <p className="text-[7px] font-bold text-gray-400 uppercase tracking-[0.3em] mb-4">Display Theme</p>
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.3em] mb-4">Display Theme</p>
                   <button onClick={toggleTheme} className="relative w-full h-11 bg-white dark:bg-black/40 border border-neutral-200 dark:border-white/5 rounded-2xl cursor-pointer overflow-hidden p-1 shadow-inner group">
                     <div className={`absolute inset-y-1 w-[calc(50%-4px)] rounded-xl bg-violet-600 shadow-lg shadow-violet-500/30 transition-all duration-500 ease-spring flex items-center justify-center text-white z-10 ${isDarkMode ? 'translate-x-[calc(100%+0px)]' : 'translate-x-0'}`}>
                       <FaSun size={12} className="dark:hidden" />
@@ -268,18 +268,16 @@ export default function Header() {
                 <div className="p-2">
                   {!authInfo ? (
                     <div className="p-3 space-y-2">
-                      <p className="text-[7px] font-bold text-gray-400 uppercase tracking-[0.3em] ml-2 mb-1">Access Control</p>
-                      <Link href="/login" onClick={() => setIsProfileOpen(false)} className="flex items-center justify-center w-full py-3 text-[9px] font-bold uppercase tracking-widest text-neutral-600 dark:text-gray-300 hover:bg-neutral-100 dark:hover:bg-white/5 rounded-2xl transition-colors">Log In</Link>
-                      <Link href="/signup" onClick={() => setIsProfileOpen(false)} className="flex items-center justify-center w-full py-3 bg-violet-600 text-white text-[9px] font-bold uppercase tracking-widest rounded-2xl hover:bg-violet-700 transition-all shadow-lg active:scale-95">Join <FaArrowRight size={8} className="ml-2" /></Link>
+                      <Link href="/login" onClick={() => setIsProfileOpen(false)} className="flex items-center justify-center w-full py-3 text-[10px] font-bold uppercase tracking-widest text-neutral-600 dark:text-gray-300 hover:bg-neutral-100 dark:hover:bg-white/5 rounded-2xl transition-colors border-2 border-neutral-200 dark:border-white/30">로그인</Link>
+                      <Link href="/signup" onClick={() => setIsProfileOpen(false)} className="flex items-center justify-center w-full py-3 bg-violet-600 text-white text-[10px] font-bold uppercase tracking-widest rounded-2xl hover:bg-violet-700 transition-all shadow-lg active:scale-95">회원가입 <FaArrowRight size={8} className="ml-2" /></Link>
                     </div>
                   ) : (
                     <div className="px-2 py-2 space-y-1">
-                      <p className="text-[7px] font-bold text-gray-400 uppercase tracking-[0.3em] ml-3 mb-2 pt-2">Account Actions</p>
-                      <Link href="/memberinfo" onClick={() => setIsProfileOpen(false)} className="flex items-center gap-3 px-4 py-3 text-[9px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:bg-neutral-100 dark:hover:bg-white/5 hover:text-violet-600 rounded-xl transition-colors">
-                        <FaGear size={11} /> Configuration
+                      <Link href="/memberinfo" onClick={() => setIsProfileOpen(false)} className="flex items-center gap-3 px-4 py-3 text-[12px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:bg-neutral-100 dark:hover:bg-white/5 hover:text-violet-600 rounded-xl transition-colors">
+                        <FaGear size={11} /> 회원 정보 수정
                       </Link>
-                      <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-[9px] font-bold uppercase tracking-widest text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-colors">
-                        <FaArrowRightFromBracket size={11} /> Logout
+                      <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-[12px] font-bold uppercase tracking-widest text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-colors">
+                        <FaArrowRightFromBracket size={11} /> 로그아웃
                       </button>
                     </div>
                   )}

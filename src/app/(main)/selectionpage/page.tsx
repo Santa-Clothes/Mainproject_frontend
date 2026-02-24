@@ -10,14 +10,14 @@ export default function SelectionPage() {
                 <div className="flex items-center gap-4">
                     <span className="w-10 h-px bg-neutral-200 dark:bg-neutral-800"></span>
                     <span className="text-[10px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
-                        Discovery Module
+                        Inventory Module
                     </span>
                 </div>
 
                 {/* 타이틀 영역 */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
-                    <h2 className="text-5xl md:text-6xl font-serif italic tracking-tighter text-neutral-900 dark:text-white">
-                        Explore Catalog
+                    <h2 className="text-5xl md:text-6xl font-normal italic tracking-tighter text-neutral-900 dark:text-white">
+                        재고상품 분석 및 추천
                     </h2>
                 </div>
             </div>

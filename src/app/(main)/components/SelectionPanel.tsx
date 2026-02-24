@@ -144,7 +144,6 @@ export default function SelectionPanel({
         }
 
         const result: RecommendList | null = await getRecommendList(selectedProductId);
-        console.log("Recommend:", result);
 
         onResultFound(result, selectedCat || 'All');
       } catch (e) {
@@ -285,8 +284,8 @@ export default function SelectionPanel({
             <div className="w-20 h-20 rounded-full bg-neutral-50 dark:bg-neutral-900 flex items-center justify-center text-neutral-300 mb-8 border border-neutral-100 shadow-inner">
               <FaShirt size={40} className="animate-pulse" />
             </div>
-            <p className="text-xs font-bold text-neutral-400 uppercase tracking-[0.2em] text-center leading-loose">
-              Select a category above
+            <p className="text-xl font-bold text-neutral-500 uppercase tracking-[0.2em] text-center leading-loose">
+              상단의 카테고리를 선택해주세요.
             </p>
           </div>
         )}

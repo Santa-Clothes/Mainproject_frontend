@@ -156,7 +156,7 @@ export default function Studio({ mode }: { mode: StudioMode }) {
               isActive={true}
               isPending={isPending}
               products={results.internalProducts || []}
-              title="9oz Style Recommendations"
+              title="9oz 스타일 목록"
               onProductClick={(product: RecommendData) => {
                 // 추천 상품 클릭 시 상세 페이지(상품 링크)로 이동
                 if (product.productLink) {
@@ -172,7 +172,7 @@ export default function Studio({ mode }: { mode: StudioMode }) {
               isActive={true}
               isPending={isPending}
               products={results.naverProducts || []}
-              title="External Similar Styles"
+              title="외부 상품 추천 목록"
               onProductClick={(product: RecommendData) => {
                 if (product.productLink) {
                   window.open(product.productLink, '_blank');

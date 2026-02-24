@@ -4,6 +4,7 @@ import { FaArrowsRotate, FaTriangleExclamation, FaExpand } from "react-icons/fa6
 import { LuChartScatter } from "react-icons/lu";
 import { ScatterPoint } from "@/app/api/statservice/plotapi";
 import { motion, AnimatePresence } from "framer-motion";
+import DashboardCard from "./DashboardCard";
 
 /**
  * react-plotly.js 라이브러리는 내부적으로 window 객체를 사용합니다.
@@ -157,24 +158,26 @@ export default function ScatterPlot({
 
     return (
         <>
-            <div className={`${className} bg-white dark:bg-neutral-900/50 rounded-3xl border-2 border-neutral-100 dark:border-white/10 p-6 space-y-4 shadow-sm overflow-hidden flex flex-col min-h-72 relative ${isExpanded ? 'invisible' : ''}`}>
-                <div className="flex justify-between items-end relative z-10">
-                    <div className="space-y-2">
-                        <span className="text-[12px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-[0.4em]">{subtitle}</span>
-                        <h3 className="text-5xl font-normal italic text-black dark:text-white tracking-tight">{title}</h3>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <div className="relative group">
-                            <button onClick={fetchData} disabled={isLoading} className="p-3 rounded-full border-2 border-neutral-200 dark:border-white/5 bg-neutral-100 dark:bg-white/5 text-gray-400 hover:text-violet-500 hover:border-2 hover:border-violet-500 flex items-center justify-center">
-                                <FaArrowsRotate className={isLoading ? 'animate-spin' : ''} />
-                            </button>
-                            <div className="absolute bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 px-2.5 py-1.5 bg-neutral-800 dark:bg-white text-white dark:text-black text-[9px] font-bold uppercase tracking-widest rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 whitespace-nowrap shadow-lg z-50">
-                                RESET
-                                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-neutral-800 dark:bg-white rotate-45"></div>
-                            </div>
+            <DashboardCard
+                title={title}
+                subtitle={subtitle}
+                isLoading={isLoading}
+                error={error}
+                onRetry={fetchData}
+                className={`${className} ${isExpanded ? 'invisible' : ''}`}
+                lgColSpan={2}
+                topRight={
+                    <div className="relative group">
+                        <button onClick={fetchData} disabled={isLoading} className="p-3 rounded-full border-2 border-neutral-200 dark:border-white/5 bg-neutral-100 dark:bg-white/5 text-gray-400 hover:text-violet-500 hover:border-2 hover:border-violet-500 flex items-center justify-center transition-all">
+                            <FaArrowsRotate className={isLoading ? 'animate-spin' : ''} />
+                        </button>
+                        <div className="absolute bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 px-2.5 py-1.5 bg-neutral-800 dark:bg-white text-white dark:text-black text-[9px] font-bold uppercase tracking-widest rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 whitespace-nowrap shadow-lg z-50">
+                            RESET
+                            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-neutral-800 dark:bg-white rotate-45"></div>
                         </div>
                     </div>
-                </div>
+                }
+            >
 
                 {/* 그래프 컨테이너 (축소 상태) */}
                 <div className="w-full flex-1 min-h-50 rounded-3xl overflow-hidden border border-neutral-300 dark:border-white/10 bg-gray-50/10 dark:bg-black/20 relative shadow-inner cursor-pointer group" onClick={() => setIsExpanded(true)}>
@@ -225,13 +228,12 @@ export default function ScatterPlot({
                     )}
                 </div>
 
-                <div className="pt-6 border-t border-gray-100 dark:border-white/5 relative z-10">
+                <div className="pt-6 border-t border-gray-100 dark:border-white/5 relative z-10 mt-auto">
                     <p className="text-[12px] font-medium text-gray-500 dark:text-gray-500 uppercase tracking-widest leading-relaxed">
                         {bottomTextFormat.replace('{count}', data.length.toString())}
                     </p>
                 </div>
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-125 h-125 bg-violet-600/5 rounded-full blur-[120px] pointer-events-none"></div>
-            </div>
+            </DashboardCard>
 
             {/* 확장된 모달 뷰 */}
             <AnimatePresence>

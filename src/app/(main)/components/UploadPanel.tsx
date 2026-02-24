@@ -3,10 +3,56 @@
 import React, { useState, useRef } from 'react';
 import { FaCloudArrowUp, FaXmark, FaMagnifyingGlass, FaCircleInfo, FaFileImage } from 'react-icons/fa6';
 import Image from 'next/image';
-import { RecommendData, RecommendList } from '@/types/ProductType';
-
+import { RecommendList } from '@/types/ProductType';
 import { imageAnalyze } from '@/app/api/imageservice/imageapi';
-// import { searchByImage, FashionSearchResponse } from '@/app/api/imageservice/fashionSearch';
+import sampleImg from '@/assets/sample.jpg';
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
+/**
+ * 서버 전송 및 히스토리 저장용 이미지 리사이징 (최대 256px)
+ * 분석 정확도를 유지하면서도 전송 속도와 저장 용량을 최적화합니다.
+ */
+const resizeImage = (file: File, maxSize: number = 300): Promise<{ dataUrl: string; blob: Blob }> => {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new window.Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxSize) {
+            height = (height * maxSize) / width;
+            width = maxSize;
+          }
+        } else {
+          if (height > maxSize) {
+            width = (width * maxSize) / height;
+            height = maxSize;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+
+        // 1. 미리보기 및 히스토리용 DataURL (JPEG 0.6)
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+
+        // 2. 서버 전송용 Blob
+        canvas.toBlob((blob) => {
+          if (blob) resolve({ dataUrl, blob });
+        }, 'image/jpeg', 0.8);
+      };
+      img.src = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  });
+};
 
 interface UploadPanelProps {
   onResultFound: (results: RecommendList | null) => void;
@@ -29,17 +75,31 @@ export default function UploadPanel({ onResultFound, onAnalysisStart, onAnalysis
   /**
    * 파일 입력 값이 변경되었을 때 실행 (파일 선택 시)
    */
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setSelectedFile(file);
+      if (file.size > MAX_FILE_SIZE) {
+        alert(`파일 크기가 너무 큽니다. 10MB 이하의 이미지만 업로드 가능합니다. (현재: ${(file.size / 1024 / 1024).toFixed(1)}MB)`);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        return;
+      }
+
+      // 1. 원본 미리보기용 (즉시 표시)
       const reader = new FileReader();
       reader.onloadend = () => {
-        const result = reader.result as string;
-        setPreview(result);
-        onAnalysisStart(result, file.name); // 부모에게 분석 시작 상태 알림
+        setPreview(reader.result as string);
       };
       reader.readAsDataURL(file);
+
+      // 2. 서버 전송 및 히스토리용 리사이즈 이미지 생성 (최대 300px)
+      const { dataUrl, blob } = await resizeImage(file, 300);
+
+      // 서버 전송용은 Blob을 File 객체로 변환하여 저장
+      const resizedFile = new File([blob], file.name, { type: 'image/jpeg' });
+      setSelectedFile(resizedFile);
+
+      // 히스토리 및 분석용 DataURL 전달
+      onAnalysisStart(dataUrl, file.name);
     }
   };
 
@@ -93,7 +153,7 @@ export default function UploadPanel({ onResultFound, onAnalysisStart, onAnalysis
       try {
         // 2. 이미지 서버로 업로드 (Server Action 호출)
         const uploadResult: any = await imageAnalyze(selectedFile);
-        console.log("uploadResult", uploadResult);
+
         if (uploadResult) {
           // 3. 분석 결과를 바탕으로 유사 상품 추천 리스트 조회 (Studio.tsx의 RecommendList 구조 맞춤)
           const legacyProducts = Array.isArray(uploadResult.similarProducts) ? uploadResult.similarProducts : uploadResult;
@@ -200,7 +260,8 @@ export default function UploadPanel({ onResultFound, onAnalysisStart, onAnalysis
               {/* Single Example Image Placeholder */}
               <div className="w-32 h-32 flex-none rounded-4xl bg-neutral-100 dark:bg-neutral-800/50 border-2 border-neutral-100 dark:border-white/10 overflow-hidden relative group/ex">
                 <div className="absolute inset-0 flex items-center justify-center text-neutral-300 dark:text-neutral-700">
-                  <FaFileImage size={24} />
+                  {/* <FaFileImage size={24} /> */}
+                  <Image src={sampleImg} alt="sample" fill className="object-contain" />
                 </div>
                 <div className="absolute inset-0 bg-violet-600/10 opacity-0 group-hover/ex:opacity-100 transition-opacity" />
               </div>
@@ -210,34 +271,43 @@ export default function UploadPanel({ onResultFound, onAnalysisStart, onAnalysis
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <div className="w-1 h-3 bg-violet-500 rounded-full" />
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-neutral-800 dark:text-neutral-200">이미지 규격</h4>
+                    <h4 className="text-[12px] font-black uppercase tracking-widest text-neutral-800 dark:text-neutral-200">이미지 규격</h4>
                   </div>
-                  <p className="text-[10px] text-neutral-500 dark:text-neutral-400 pl-3">Under 800x800px optimization.</p>
+                  <p className="text-[12px] text-neutral-500 dark:text-neutral-400 pl-3">300x300px이 분석에 최적화 되어 있습니다.</p>
+                  <p className="text-[12px] text-neutral-500 dark:text-neutral-400 pl-3">300x300px 이상 1080x1080px 이하.</p>
+                  <p className="text-[12px] text-neutral-500 dark:text-neutral-400 pl-3">해상도 72dpi~300dpi</p>
                 </div>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <div className="w-1 h-3 bg-violet-500 rounded-full" />
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-neutral-800 dark:text-neutral-200">이미지 형태</h4>
+                    <h4 className="text-[12px] font-black uppercase tracking-widest text-neutral-800 dark:text-neutral-200">이미지 형태</h4>
                   </div>
-                  <p className="text-[10px] text-neutral-500 dark:text-neutral-400 pl-3">Centered & clear focus.</p>
+                  <p className="text-[12px] text-neutral-500 dark:text-neutral-400 pl-3">얼굴 제외, 옷을 가리지 않게, 배경이 깔끔한 이미지</p>
                 </div>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <div className="w-1 h-3 bg-violet-500 rounded-full" />
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-neutral-800 dark:text-neutral-200">파일 크기</h4>
+                    <h4 className="text-[12px] font-black uppercase tracking-widest text-neutral-800 dark:text-neutral-200">파일 크기</h4>
                   </div>
-                  <p className="text-[10px] text-neutral-500 dark:text-neutral-400 pl-3">Under 10MB.</p>
+                  <p className="text-[12px] text-neutral-500 dark:text-neutral-400 pl-3">10MB 이하.</p>
+                </div>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <div className="w-1 h-3 bg-violet-500 rounded-full" />
+                    <h4 className="text-[12px] font-black uppercase tracking-widest text-neutral-800 dark:text-neutral-200">파일 형식</h4>
+                  </div>
+                  <p className="text-[12px] text-neutral-500 dark:text-neutral-400 pl-3">JPG, PNG</p>
                 </div>
               </div>
             </div>
 
-            {/* Bottom Side Info */}
+            {/* Bottom Side Info
             <div className="p-5 rounded-3xl border-2 border-neutral-100 dark:border-white/10 bg-neutral-50/50 dark:bg-neutral-800/30 space-y-2">
               <h4 className="text-[10px] font-black uppercase tracking-widest text-neutral-800 dark:text-neutral-200">Formats & Quality</h4>
               <p className="text-[10px] text-neutral-500 dark:text-neutral-400 leading-relaxed">
                 Standard JPG/PNG
               </p>
-            </div>
+            </div> */}
           </div>
         </div>
 
