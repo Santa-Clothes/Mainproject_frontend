@@ -2,14 +2,14 @@
 
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { FaArrowRotateLeft, FaArrowsRotate, FaCheck, FaFingerprint, FaMagnifyingGlass, FaChartLine, FaCalendarDays, FaShirt } from 'react-icons/fa6';
-import { ProductData, RecommendData } from '@/types/ProductType';
+import { ProductData, RecommendData, RecommendList } from '@/types/ProductType';
 import Image from 'next/image';
 import ProductCard from './ProductCard';
 import { getProductList, getRecommendList } from '@/app/api/productservice/productapi';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 interface SelectionPanelProps {
-  onResultFound: (results: RecommendData[] | null, category?: string) => void;
+  onResultFound: (results: RecommendList | null, category?: string) => void;
   onAnalysisStart: (imgUrl: string, name?: string) => void;
   isPending: boolean;
   startTransition: React.TransitionStartFunction;
@@ -121,7 +121,9 @@ export default function SelectionPanel({
       params.delete('pid'); // 이미 선택된 상품이면 해제
     } else {
       params.set('pid', product.productId);
-      onAnalysisStart(product.imageUrl, product.productName); // 분석 미리보기용 데이터 전달
+      const safeImageUrl = product.imageUrl || (product as any).image_url || (product as any).image || 'https://via.placeholder.com/600x600?text=No+Image';
+      const safeName = product.productName || (product as any).name || 'Unknown Product';
+      onAnalysisStart(safeImageUrl, safeName); // 분석 미리보기용 데이터 전달
     }
     router.replace(`?${params.toString()}`, { scroll: false });
   };
@@ -133,8 +135,16 @@ export default function SelectionPanel({
     if (!selectedProductId) return;
     startTransition(async () => {
       try {
-        const results: RecommendData[] = await getRecommendList(selectedProductId);
-        onResultFound(results, selectedCat || 'All');
+        // [수정] 새로고침 직후 등 onAnalysisStart가 누락되어 회색박스(No Image)가 뜨는 현상 방지
+        const targetProduct = allProducts.find(p => p.productId === selectedProductId);
+        if (targetProduct) {
+          const safeImageUrl = targetProduct.imageUrl || (targetProduct as any).image_url || (targetProduct as any).image || 'https://via.placeholder.com/600x600?text=No+Image';
+          const safeName = targetProduct.productName || (targetProduct as any).name || 'Unknown Product';
+          onAnalysisStart(safeImageUrl, safeName);
+        }
+
+        const result: RecommendList | null = await getRecommendList(selectedProductId);
+        onResultFound(result, selectedCat || 'All');
       } catch (e) {
         console.error("검색 실패:", e);
       }

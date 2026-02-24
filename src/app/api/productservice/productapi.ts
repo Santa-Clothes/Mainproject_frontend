@@ -5,7 +5,7 @@
 
 const BASEURL = process.env.NEXT_PUBLIC_BACK_API_URL;
 
-import { ProductData, RecommendData } from "@/types/ProductType";
+import { ProductData, RecommendList } from "@/types/ProductType";
 
 /**
  * 프로젝트 내의 전체 상품 리스트를 가져옵니다.
@@ -37,9 +37,9 @@ export const getProductList = async (): Promise<ProductData[]> => {
  * 특정 상품ID를 기반으로 AI가 분석한 유사 스타일 상품 리스트를 가져옵니다.
  * @param productId 기준이 될 상품 식별자
  */
-export const getRecommendList = async (productId: string): Promise<RecommendData[]> => {
+export const getRecommendList = async (productId: string): Promise<RecommendList | null> => {
     try {
-        const response = await fetch(`${BASEURL}/api/recommand/demo/${productId}`, {
+        const response = await fetch(`${BASEURL}/api/recommand/${productId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -48,14 +48,15 @@ export const getRecommendList = async (productId: string): Promise<RecommendData
 
         if (!response.ok) {
             console.error(`서버 에러: ${response.status}`);
-            return [];
+            return null;
         }
 
         const data = await response.json();
+
         return data;
     } catch (error) {
         console.error("getRecommendList error:", error);
-        return [];
+        return null;
     }
 }
 

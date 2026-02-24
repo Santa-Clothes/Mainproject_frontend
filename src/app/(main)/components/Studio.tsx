@@ -9,7 +9,7 @@ import SelectionPanel from './SelectionPanel';
 import UploadPanel from './UploadPanel';
 import AnalysisSection from './AnalysisSection';
 
-import { RecommendData } from '@/types/ProductType';
+import { RecommendData, RecommendList } from '@/types/ProductType';
 
 export type StudioMode = 'imageInput' | 'imageSelection';
 
@@ -23,7 +23,7 @@ export default function Studio({ mode }: { mode: StudioMode }) {
   const [isPending, startTransition] = useTransition();
 
   // [상태 관리]
-  const [results, setResults] = useState<RecommendData[] | null>(null); // 분석 결과 리스트
+  const [results, setResults] = useState<RecommendList | null>(null); // 분석 결과 리스트
   const [analysisImage, setAnalysisImage] = useState<string | null>(null); // 현재 분석 대상 이미지
   const [analysisName, setAnalysisName] = useState<string | undefined>(undefined); // 현재 분석 대상 상품명
   const [isAnalyzing, setIsAnalyzing] = useState(false); // 분석 중 로딩 상태
@@ -36,7 +36,7 @@ export default function Studio({ mode }: { mode: StudioMode }) {
     if (activeHistory) {
       setAnalysisImage(activeHistory.sourceImage);
       setAnalysisName(activeHistory.productName);
-      setResults(activeHistory.results);
+      setResults(activeHistory.results || null);
       setIsAnalyzing(false);
     }
   }, [activeHistory]);
@@ -66,12 +66,13 @@ export default function Studio({ mode }: { mode: StudioMode }) {
   /**
    * 결과 수신 핸들러: 분석이 완료되었을 때 호출
    */
-  const handleSearchResult = (data: RecommendData[] | null) => {
+  const handleSearchResult = (data: RecommendList | null) => {
     setResults(data);
+
     setIsAnalyzing(false);
 
     // 데이터가 있고 분석 모드로 전환되는 경우 브라우저 히스토리 스택 추가
-    if (data && data.length > 0) {
+    if (data && (data.internalProducts?.length > 0 || data.naverProducts?.length > 0)) {
       // 현재 URL에 view=result 파라미터 추가하여 가짜 페이지 이동 기록 생성
       // 이 때, 이동 기록에 분석 결과까지 함께 저장해둡니다. (앞으로 가기 시 복원용)
       const newUrl = new URL(window.location.href);
@@ -145,8 +146,8 @@ export default function Studio({ mode }: { mode: StudioMode }) {
             <ResultGrid
               isActive={true}
               isPending={isPending}
-              products={results}
-              title="Primary Recommendations"
+              products={results.internalProducts || []}
+              title="9oz Style Recommendations"
               onProductClick={(product: RecommendData) => {
                 // 추천 상품 클릭 시 상세 페이지(상품 링크)로 이동
                 if (product.productLink) {
@@ -161,8 +162,8 @@ export default function Studio({ mode }: { mode: StudioMode }) {
             <ResultGrid
               isActive={true}
               isPending={isPending}
-              products={results} // TODO: 두 번째 리스트용 별도 데이터(results2 등)가 준비되면 교체
-              title="Secondary Recommendations / Similar Styles"
+              products={results.naverProducts || []}
+              title="External Similar Styles"
               onProductClick={(product: RecommendData) => {
                 if (product.productLink) {
                   window.open(product.productLink, '_blank');

@@ -14,7 +14,10 @@ export interface ProductData {
   categoryName: string
   imageUrl: string
 }
-
+export interface RecommendList {
+  internalProducts: RecommendData[],
+  naverProducts: RecommendData[]
+}
 export interface RecommendData {
   productId: string,
   title: string,

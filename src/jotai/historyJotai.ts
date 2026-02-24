@@ -1,6 +1,6 @@
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
-import { RecommendData } from '@/types/ProductType';
+import { RecommendData, RecommendList } from '@/types/ProductType';
 
 export interface HistoryItem {
     id: string;
@@ -8,7 +8,7 @@ export interface HistoryItem {
     sourceImage: string;
     productName?: string;
     timestamp: number;
-    results: RecommendData[];
+    results?: RecommendList;
 }
 
 // 1. 히스토리 전체 목록 저장용 (로컬 스토리지에 자동 저장됨)

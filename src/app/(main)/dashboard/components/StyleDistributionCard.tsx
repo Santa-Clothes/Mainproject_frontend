@@ -38,13 +38,13 @@ const StyleDistributionCard: React.FC<Props> = ({ data, isLoading, error, onRetr
     return (
         <DashboardCard
             title="스타일 차트"
-            subtitle="9oz 스타일 비율"
+            subtitle="스타일별 비율 통계"
             isLoading={isLoading}
             error={error}
             onRetry={onRetry}
             lgColSpan={2}
             className={`${className} min-h-72`}
-            topRight={`${totalCnt}ea`}
+            topRight={`${totalCnt}개`}
         >
             <div className="flex flex-col md:flex-row items-center gap-4 h-full">
                 {/* 차트 영역: 왼쪽 배치 */}

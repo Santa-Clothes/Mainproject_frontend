@@ -7,10 +7,10 @@ import {
 } from 'recharts';
 import { FaWaveSquare, FaCircleCheck } from 'react-icons/fa6';
 import { getNaverProductCount } from '@/app/api/productservice/productapi';
-import { getShoppingTrends } from '@/app/api/trendservice/trendapi';
+import { getShoppingTrends } from '@/app/api/statservice/trendapi';
 import { SiNaver } from 'react-icons/si';
 import DashboardCard from '../dashboard/components/DashboardCard';
-import SearchRankCard from '../dashboard/components/SearchRankCard';
+import SearchRankCard from './SearchRankCard';
 
 interface AnalysisData {
     name: string;
@@ -39,10 +39,10 @@ export default function AnalysisSection({ sourceImage, productName, isLoading }:
     const [isMounting, setIsMounting] = useState(true);
 
     //네이버 상품 개수
-    const [naverProductCount, setNaverProductCount] = useState(0);
-    const [isLoadingNaverProductCount, setIsLoadingNaverProductCount] = useState(true);
-    const [errorNaverProductCount, setErrorNaverProductCount] = useState<string | null>(null);
-    const [hasAttemptedNaverProductCount, setHasAttemptedNaverProductCount] = useState(false);
+    // const [naverProductCount, setNaverProductCount] = useState(0);
+    // const [isLoadingNaverProductCount, setIsLoadingNaverProductCount] = useState(true);
+    // const [errorNaverProductCount, setErrorNaverProductCount] = useState<string | null>(null);
+    // const [hasAttemptedNaverProductCount, setHasAttemptedNaverProductCount] = useState(false);
 
     // 네이버 검색 트렌드
     const [trendsData, setTrendsData] = useState<any[]>([]);
@@ -55,29 +55,29 @@ export default function AnalysisSection({ sourceImage, productName, isLoading }:
     }, []);
 
     useEffect(() => {
-        if (naverProductCount === 0 && !hasAttemptedNaverProductCount) {
-            fetchNaverProductCount();
-        }
+        // if (naverProductCount === 0 && !hasAttemptedNaverProductCount) {
+        //     fetchNaverProductCount();
+        // }
         if (trendsData.length === 0 && !hasAttemptedTrendsFetch) {
             fetchTrends();
         }
-    }, [naverProductCount, hasAttemptedNaverProductCount, trendsData.length, hasAttemptedTrendsFetch]);
+    }, [/* naverProductCount, hasAttemptedNaverProductCount, */ trendsData.length, hasAttemptedTrendsFetch]);
 
-    const fetchNaverProductCount = async (isRetry = false) => {
-        if (!isRetry && hasAttemptedNaverProductCount) return;
-        setHasAttemptedNaverProductCount(true);
-        setIsLoadingNaverProductCount(true);
-        setErrorNaverProductCount(null);
-        try {
-            // const result = await getNaverProductCount();
-            // setNaverProductCount(result);
-        } catch (err) {
-            console.error('Failed to fetch product count:', err);
-            setErrorNaverProductCount('Connection Failed');
-        } finally {
-            setIsLoadingNaverProductCount(false);
-        }
-    };
+    // const fetchNaverProductCount = async (isRetry = false) => {
+    //     if (!isRetry && hasAttemptedNaverProductCount) return;
+    //     setHasAttemptedNaverProductCount(true);
+    //     setIsLoadingNaverProductCount(true);
+    //     setErrorNaverProductCount(null);
+    //     try {
+    //         const result = await getNaverProductCount();
+    //         setNaverProductCount(result);
+    //     } catch (err) {
+    //         console.error('Failed to fetch product count:', err);
+    //         setErrorNaverProductCount('Connection Failed');
+    //     } finally {
+    //         setIsLoadingNaverProductCount(false);
+    //     }
+    // };
 
     const fetchTrends = async (isRetry = false) => {
         if (!isRetry && hasAttemptedTrendsFetch) return;
@@ -86,19 +86,16 @@ export default function AnalysisSection({ sourceImage, productName, isLoading }:
         setErrorTrends(null);
 
         try {
-            // const result = await getShoppingTrends();
-            // const processedData = result.map((item: any, i: number) => ({
-            //     ...item,
-            //     score: item.value || 0,
-            //     value: item.value || 0,
-            //     percentStr: item.percentStr || '0%',
-            //     xcoord: Math.random() * 200 - 100,
-            //     ycoord: Math.random() * 200 - 100,
-            //     productId: `trend-${i}`,
-            //     productName: item.style || `Style-${i}`
-            // })).sort((a: any, b: any) => b.value - a.value);
+            const result = await getShoppingTrends();
 
-            // setTrendsData(processedData);
+            const processedData = result.map((item: any, i: number) => ({
+                ...item,
+                score: item.value || 0,
+                value: item.value || 0,
+                percentStr: item.percentStr || '0%',
+            })).sort((a: any, b: any) => b.value - a.value);
+
+            setTrendsData(processedData);
         } catch (err) {
             console.error('Failed to fetch trends:', err);
             setErrorTrends('Connection Failed');
@@ -132,16 +129,16 @@ export default function AnalysisSection({ sourceImage, productName, isLoading }:
                             <div className="absolute inset-0 flex items-center justify-center bg-neutral-100 dark:bg-neutral-900 animate-pulse">
                                 <FaWaveSquare className="text-violet-500/20" size={40} />
                             </div>
-                        ) : sourceImage ? (
+                        ) : (
                             <Image
-                                src={sourceImage}
+                                src={sourceImage || 'https://via.placeholder.com/600x600?text=No+Image'}
                                 alt="Original Reference"
                                 fill
                                 sizes='(min-width: 1024px) 50vw, (min-width: 768px) 75vw, 100vw'
                                 className="object-cover"
-                                unoptimized={sourceImage.startsWith('data:')}
+                                unoptimized={true}
                             />
-                        ) : null}
+                        )}
                         {!isLoading && (
                             <div className="absolute top-6 right-6">
                                 <div className="bg-white/90 dark:bg-black/60 backdrop-blur-md p-2 rounded-full border border-neutral-100 dark:border-white/10 text-violet-600 shadow-lg">
@@ -154,17 +151,6 @@ export default function AnalysisSection({ sourceImage, productName, isLoading }:
 
                 {/* Right Col: Graphs */}
                 <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-10">
-
-                    <div className="lg:col-span-1">
-                        <SearchRankCard
-                            trends={trendsData}
-                            isLoading={isLoadingTrends}
-                            error={errorTrends}
-                            onRetry={() => fetchTrends(true)}
-                            className="h-full"
-                        />
-                    </div>
-
                     {/* Bar Chart Section */}
                     <div className="bg-white dark:bg-neutral-900/50 rounded-4xl p-8 border-2 border-neutral-100 dark:border-white/10 shadow-sm space-y-6">
                         <h4 className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500">Visual Attribute Distribution</h4>
@@ -191,7 +177,15 @@ export default function AnalysisSection({ sourceImage, productName, isLoading }:
                             )}
                         </div>
                     </div>
-
+                    <div className="lg:col-span-1">
+                        <SearchRankCard
+                            trends={trendsData}
+                            isLoading={isLoadingTrends}
+                            error={errorTrends}
+                            onRetry={() => fetchTrends(true)}
+                            className="h-full"
+                        />
+                    </div>
                 </div>
             </div>
         </div>

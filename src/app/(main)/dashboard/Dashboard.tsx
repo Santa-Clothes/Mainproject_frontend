@@ -1,18 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import {
-  FaBoxesStacked
-} from 'react-icons/fa6';
+
 // import SearchRankCard from './components/SearchRankCard';
 import StyleDistributionCard from './components/StyleDistributionCard';
 import BestSellersCard from './components/BestSellersCard';
-import DashboardCard from './components/DashboardCard';
+// import DashboardCard from './components/DashboardCard';
 import { getInternalStyleCount } from '@/app/api/productservice/productapi';
 import { getSalesRanking, getSalesRankingByShopAndDate, SalesRankItem } from '@/app/api/salesservice/salesapi';
-import { getTSNEPoints } from '@/app/api/trendservice/tsneapi';
+import { getScatterPoints } from '@/app/api/statservice/plotapi';
 import ScatterPlot from './components/ScatterPlot';
-import { getInternalProductCount } from '@/app/api/productservice/productapi';
+// import { getInternalProductCount } from '@/app/api/productservice/productapi';
 import { InternalStyleCount } from '@/types/ProductType';
 
 
@@ -31,16 +29,6 @@ interface DashboardStyleItem {
 }
 
 /**
- * 메트릭 카드의 색상 스타일 정의
- */
-const METRIC_COLORS: Record<string, string> = {
-  violet: 'bg-violet-600 shadow-violet-100 dark:shadow-none',
-  indigo: 'bg-indigo-600 shadow-indigo-100 dark:shadow-none',
-  green: 'bg-emerald-500 shadow-emerald-100 dark:shadow-none',
-  black: 'bg-black dark:bg-neutral-800 shadow-gray-100 dark:shadow-none',
-};
-
-/**
  * Dashboard Component
  * 서비스의 주요 지표, 스타일 트렌드, 매출 순위 등을 한눈에 보여주는 메인 관제 센터
  */
@@ -52,8 +40,8 @@ export default function Dashboard({
   initialSales?: SalesRankItem[]
 }) {
 
-  //TSNE용
-  const [tsneData, setTSNEData] = useState<DashboardStyleItem[]>(
+  //산점도용
+  const [ScatterData, setScatterData] = useState<DashboardStyleItem[]>(
     initialData.length > 0
       ? initialData.map((t, i) => ({
         ...t,
@@ -68,8 +56,8 @@ export default function Dashboard({
       })).sort((a, b) => b.value - a.value)
       : []
   );
-  const [isLoadingTSNE, setIsLoadingTSNE] = useState(initialData.length === 0);
-  const [errorTSNE, setErrorTSNE] = useState<string | null>(null);
+  const [isLoadingScatter, setIsLoadingScatter] = useState(initialData.length === 0);
+  const [errorScatter, setErrorScatter] = useState<string | null>(null);
 
   //랭킹용
   const [sales, setSales] = useState<SalesRankItem[]>(
@@ -84,7 +72,7 @@ export default function Dashboard({
   const [errorInternalStyles, setErrorInternalStyles] = useState<string | null>(null);
 
   // 무한 페칭 방지를 위한 요청 시도 플래그
-  const [hasAttemptedTSNEFetch, setHasAttemptedTSNEFetch] = useState(false);
+  const [hasAttemptedScatterFetch, setHasAttemptedScatterFetch] = useState(false);
   const [hasAttemptedSalesFetch, setHasAttemptedSalesFetch] = useState(false);
   const [hasAttemptedInternalStylesFetch, setHasAttemptedInternalStylesFetch] = useState(false);
 
@@ -110,14 +98,14 @@ export default function Dashboard({
     }
   };
 
-  const fetchTSNEData = async (isRetry = false) => {
-    if (!isRetry && hasAttemptedTSNEFetch) return;
-    setHasAttemptedTSNEFetch(true);
-    setIsLoadingTSNE(true);
-    setErrorTSNE(null);
+  const fetchScatterData = async (isRetry = false) => {
+    if (!isRetry && hasAttemptedScatterFetch) return;
+    setHasAttemptedScatterFetch(true);
+    setIsLoadingScatter(true);
+    setErrorScatter(null);
 
     try {
-      const result = await getTSNEPoints();
+      const result = await getScatterPoints();
       const processedData = result.map((item: any, i: number) => ({
         ...item,
         score: item.value || 0,
@@ -129,12 +117,12 @@ export default function Dashboard({
         productName: item.style || `Style-${i}`
       })).sort((a: any, b: any) => b.value - a.value);
 
-      setTSNEData(processedData);
+      setScatterData(processedData);
     } catch (err) {
       console.error('Failed to fetch trends:', err);
-      setErrorTSNE('Connection Failed');
+      setErrorScatter('Connection Failed');
     } finally {
-      setIsLoadingTSNE(false);
+      setIsLoadingScatter(false);
     }
   };
 
@@ -160,46 +148,12 @@ export default function Dashboard({
     }
   };
 
-  // const fetchSalesByShopAndDate = async (isRetry = false) => {
-  //   if (!isRetry && hasAttemptedSalesFetch) return;
-  //   setHasAttemptedSalesFetch(true);
-  //   setIsLoadingSales(true);
-  //   setErrorSales(null);
-
-  //   try {
-  //     const result = await getSalesRankingByShopAndDate('9oz', '2022-01-01', '2022-12-31');
-  //     const sortedSales = result.sort((a, b) => b.saleQuantity - a.saleQuantity);
-  //     setSales(sortedSales);
-  //   } catch (err) {
-  //     console.error('Failed to fetch sales:', err);
-  //     setErrorSales('Connection Failed');
-  //   } finally {
-  //     setIsLoadingSales(false);
-  //   }
-  // };
-
-
   useEffect(() => {
-    if (initialData.length === 0 && !hasAttemptedTSNEFetch) fetchTSNEData();
+    if (initialData.length === 0 && !hasAttemptedScatterFetch) fetchScatterData();
     if (initialSales.length === 0 && !hasAttemptedSalesFetch) fetchSales();
     if (internalStyles.length === 0 && !hasAttemptedInternalStylesFetch) fetchInternalStyles();
 
   }, []);
-
-  // 대시보드 메트릭 카드 정의
-  // const mainMetrics = [
-  //   {
-  //     label: '9oz Inventory',
-  //     value: internalProductCount,
-  //     sub: 'Total Products',
-  //     icon: <FaBoxesStacked />,
-  //     color: 'violet',
-  //     isLoading: isLoadingInternalProductCount,
-  //     error: errorInternalProductCount,
-  //     onRetry: () => fetchInternalProductCount(true)
-  //   },
-
-  // ];
 
   return (
     <div className="space-y-8 pb-20">
@@ -218,12 +172,12 @@ export default function Dashboard({
 
         <div className="flex flex-col gap-6">
           <ScatterPlot
-            title="9oz 스타일 클러스터"
-            subtitle="Latent Projection"
+            title="스타일 클러스터"
+            subtitle="잠재벡터 2차원 투영"
             description="스타일별로 고차원 제품 특징을 차원축소 알고리즘을 통해 2차원 평면에 압축하여 시각화한 맵입니다."
             bottomTextFormat="총 {count}개의 데이터가 매핑되었습니다."
             className="flex-1 h-full"
-            fetchDataFn={getTSNEPoints}
+            fetchDataFn={getScatterPoints}
           />
         </div>
       </div>

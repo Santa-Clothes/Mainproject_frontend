@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { FaArrowsRotate, FaTriangleExclamation, FaExpand } from "react-icons/fa6";
 import { LuChartScatter } from "react-icons/lu";
-import { TSNEPoint } from "@/app/api/trendservice/tsneapi";
+import { ScatterPoint } from "@/app/api/statservice/plotapi";
 import { motion, AnimatePresence } from "framer-motion";
 
 /**
@@ -25,7 +25,7 @@ export interface ScatterPlotProps {
     description?: string;
     bottomTextFormat?: string;
     className?: string;
-    fetchDataFn: () => Promise<TSNEPoint[]>;
+    fetchDataFn: () => Promise<ScatterPoint[]>;
 }
 
 export default function ScatterPlot({
@@ -36,7 +36,7 @@ export default function ScatterPlot({
     className = "lg:col-span-4",
     fetchDataFn
 }: ScatterPlotProps) {
-    const [data, setData] = useState<TSNEPoint[]>([]);
+    const [data, setData] = useState<ScatterPoint[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
@@ -63,7 +63,7 @@ export default function ScatterPlot({
             const points = await Promise.race([
                 fetchDataFn(),
                 timeoutPromise
-            ]) as TSNEPoint[];
+            ]) as ScatterPoint[];
 
             setData(points);
         } catch (err: any) {
@@ -77,7 +77,7 @@ export default function ScatterPlot({
             );
 
             // 데모용 샘플 데이터 생성 (실패 시에도 UI 흐름 유지를 위함)
-            const mockPoints: TSNEPoint[] = Array.from({ length: 0 }, (_, i) => ({
+            const mockPoints: ScatterPoint[] = Array.from({ length: 0 }, (_, i) => ({
                 xcoord: Math.random() * 20 - 10,
                 ycoord: Math.random() * 20 - 10,
                 productName: `Style Item #${i + 1}`,
@@ -119,7 +119,7 @@ export default function ScatterPlot({
         if (!data || data.length === 0) return [];
 
         // 데이터 클러스터링 그룹화 (style 기준)
-        const groups = new Map<string, TSNEPoint[]>();
+        const groups = new Map<string, ScatterPoint[]>();
         data.forEach(point => {
             const style = point.style || "Unknown";
             if (!groups.has(style)) groups.set(style, []);
@@ -161,7 +161,7 @@ export default function ScatterPlot({
                 <div className="flex justify-between items-end relative z-10">
                     <div className="space-y-2">
                         <span className="text-[12px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-[0.4em]">{subtitle}</span>
-                        <h3 className="text-3xl font-normal italic text-black dark:text-white tracking-tight">{title}</h3>
+                        <h3 className="text-5xl font-normal italic text-black dark:text-white tracking-tight">{title}</h3>
                     </div>
                     <div className="flex items-center gap-3">
                         <div className="relative group">

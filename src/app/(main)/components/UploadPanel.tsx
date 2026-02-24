@@ -3,13 +3,13 @@
 import React, { useState, useRef } from 'react';
 import { FaCloudArrowUp, FaXmark, FaMagnifyingGlass, FaCircleInfo, FaFileImage } from 'react-icons/fa6';
 import Image from 'next/image';
-import { RecommendData } from '@/types/ProductType';
+import { RecommendData, RecommendList } from '@/types/ProductType';
 
 import { imageAnalyze } from '@/app/api/imageservice/imageapi';
 // import { searchByImage, FashionSearchResponse } from '@/app/api/imageservice/fashionSearch';
 
 interface UploadPanelProps {
-  onResultFound: (results: any[] | null) => void;
+  onResultFound: (results: RecommendList | null) => void;
   onAnalysisStart: (imgUrl: string, name?: string) => void;
   onAnalysisCancel: () => void;
   isPending: boolean;
@@ -61,7 +61,7 @@ export default function UploadPanel({ onResultFound, onAnalysisStart, onAnalysis
 
     startTransition(async () => {
       // 1. 즉시 로딩 화면으로 전환 (결과 그리드 초기화)
-      onResultFound([]);
+      onResultFound(null);
 
       // try {
       // 2. 이미지 서버로 업로드 (Server Action 호출)
@@ -95,10 +95,17 @@ export default function UploadPanel({ onResultFound, onAnalysisStart, onAnalysis
         const uploadResult: any = await imageAnalyze(selectedFile);
         console.log("uploadResult", uploadResult);
         if (uploadResult) {
-          // 3. 분석 결과를 바탕으로 유사 상품 추천 리스트 조회
-          // const results: RecommendData[] = await getRecommendList("AKA3CA001");
+          // 3. 분석 결과를 바탕으로 유사 상품 추천 리스트 조회 (Studio.tsx의 RecommendList 구조 맞춤)
+          const legacyProducts = Array.isArray(uploadResult.similarProducts) ? uploadResult.similarProducts : uploadResult;
 
-          onResultFound(uploadResult.similarProducts);
+          if (Array.isArray(legacyProducts)) {
+            onResultFound({
+              internalProducts: legacyProducts,
+              naverProducts: [] // UploadPanel은 외부 API 분석이 추후 연계될 시 점진적으로 추가
+            } as any);
+          } else {
+            onResultFound(uploadResult);
+          }
         } else {
           alert("이미지 업로드에 실패했습니다.");
           onResultFound(null);

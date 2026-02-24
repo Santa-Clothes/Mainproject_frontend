@@ -8,7 +8,7 @@ export interface rawData {
     ycoords: number[]
 }
 
-export interface TSNEPoint {
+export interface ScatterPoint {
     productId: string,
     productName: string,
     style: string,
@@ -17,10 +17,10 @@ export interface TSNEPoint {
 }
 
 /**
- * t-SNE 좌표 데이터를 가져오는 API
- * @returns {Promise<TSNEPoint[]>} t-SNE 포인트 배열
+ * 산점도 좌표 데이터를 가져오는 API
+ * @returns {Promise<ScatterPoint[]>} 산점도 포인트 배열
  */
-export const getTSNEPoints = async (): Promise<TSNEPoint[]> => {
+export const getScatterPoints = async (): Promise<ScatterPoint[]> => {
     try {
         const response = await fetch(`${BASEURL}/api/products/map`, {
             method: 'GET',
@@ -43,7 +43,7 @@ export const getTSNEPoints = async (): Promise<TSNEPoint[]> => {
             ycoord: data.ycoords?.[i] ?? 0
         }));
     } catch (error) {
-        console.error("getTSNEPoints error:", error);
+        console.error("getScatterPoints error:", error);
         // API가 아직 준비되지 않았을 경우를 대비해 빈 배열 혹은 에러를 던집니다.
         return [];
     }

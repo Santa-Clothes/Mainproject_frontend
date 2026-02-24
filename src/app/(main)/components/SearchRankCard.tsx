@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import DashboardCard from './DashboardCard';
+import DashboardCard from '../dashboard/components/DashboardCard';
 import { SiNaver } from 'react-icons/si';
 
 interface Trend {
@@ -10,7 +10,7 @@ interface Trend {
     value: number;
 }
 
-interface Props {
+interface RankProps {
     trends: Trend[];
     isLoading: boolean;
     error: string | null;
@@ -22,10 +22,10 @@ interface Props {
  * SearchRankCard: 사용자 검색량 기준 상위 5개 트렌드를 순위 리스트 형태로 표시합니다.
  * 수치를 배제하고 명칭과 순위 위주의 깔끔한 UI를 제공합니다.
  */
-const SearchRankCard: React.FC<Props> = ({ trends, isLoading, error, onRetry, className = "" }) => {
+const SearchRankCard: React.FC<RankProps> = ({ trends, isLoading, error, onRetry, className = "" }) => {
     return (
         <DashboardCard
-            title="Search Rank"
+            title="검색어 순위"
             subtitle="Naver Top 5 Trends"
             isLoading={isLoading}
             error={error}
