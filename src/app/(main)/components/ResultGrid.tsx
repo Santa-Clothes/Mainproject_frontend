@@ -63,7 +63,7 @@ const ResultGrid: React.FC<ResultGridProps> = ({
                         <FaLayerGroup size={10} className="text-violet-500" />
                         <span className="text-[9px] font-bold uppercase tracking-widest">{subtitle}</span>
                     </div>
-                    <h3 className="font-serif text-3xl lg:text-4xl italic tracking-tighter text-neutral-900 dark:text-white">
+                    <h3 className="font-normal text-3xl lg:text-4xl italic tracking-tighter text-neutral-900 dark:text-white">
                         {title}
                     </h3>
                 </div>

@@ -173,6 +173,28 @@ export default function Header() {
           {/* 톱니바퀴만 오른쪽 끝으로 밀어내기 위한 여백(Spacer) */}
           <div className="flex-1" />
 
+          {/* 테마 설정 섹션: 네비게이션 아이템과 어우러지는 컴팩트한 원형 디자인 */}
+          <div className="flex items-center px-2">
+            <button
+              onClick={toggleTheme}
+              className="relative w-9 h-9 flex items-center justify-center rounded-full bg-neutral-100/50 dark:bg-white/5 border border-neutral-200 dark:border-white/10 hover:border-violet-500/50 transition-all duration-300 group overflow-hidden"
+              title={isDarkMode ? "라이트 모드로 전환" : "다크 모드로 전환"}
+            >
+              <div className="relative w-full h-full flex items-center justify-center">
+                <FaSun
+                  size={14}
+                  className={`absolute transition-all duration-500 transform ${isDarkMode ? 'translate-y-10 rotate-90 opacity-0' : 'translate-y-0 rotate-0 opacity-100 text-amber-500'}`}
+                />
+                <FaMoon
+                  size={14}
+                  className={`absolute transition-all duration-500 transform ${isDarkMode ? 'translate-y-0 rotate-0 opacity-100 text-violet-400' : '-translate-y-10 -rotate-90 opacity-0'}`}
+                />
+              </div>
+              {/* 호버 시 은은한 글로우 효과 */}
+              <div className="absolute inset-0 bg-violet-500/0 group-hover:bg-violet-500/5 transition-colors duration-300" />
+            </button>
+          </div>
+
           {/* 3. 우측: 설정 및 인증 상태 (오른쪽 끝에 고정) */}
           <div className="flex items-center justify-end shrink-0 pr-1 md:pr-2" ref={profileRef}>
 
@@ -182,7 +204,7 @@ export default function Header() {
               const hasValidUrl = typeof profile === 'string' && (profile.startsWith("http") || profile.startsWith("data:"));
 
               return (
-                <div className="hidden sm:flex items-center gap-3 pl-3 pr-2 border-l border-gray-200 dark:border-white/10 mr-1 animate-in fade-in slide-in-from-right-4 duration-500">
+                <div className="hidden sm:flex items-center gap-3 pl-3 pr-2 border-l border-neutral-200 dark:border-white/10 mr-1 animate-in fade-in slide-in-from-right-4 duration-500">
                   <div className="flex flex-col text-right font-sans shrink-0">
                     <span className="text-[10px] font-black leading-none uppercase tracking-wider text-neutral-900 dark:text-white">
                       {authInfo.name}
@@ -249,21 +271,6 @@ export default function Header() {
             {/* 드롭다운 메뉴 */}
             {isProfileOpen && (
               <div className="absolute top-[calc(100%+12px)] right-0 w-64 bg-white/95 dark:bg-neutral-950/95 backdrop-blur-2xl rounded-3xl shadow-2xl overflow-hidden z-50 border-2 border-neutral-100 dark:border-white/10 animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-200">
-                {/* 1. 테마 설정 섹션 */}
-                <div className="p-5 border-b border-neutral-100 dark:border-white/5 bg-neutral-50/50 dark:bg-white/5">
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.3em] mb-4">Display Theme</p>
-                  <button onClick={toggleTheme} className="relative w-full h-11 bg-white dark:bg-black/40 border border-neutral-200 dark:border-white/5 rounded-2xl cursor-pointer overflow-hidden p-1 shadow-inner group">
-                    <div className={`absolute inset-y-1 w-[calc(50%-4px)] rounded-xl bg-violet-600 shadow-lg shadow-violet-500/30 transition-all duration-500 ease-spring flex items-center justify-center text-white z-10 ${isDarkMode ? 'translate-x-[calc(100%+0px)]' : 'translate-x-0'}`}>
-                      <FaSun size={12} className="dark:hidden" />
-                      <FaMoon size={12} className="hidden dark:block" />
-                    </div>
-                    <div className="relative w-full h-full flex items-center justify-between px-4">
-                      <span className={`text-[9px] font-bold uppercase tracking-widest transition-colors ${!isDarkMode ? 'text-white' : 'text-gray-400'}`}>Light</span>
-                      <span className={`text-[9px] font-bold uppercase tracking-widest transition-colors ${isDarkMode ? 'text-white' : 'text-gray-400'}`}>Dark</span>
-                    </div>
-                  </button>
-                </div>
-
                 {/* 2. 계정 섹션 */}
                 <div className="p-2">
                   {!authInfo ? (
