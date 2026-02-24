@@ -94,19 +94,6 @@ export default function MainPage() {
           suppressHydrationWarning
           className="relative flex flex-col justify-between overflow-hidden rounded-[3rem] border-2 border-neutral-100 bg-white p-10 dark:border-white/10 dark:bg-neutral-900/50 md:p-14 group shadow-sm transition-[border-color,box-shadow,transform] duration-300 hover:border-violet-500/40"
         >
-          {/* <div className="relative z-10 space-y-12">
-            <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-violet-600 shadow-lg group-hover:bg-violet-500">
-              <FaChartLine className="text-white text-2xl" />
-            </div>
-            <div className="space-y-4">
-              <h4 className="text-[11px] font-bold uppercase tracking-widest text-violet-500">Dashboard</h4>
-              <p className="text-7xl font-serif italic tracking-tighter text-neutral-900 dark:text-white"></p>
-              <div className="flex items-center gap-3">
-                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">analytics</span>
-              </div>
-            </div>
-          </div> */}
-
           <div className="absolute bottom-12 left-10 right-10 space-y-6">
             <div className="space-y-4">
               <h3 className="text-4xl md:text-5xl font-normal italic text-neutral-900 dark:text-white tracking-tighter leading-none">Analytics <br /> Dashboard</h3>

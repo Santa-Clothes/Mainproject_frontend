@@ -215,19 +215,15 @@ export default function SelectionPanel({
 
       {/* 2. 스크롤 영역: 상품 그리드 리스트 */}
       <div className="flex items-center justify-between">
-        <span className="text-[9px] font-bold text-neutral-900 dark:text-white uppercase tracking-widest">
+        <span className="text-[10px] font-bold text-neutral-900 dark:text-white uppercase tracking-widest">
           Category: <span className="font-extrabold normal-case text-xs text-violet-500">{selectedCat}</span>
           <span className="ml-2 text-neutral-400 font-normal">({filteredProducts.length} items)</span>
         </span>
         {/* Data Insights Badges */}
         <div className="flex flex-wrap gap-2.5">
           <div className="px-4 py-2 flex flex-row items-center gap-2.5">
-            <FaCalendarDays size={10} className="text-violet-600 dark:text-violet-400" />
-            <span className="text-[8px] font-black text-violet-600 dark:text-violet-400 uppercase tracking-[0.2em]">Past 12 Months Analytics</span>
-          </div>
-          <div className="px-4 py-2 flex flex-row items-center gap-2.5">
             <FaChartLine size={10} className="text-neutral-500 dark:text-neutral-400" />
-            <span className="text-[8px] font-black text-neutral-500 dark:text-neutral-400 uppercase tracking-[0.2em]">Ranked by Sales Momentum</span>
+            <span className="text-[10px] font-black text-neutral-500 dark:text-neutral-400 uppercase tracking-[0.2em]">최근 1년 기준 판매량 순위</span>
           </div>
         </div>
       </div>

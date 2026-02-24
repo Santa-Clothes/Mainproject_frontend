@@ -261,7 +261,7 @@ export default function UploadPanel({ onResultFound, onAnalysisStart, onAnalysis
               <div className="w-32 h-32 flex-none rounded-4xl bg-neutral-100 dark:bg-neutral-800/50 border-2 border-neutral-100 dark:border-white/10 overflow-hidden relative group/ex">
                 <div className="absolute inset-0 flex items-center justify-center text-neutral-300 dark:text-neutral-700">
                   {/* <FaFileImage size={24} /> */}
-                  <Image src={sampleImg} alt="sample" fill className="object-contain" />
+                  <Image src={sampleImg} alt="sample" fill className="object-cover" />
                 </div>
                 <div className="absolute inset-0 bg-violet-600/10 opacity-0 group-hover/ex:opacity-100 transition-opacity" />
               </div>

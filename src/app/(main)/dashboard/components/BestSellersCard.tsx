@@ -296,18 +296,20 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
 
                 {/* 2. Content Split by Shop (Columns) */}
                 <div className="flex-1 min-h-80">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 h-full">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-0 gap-y-12 lg:gap-y-0 h-full items-stretch">
 
                         {/* Always Display Total First */}
-                        <div className="flex flex-col space-y-4 col-span-1">
+                        <div className="flex flex-col space-y-6 col-span-1 px-4 md:px-6 lg:px-8 min-w-0">
                             {/* 지점 헤더 */}
-                            <div className="flex items-center gap-3 border-b border-neutral-100 dark:border-white/10 pb-2">
-                                <div className="w-1.5 h-4 bg-violet-500 rounded-full"></div>
-                                <h4 className="text-xs font-bold text-neutral-800 dark:text-gray-200 uppercase tracking-widest truncate">
-                                    전체 지점
-                                </h4>
+                            <div className="flex items-center gap-3 pb-4">
+                                <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl border-2 border-violet-500/20 dark:border-violet-500/30 bg-violet-50/50 dark:bg-violet-900/20 shadow-sm ring-1 ring-violet-500/10 shrink-0">
+                                    <div className="w-1.5 h-4 bg-violet-500 rounded-full shadow-[0_0_8px_rgba(139,92,246,0.5)]"></div>
+                                    <h4 className="text-sm font-black text-neutral-900 dark:text-white uppercase tracking-widest truncate">
+                                        전체 지점
+                                    </h4>
+                                </div>
                                 {(loadingShops['전체'] || isLoading) && (
-                                    <div className="w-4 h-4 rounded-full border-2 border-violet-500 border-t-transparent animate-spin ml-auto"></div>
+                                    <div className="w-4 h-4 rounded-full border-2 border-violet-500 border-t-transparent animate-spin ml-auto shrink-0"></div>
                                 )}
                             </div>
 
@@ -328,17 +330,17 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
                                 );
 
                                 if (items.length > 0) return (
-                                    <div className={`flex flex-col gap-5 ${isLoadingShopData ? 'opacity-50' : ''}`}>
+                                    <div className={`flex flex-col gap-5 ${isLoadingShopData ? 'opacity-50' : ''} min-w-0`}>
                                         {items.map((item, i) => (
-                                            <div key={item.shortName} className="space-y-2 group">
-                                                <div className="flex justify-between items-end">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-[12px] italic text-violet-600 font-bold">0{i + 1}</span>
-                                                        <span className="text-[11px] font-bold text-black dark:text-white uppercase tracking-tight truncate max-w-28 xl:max-w-32 group-hover:text-violet-500 transition-colors tooltip" title={item.shortName}>
+                                            <div key={item.shortName} className="space-y-2 group min-w-0">
+                                                <div className="flex justify-between items-end gap-3 min-w-0">
+                                                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                                                        <span className="text-[12px] italic text-violet-600 font-bold shrink-0">0{i + 1}</span>
+                                                        <span className="text-[11px] font-bold text-black dark:text-white uppercase tracking-tight truncate group-hover:text-violet-500 transition-colors tooltip flex-1" title={item.shortName}>
                                                             {item.shortName}
                                                         </span>
                                                     </div>
-                                                    <span className="text-[12px] font-black text-violet-600 tracking-tighter">
+                                                    <span className="text-[12px] font-black text-violet-600 tracking-tighter shrink-0">
                                                         {item.quantity.toLocaleString()}
                                                     </span>
                                                 </div>
@@ -361,12 +363,14 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
                             // Empty Slot
                             if (!shop) {
                                 return (
-                                    <div key={`empty-${slotIdx}`} className="flex flex-col space-y-4 col-span-1">
-                                        <div className="flex items-center gap-3 border-b border-dashed border-neutral-200 dark:border-white/10 pb-2">
-                                            <div className="w-1.5 h-4 bg-neutral-200 dark:bg-neutral-800 rounded-full"></div>
-                                            <h4 className="text-xs font-bold text-neutral-400 dark:text-gray-600 uppercase tracking-widest truncate">
-                                                비교 지점 선택
-                                            </h4>
+                                    <div key={`empty-${slotIdx}`} className={`flex flex-col space-y-6 col-span-1 px-4 md:px-6 lg:px-8 min-w-0 lg:border-l ${slotIdx % 2 === 0 ? 'md:border-l' : ''} border-neutral-200 dark:border-white/20`}>
+                                        <div className="flex items-center gap-3 pb-4">
+                                            <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl border border-dashed border-neutral-300 dark:border-white/20 bg-transparent opacity-60 shrink-0">
+                                                <div className="w-1.5 h-4 bg-neutral-300 dark:bg-neutral-700 rounded-full"></div>
+                                                <h4 className="text-sm font-bold text-neutral-400 dark:text-gray-500 uppercase tracking-widest truncate">
+                                                    비교 지점 선택
+                                                </h4>
+                                            </div>
                                         </div>
                                         <div className="flex-1 min-h-50 flex flex-col items-center justify-center text-center p-6 bg-neutral-50 dark:bg-white/5 rounded-xl border border-dashed border-neutral-200 dark:border-white/10">
                                             <div className="w-10 h-10 mb-3 bg-neutral-100 dark:bg-neutral-800 rounded-full flex items-center justify-center">
@@ -386,21 +390,23 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
                             const maxQ = items[0]?.quantity || 1;
 
                             return (
-                                <div key={shop} className="flex flex-col space-y-4 col-span-1 fade-in">
-                                    <div className="flex items-center gap-3 border-b border-neutral-100 dark:border-white/10 pb-2 group/header relative">
-                                        <div className="w-1.5 h-4 bg-indigo-500 rounded-full"></div>
-                                        <h4 className="text-xs font-bold text-neutral-800 dark:text-gray-200 uppercase tracking-widest truncate max-w-[calc(100%-40px)]">
-                                            {shop}
-                                        </h4>
+                                <div key={shop} className={`flex flex-col space-y-6 col-span-1 fade-in px-4 md:px-6 lg:px-8 min-w-0 lg:border-l ${slotIdx % 2 === 0 ? 'md:border-l' : ''} border-neutral-200 dark:border-white/20`}>
+                                    <div className="flex items-center gap-3 pb-4 group/header relative">
+                                        <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl border-2 border-indigo-500/20 dark:border-indigo-500/30 bg-indigo-50/50 dark:bg-indigo-900/20 shadow-sm ring-1 ring-indigo-500/10 max-w-[calc(100%-40px)] shrink-0">
+                                            <div className="w-1.5 h-4 bg-indigo-500 rounded-full shadow-[0_0_8px_rgba(99,102,241,0.5)]"></div>
+                                            <h4 className="text-sm font-black text-neutral-900 dark:text-white uppercase tracking-widest truncate">
+                                                {shop}
+                                            </h4>
+                                        </div>
                                         <button
                                             onClick={() => handleShopToggle(shop)}
-                                            className="absolute right-0 p-1 rounded-full text-neutral-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                                            className="absolute right-0 p-1.5 rounded-full text-neutral-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors border border-transparent hover:border-red-100 dark:hover:border-red-900/20 shrink-0"
                                             title="선택 해제"
                                         >
                                             <FaTimes size={10} />
                                         </button>
                                         {isLoadingShopData && (
-                                            <div className="w-4 h-4 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin ml-auto"></div>
+                                            <div className="w-4 h-4 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin ml-auto shrink-0"></div>
                                         )}
                                     </div>
 
@@ -414,17 +420,17 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
                                             ))}
                                         </div>
                                     ) : items.length > 0 ? (
-                                        <div className={`flex flex-col gap-5 ${isLoadingShopData ? 'opacity-50' : ''}`}>
+                                        <div className={`flex flex-col gap-5 ${isLoadingShopData ? 'opacity-50' : ''} min-w-0`}>
                                             {items.map((item, i) => (
-                                                <div key={item.shortName} className="space-y-2 group">
-                                                    <div className="flex justify-between items-end">
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="text-[12px] italic text-indigo-600 font-bold">0{i + 1}</span>
-                                                            <span className="text-[11px] font-bold text-black dark:text-white uppercase tracking-tight truncate max-w-28 xl:max-w-32 group-hover:text-indigo-500 transition-colors tooltip" title={item.shortName}>
+                                                <div key={item.shortName} className="space-y-2 group min-w-0">
+                                                    <div className="flex justify-between items-end gap-3 min-w-0">
+                                                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                                                            <span className="text-[12px] italic text-indigo-600 font-bold shrink-0">0{i + 1}</span>
+                                                            <span className="text-[11px] font-bold text-black dark:text-white uppercase tracking-tight truncate group-hover:text-indigo-500 transition-colors tooltip flex-1" title={item.shortName}>
                                                                 {item.shortName}
                                                             </span>
                                                         </div>
-                                                        <span className="text-[12px] font-black text-indigo-600 tracking-tighter">
+                                                        <span className="text-[12px] font-black text-indigo-600 tracking-tighter shrink-0">
                                                             {item.quantity.toLocaleString()}
                                                         </span>
                                                     </div>

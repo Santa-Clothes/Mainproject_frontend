@@ -205,8 +205,7 @@ export default function MemberInfo() {
     <div className="max-w-4xl mx-auto space-y-10 py-10 px-6">
       {/* 상단 헤더 섹션 */}
       <div className="flex flex-col gap-2">
-        <h1 className="text-4xl font-serif italic text-neutral-900 dark:text-white">Curator Profile</h1>
-        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.5em]">Neural Interface & Identity Management</p>
+        <h1 className="text-4xl font-normal italic text-neutral-900 dark:text-white">회원 정보</h1>
         <div className="h-px w-20 bg-violet-500 mt-4"></div>
       </div>
 
@@ -275,11 +274,11 @@ export default function MemberInfo() {
 
           <div className="p-6 rounded-3xl bg-neutral-50 dark:bg-neutral-900/50 border border-neutral-100 dark:border-white/5 space-y-4">
             <div className="flex flex-col gap-1">
-              <label className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest">Authentication Method</label>
+              <label className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest">인증 방식</label>
               <p className="text-xs font-black text-violet-600 uppercase tracking-wider">{auth.provider || 'LOCAL'}</p>
             </div>
             <div className="flex flex-col gap-1">
-              <label className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest">User ID</label>
+              <label className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest">아이디</label>
               <p className="text-xs font-medium text-neutral-900 dark:text-white truncate">{auth.userId}</p>
             </div>
           </div>
@@ -296,10 +295,9 @@ export default function MemberInfo() {
                   <div className="p-2.5 rounded-2xl bg-violet-600 text-white shadow-lg shadow-violet-600/20">
                     <FaUser size={14} />
                   </div>
-                  <h2 className="text-xl font-normal italic text-neutral-900 dark:text-white">Neural Designation</h2>
+                  <h2 className="text-xl font-normal italic text-neutral-900 dark:text-white">닉네임</h2>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-neutral-500 uppercase tracking-[0.2em] ml-1">Public Nickname</label>
                   <input
                     type="text"
                     value={nickname}
@@ -317,12 +315,12 @@ export default function MemberInfo() {
                     <div className="p-2.5 rounded-2xl bg-violet-600 text-white shadow-lg shadow-violet-600/20">
                       <FaLock size={14} />
                     </div>
-                    <h2 className="text-xl font-normal italic text-neutral-900 dark:text-white">Access Credentials</h2>
+                    <h2 className="text-xl font-normal italic text-neutral-900 dark:text-white">비밀번호</h2>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="text-[10px] font-bold text-neutral-500 uppercase tracking-[0.2em] ml-1">New Security Key</label>
+                      <label className="text-[10px] font-bold text-neutral-500 uppercase tracking-[0.2em] ml-1">새 비밀번호</label>
                       <input
                         type="password"
                         value={newPassword}
@@ -332,7 +330,7 @@ export default function MemberInfo() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[10px] font-bold text-neutral-500 uppercase tracking-[0.2em] ml-1">Confirm Key</label>
+                      <label className="text-[10px] font-bold text-neutral-500 uppercase tracking-[0.2em] ml-1">비밀번호 확인</label>
                       <input
                         type="password"
                         value={confirmPassword}
@@ -349,9 +347,9 @@ export default function MemberInfo() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-5 rounded-3xl bg-neutral-900 dark:bg-violet-600 text-white text-[10px] font-bold uppercase tracking-[0.4em] shadow-2xl hover:bg-violet-600 dark:hover:bg-violet-500 transition-all disabled:opacity-50 active:scale-[0.98]"
+                className="w-full py-5 rounded-3xl bg-neutral-900 dark:bg-violet-600 text-white text-[20px] font-bold uppercase tracking-[0.4em] shadow-2xl hover:bg-violet-600 dark:hover:bg-violet-500 transition-all disabled:opacity-50 active:scale-[0.98]"
               >
-                {isSubmitting ? 'Updating Neural Grid...' : 'Commit Protocol Changes'}
+                {isSubmitting ? '수정 중...' : '회원 정보 수정'}
               </button>
             </form>
           </section>
@@ -376,15 +374,15 @@ export default function MemberInfo() {
       {/* 하단 탈퇴 버튼 섹션 */}
       <div className="max-w-2xl mx-auto p-4 px-6 rounded-2xl bg-red-50/30 dark:bg-red-950/5 border-2 border-red-200/50 dark:border-red-900/30 flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10">
         <div className="space-y-1 text-center sm:text-left">
-          <p className="text-[10px] font-black text-red-500 uppercase tracking-widest">Withdrawal Status</p>
-          <p className="text-xs text-neutral-500">Permanently remove your account and all associated data.</p>
+          <p className="text-[10px] font-black text-red-500 uppercase tracking-widest">회원 탈퇴</p>
+          <p className="text-xs text-neutral-500">회원 탈퇴 시 모든 데이터가 삭제됩니다.</p>
         </div>
         <button
           onClick={handleDeleteAccount}
           className="flex items-center gap-2 px-6 py-3 rounded-xl bg-red-500 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-red-600 transition-all active:scale-95 shrink-0 shadow-lg shadow-red-500/10"
         >
           <FaTrash size={12} />
-          Withdraw
+          회원 탈퇴
         </button>
       </div>
 
@@ -398,7 +396,7 @@ export default function MemberInfo() {
                   <div className="p-2.5 rounded-2xl bg-red-500 text-white shadow-lg shadow-red-500/20">
                     <FaTrash size={14} />
                   </div>
-                  <h2 className="text-xl font-normal italic text-neutral-900 dark:text-white">Security Verification</h2>
+                  <h2 className="text-xl font-normal italic text-neutral-900 dark:text-white">회원 탈퇴 확인</h2>
                 </div>
                 <button
                   onClick={() => setIsDeleteModalOpen(false)}
@@ -409,13 +407,13 @@ export default function MemberInfo() {
               </div>
 
               <div className="space-y-2">
-                <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest">Withdrawal Protocol Initiation</p>
-                <p className="text-xs text-neutral-500">To proceed with account withdrawal, please verify your credentials. This action is irreversible.</p>
+                <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest">회원 탈퇴 확인</p>
+                <p className="text-xs text-neutral-500">회원 탈퇴 시 모든 데이터가 삭제됩니다.</p>
               </div>
 
               <form onSubmit={submitWithdraw} className="space-y-4">
                 <div className="space-y-1.5">
-                  <label className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest ml-1">ID</label>
+                  <label className="text-[12px] font-bold text-neutral-400 uppercase tracking-widest ml-1">ID</label>
                   <input
                     type="text"
                     value={withdrawId}
@@ -426,7 +424,7 @@ export default function MemberInfo() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest ml-1">Password</label>
+                  <label className="text-[12px] font-bold text-neutral-400 uppercase tracking-widest ml-1">비밀번호</label>
                   <input
                     type="password"
                     value={withdrawPassword}
@@ -443,14 +441,14 @@ export default function MemberInfo() {
                     onClick={() => setIsDeleteModalOpen(false)}
                     className="flex-1 py-4 rounded-2xl bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 text-[10px] font-bold uppercase tracking-widest hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-all"
                   >
-                    Cancel
+                    취소
                   </button>
                   <button
                     type="submit"
                     disabled={isSubmitting}
                     className="flex-2 py-4 rounded-2xl bg-red-500 text-white text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-red-500/20 hover:bg-red-600 transition-all disabled:opacity-50"
                   >
-                    {isSubmitting ? 'Terminating...' : 'Confirm Withdrawal'}
+                    {isSubmitting ? '탈퇴 중...' : '회원 탈퇴'}
                   </button>
                 </div>
               </form>
