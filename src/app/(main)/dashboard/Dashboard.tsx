@@ -138,7 +138,8 @@ export default function Dashboard({
 
     try {
       const result = await getSalesRanking();
-      const sortedSales = result.sort((a, b) => b.saleQuantity - a.saleQuantity);
+
+      const sortedSales = result.products.sort((a, b) => b.saleQuantity - a.saleQuantity);
       setSales(sortedSales);
     } catch (err) {
       console.error('Failed to fetch sales:', err);

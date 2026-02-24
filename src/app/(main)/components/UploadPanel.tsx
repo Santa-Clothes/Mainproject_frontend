@@ -101,7 +101,7 @@ export default function UploadPanel({ onResultFound, onAnalysisStart, onAnalysis
           if (Array.isArray(legacyProducts)) {
             onResultFound({
               internalProducts: legacyProducts,
-              naverProducts: [] // UploadPanel은 외부 API 분석이 추후 연계될 시 점진적으로 추가
+              similarProducts: [] // UploadPanel은 외부 API 분석이 추후 연계될 시 점진적으로 추가
             } as any);
           } else {
             onResultFound(uploadResult);

@@ -1,6 +1,6 @@
 import { RecommendData } from "@/types/ProductType";
 import Image from "next/image";
-import { FaCheck, FaCartArrowDown } from "react-icons/fa6";
+import { FaCheck, FaCartArrowDown, FaShirt } from "react-icons/fa6";
 import { useAtom } from "jotai";
 import { cartAtom } from "@/jotai/historyJotai";
 
@@ -26,9 +26,7 @@ export default function ProductCard({ product, index = 0, selected = false, show
         style: 'currency',
         currency: 'KRW'
     }).format(product.price || 0);
-
-    // Naver API 등에서 imageUrl이 맵핑되지 않았을 때 fallback 처리 (추후 백엔드에서 수정 필요)
-    const displayImageUrl = product.imageUrl || (product as any).image || 'https://via.placeholder.com/300x400?text=No+Image';
+    const displayImageUrl = product.imageUrl || (product as any).image_url || (product as any).image || '';
     const displayTitle = product.title || (product as any).name || 'Unknown Product';
 
     // 장바구니 상태 관리
@@ -56,14 +54,21 @@ export default function ProductCard({ product, index = 0, selected = false, show
             {/* 1. 이미지 컨테이너 */}
             <div className={`aspect-3/4 overflow-hidden rounded-3xl bg-white dark:bg-neutral-900/50 border-2 relative shadow-sm transition-all
                 ${selected ? 'border-violet-600 ring-4 ring-violet-600/10 shadow-2xl' : 'border-neutral-100 dark:border-white/15 group-hover:border-violet-200'}`}>
-                <Image
-                    src={displayImageUrl}
-                    alt={displayTitle}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    priority={index < 4}
-                    className={`group-hover:scale-110 transition-transform duration-1000 object-cover ${selected ? 'brightness-75' : ''}`}
-                />
+                {displayImageUrl ? (
+                    <Image
+                        src={displayImageUrl}
+                        alt={displayTitle}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        priority={index < 4}
+                        className={`group-hover:scale-110 transition-transform duration-1000 object-cover ${selected ? 'brightness-75' : ''}`}
+                    />
+                ) : (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-neutral-100 dark:bg-neutral-800 text-neutral-300 dark:text-neutral-600">
+                        <FaShirt size={48} className="mb-4 opacity-50" />
+                        <span className="text-[10px] font-bold uppercase tracking-widest opacity-50">No Image</span>
+                    </div>
+                )}
 
                 {/* 선택 시 체크 표시 오버레이 */}
                 {selected && (

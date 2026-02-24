@@ -2,19 +2,19 @@
 
 import React from 'react';
 import DashboardCard from './DashboardCard';
-import { SalesRankItem } from '@/app/api/salesservice/salesapi';
+import { RankingData, SalesRankItem } from '@/app/api/salesservice/salesapi';
 import { FaRegCalendarAlt, FaTimes } from 'react-icons/fa';
 import { getShopList, ShopInfo } from '@/app/api/salesservice/salesapi';
 
 interface Props {
     initialSales: SalesRankItem[];
-    fetchSalesFn: (shop: string, startDate: string, endDate: string) => Promise<SalesRankItem[]>;
+    fetchSalesFn: (shop: string, startDate: string, endDate: string) => Promise<RankingData>;
     className?: string;
     isLoading?: boolean;
 }
 
 const fetchShopList = async (): Promise<ShopInfo[]> => {
-    // 임시 모의 API: 향후 백엔드 API로 교체 가능
+
     const shopList = await getShopList();
     return shopList;
 };
@@ -61,7 +61,7 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
                 for (const shop of list) {
                     if (shop.storeName.includes('온라인')) {
                         if (!hasOnline) {
-                            unifiedList.push({ storeId: 'S', storeName: '온라인' });
+                            unifiedList.push({ storeId: 'online', storeName: '온라인' });
                             hasOnline = true;
                         }
                     } else {
@@ -78,8 +78,7 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
 
     const formatProductName = (name: string) => {
         if (!name) return 'Unknown Product';
-        const parts = name.split('-');
-        return (parts[parts.length - 1] || name).trim();
+        return name.trim();
     };
 
     const handleShopToggle = (shop: string) => {
@@ -101,6 +100,7 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
 
         for (const shop of shopsToProcess) {
             const data = salesMap[shop] || [];
+
             const map = new Map<string, { shortName: string; quantity: number }>();
 
             data.forEach(s => {
@@ -150,7 +150,7 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
                             fetchParam = targetShop ? targetShop.storeId : shopName;
                         }
 
-                        const data = await fetchSalesFn(
+                        const data: RankingData = await fetchSalesFn(
                             fetchParam,
                             startDate,
                             endDate
@@ -162,7 +162,7 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
                 setSalesMap(prev => {
                     const nextMap = isDateChanged ? {} : { ...prev };
                     results.forEach(res => {
-                        nextMap[res.shop] = res.data;
+                        nextMap[res.shop] = res.data?.products || [];
                     });
 
                     if (isDateChanged && !nextMap['전체'] && prev['전체']) {
@@ -182,7 +182,7 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
         };
 
         loadFilteredData();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+
     }, [selectedShops, startDate, endDate]);
 
     const formatDateDisplay = (dateStr: string) => {

@@ -113,9 +113,17 @@ export default function Studio({ mode }: { mode: StudioMode }) {
    * 초기 화면으로 돌아가기 핸들러
    */
   const handleBackToSearch = () => {
-    // 이제 직접 상태를 지우는 대신 브라우저의 뒤로가기 기능을 동작시킵니다.
-    // 사용자가 뒤로 갈 때 브라우저 히스토리 스택 자체를 맞추기 위함입니다.
-    window.history.back();
+    // 명시적으로 상태를 초기화하여, 컴포넌트 내부에서 즉시 리렌더링 (Selection/Upload 패널로 돌아감)
+    setResults(null);
+    setActiveHistory(null);
+    setIsAnalyzing(false);
+
+    // 브라우저 URL에 남아있는 '?view=result' 파라미터를 깔끔하게 제거하여 히스토리 맞춤
+    const url = new URL(window.location.href);
+    if (url.searchParams.has('view')) {
+      url.searchParams.delete('view');
+      window.history.pushState({}, '', url.toString());
+    }
   };
 
   return (
@@ -138,6 +146,7 @@ export default function Studio({ mode }: { mode: StudioMode }) {
               sourceImage={analysisImage}
               productName={analysisName}
               isLoading={isAnalyzing}
+              barData={results?.results?.[0]?.topk || []}
             />
           </div>
 
