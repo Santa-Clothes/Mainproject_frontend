@@ -39,6 +39,8 @@ export default function LoginForm() {
 
     setAuth(null); // 기존 인증 정보 초기화
 
+    setIsAuthenticating(true);
+
     try {
       const result = await loginAPI(userId, password);
       if (result && result.success) {
@@ -53,11 +55,14 @@ export default function LoginForm() {
         });
         router.push("/");
       } else {
-        alert("인증 정보가 올바르지 않습니다.");
+        // 결과가 null이거나 success가 false인 경우 (서버 이슈 등 포함)
+        alert("로그인에 실패했습니다. ID/Key 또는 서버 상태를 확인해주세요.");
       }
     } catch (error) {
       console.error("Login failed:", error);
-      alert("로그인 중 오류가 발생했습니다.");
+      alert("서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    } finally {
+      setIsAuthenticating(false);
     }
   };
 
@@ -104,8 +109,8 @@ export default function LoginForm() {
         <div className="space-y-8">
           {/* 아이디 입력 필드 */}
           <div className="group relative border-b-2 border-neutral-200 py-3 transition-all duration-500 focus-within:border-violet-500 dark:border-white/10">
-            <label className="absolute -top-6 left-0 text-[9px] font-bold uppercase tracking-[0.3em] text-neutral-500 transition-colors group-focus-within:text-violet-600 dark:group-focus-within:text-violet-400">
-              Identifier
+            <label className="absolute -top-6 left-0 text-[12px] font-bold uppercase tracking-[0.3em] text-neutral-500 transition-colors group-focus-within:text-violet-600 dark:group-focus-within:text-violet-400">
+              아이디
             </label>
             <input
               ref={userIdRef}
@@ -118,8 +123,8 @@ export default function LoginForm() {
 
           {/* 비밀번호 입력 필드 */}
           <div className="group relative border-b-2 border-neutral-200 py-3 transition-all duration-500 focus-within:border-violet-500 dark:border-white/10">
-            <label className="absolute -top-6 left-0 text-[9px] font-bold uppercase tracking-[0.3em] text-neutral-500 transition-colors group-focus-within:text-violet-600 dark:group-focus-within:text-violet-400">
-              Security Key
+            <label className="absolute -top-6 left-0 text-[12px] font-bold uppercase tracking-[0.3em] text-neutral-500 transition-colors group-focus-within:text-violet-600 dark:group-focus-within:text-violet-400">
+              비밀번호
             </label>
             <input
               ref={passwordRef}
@@ -135,15 +140,15 @@ export default function LoginForm() {
           {/* 로그인 버튼 */}
           <button
             type="submit"
-            className="group flex w-full items-center justify-center gap-6 bg-neutral-900 py-4 text-[10px] font-bold uppercase tracking-[0.8em] text-white shadow-xl transition-all active:scale-[0.98] hover:bg-violet-600 dark:bg-violet-600 dark:hover:bg-violet-500"
+            className="group flex w-full items-center justify-center gap-6 bg-neutral-900 py-4 text-[16px] font-bold uppercase tracking-[0.8em] text-white shadow-xl transition-all active:scale-[0.98] hover:bg-violet-600 dark:bg-violet-600 dark:hover:bg-violet-500"
           >
-            Authenticate <FaArrowRight className="transition-transform group-hover:translate-x-2" />
+            로그인 <FaArrowRight className="transition-transform group-hover:translate-x-2" />
           </button>
 
           {/* 소셜 로그인 구분선 */}
           <div className="relative flex items-center justify-center py-2 gap-4">
             <div className="flex-1 border-t-2 border-neutral-200 dark:border-white/10"></div>
-            <span className="text-[9px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 shrink-0">
+            <span className="text-[12px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 shrink-0">
               Or Access With
             </span>
             <div className="flex-1 border-t-2 border-neutral-200 dark:border-white/10"></div>
@@ -164,8 +169,8 @@ export default function LoginForm() {
 
           {/* 회원가입 페이지 이동 링크 (경로 보정: /signup) */}
           <div className="flex flex-col items-center gap-3 pt-1">
-            <Link href="/signup" className="border-b border-transparent pb-1 text-[9px] font-bold uppercase tracking-[0.4em] text-neutral-500 transition-colors hover:border-violet-500 hover:text-violet-600 dark:hover:text-violet-400">
-              Registry New Curator
+            <Link href="/signup" className="border-b border-transparent pb-1 text-[12px] font-bold uppercase tracking-[0.4em] text-neutral-500 transition-colors hover:border-violet-500 hover:text-violet-600 dark:hover:text-violet-400">
+              회원가입
             </Link>
           </div>
         </div>

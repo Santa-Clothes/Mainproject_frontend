@@ -27,7 +27,7 @@ export const saveBookmarkAPI = async (token: string, productId: string) => {
  * @param productIds 삭제할 ID들의 배열 (Body에 직접 배열로 전송)
  */
 export const deleteBookmarkAPI = async (token: string, productIds: string[]) => {
-    console.log("selectedIds", productIds);
+
     const reqUrl = `${BASEURL}/api/save-products`;
     try {
         const response = await fetch(reqUrl, {
@@ -48,7 +48,14 @@ export const deleteBookmarkAPI = async (token: string, productIds: string[]) => 
 /**
  * 장바구니 리스트 불러오기 API
  */
-export const getBookmarkAPI = async (token: string): Promise<RecommendData[] | null> => {
+import { BookmarkData } from "@/types/ProductType";
+
+// ... (중략)
+
+/**
+ * 장바구니 리스트 불러오기 API
+ */
+export const getBookmarkAPI = async (token: string): Promise<BookmarkData[] | null> => {
     const reqUrl = `${BASEURL}/api/save-products`;
     try {
         const response = await fetch(reqUrl, {
@@ -59,8 +66,8 @@ export const getBookmarkAPI = async (token: string): Promise<RecommendData[] | n
         });
         if (!response.ok) return [];
         const data = await response.json();
+        console.log("getBookmarkAPI", data);
 
-        // [매핑] 백엔드 응답 필드(naverProductId 등)를 프론트 표준(productId)으로 통일
         if (Array.isArray(data)) {
             return data.map((item: any) => ({
                 ...item,

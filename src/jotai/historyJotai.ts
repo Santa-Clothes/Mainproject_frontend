@@ -1,6 +1,6 @@
 import { atom } from 'jotai';
 import { atomWithStorage, createJSONStorage } from 'jotai/utils';
-import { RecommendData, RecommendList } from '@/types/ProductType';
+import { BookmarkData, RecommendList } from '@/types/ProductType';
 
 export interface HistoryItem {
     id: string;
@@ -22,4 +22,4 @@ export const analysisHistoryAtom = atomWithStorage<HistoryItem[]>(
 export const activeHistoryAtom = atom<HistoryItem | null>(null);
 
 // 3. 사용자가 찜한 결과(북마크) 상태 저장 애텀 (메모리 관리, 백엔드 동기화 기반)
-export const bookmarkAtom = atom<RecommendData[]>([]);
+export const bookmarkAtom = atom<BookmarkData[]>([]);

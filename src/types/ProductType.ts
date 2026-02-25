@@ -48,8 +48,13 @@ export interface InternalStyleCount {
   count: number;
 }
 
-// export interface AnalysisResult {
-//   dimension: number,
-//   similarProducts: RecommendData[],
-//   results?: RecommendResult[]
-// }
+export interface BookmarkData {
+  createdAt: string,
+  imageUrl: string,
+  naverProductId: string,
+  productId: string, // 호환성 유지용
+  price: number,
+  productLink: string,
+  title: string,
+  saveId: number,
+}

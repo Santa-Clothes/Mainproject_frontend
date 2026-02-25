@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { RecommendData } from "@/types/ProductType";
+import { RecommendData, BookmarkData } from "@/types/ProductType";
 import Image from "next/image";
 import { FaCheck, FaBookmark, FaShirt, FaArrowsRotate, FaXmark, FaMagnifyingGlass } from "react-icons/fa6";
 import { useAtom } from "jotai";
@@ -8,7 +8,7 @@ import { authUserAtom } from "@/jotai/loginjotai";
 import { saveBookmarkAPI, deleteBookmarkAPI } from "@/app/api/memberservice/bookmarkapi";
 
 interface ProductCardProps {
-    product: RecommendData;
+    product: RecommendData | BookmarkData;
     index?: number;
     selected?: boolean; // 선택 상태 추가
     onClick?: () => void;
@@ -32,16 +32,17 @@ const ProductCard = React.memo(({
     onClick
 }: ProductCardProps) => {
     // ... 기존 포맷팅 로직
-    const formattedScore = typeof product.similarityScore === 'number'
-        ? `${(product.similarityScore * 100).toFixed(1)}%`
-        : product.similarityScore;
+    const similarityScore = (product as RecommendData).similarityScore;
+    const formattedScore = typeof similarityScore === 'number'
+        ? `${(similarityScore * 100).toFixed(1)}%`
+        : similarityScore;
 
     const formattedPrice = new Intl.NumberFormat('ko-KR', {
         style: 'currency',
         currency: 'KRW'
     }).format(product.price || 0);
     const displayImageUrl = product.imageUrl || (product as any).image_url || (product as any).image || '';
-    const displayTitle = product.title || (product as any).name || 'Unknown Product';
+    const displayTitle = (product as any).title || (product as any).name || 'Unknown Product';
 
     // 북마크 상태 관리
     const [bookmark, setBookmark] = useAtom(bookmarkAtom);
@@ -81,7 +82,13 @@ const ProductCard = React.memo(({
                 // 서버에 저장 시도
                 const success = await saveBookmarkAPI(authUser.accessToken, product.productId);
                 if (success) {
-                    setBookmark([...bookmark, product]);
+                    // BookmarkData 규격을 맞추기 위해 임시 객체 생성 (any 타입 활용)
+                    const newBookmarkItem: any = {
+                        ...product,
+                        naverProductId: product.productId,
+                        createdAt: new Date().toISOString(), // 임시 날짜
+                    };
+                    setBookmark([...bookmark, newBookmarkItem]);
                 } else {
                     alert('저장에 실패했습니다.');
                 }
@@ -181,7 +188,7 @@ const ProductCard = React.memo(({
             {/* 2. 상품 정보 컨테이너 */}
             <div className={`space-y-1.5 px-1 transition-colors`}>
                 <div className="flex justify-between items-center h-4">
-                    {product.similarityScore !== undefined && (
+                    {similarityScore !== undefined && (
                         <div className="flex items-center gap-1.5">
                             <div className="w-1 h-1 rounded-full bg-violet-500" />
                             <span className="text-[10px] font-bold text-violet-500 uppercase tracking-widest">

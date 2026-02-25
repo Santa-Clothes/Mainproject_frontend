@@ -6,8 +6,10 @@ import { useEffect, useState } from 'react';
 
 export default function LoginPage() {
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
     const savedTheme = localStorage.getItem('atelier_theme');
     if (savedTheme === 'light') {
       setIsDarkMode(false);
@@ -31,32 +33,59 @@ export default function LoginPage() {
   };
 
   return (
-    /* bg-neutral-100/50: 너무 생하얀색이 아닌 차분한 미색 배경 적용 */
-    <main className="relative flex min-h-screen w-full items-center justify-center bg-neutral-100/50 transition-colors duration-500 p-6 md:p-10 dark:bg-neutral-950 overflow-y-auto">
+    <main className="relative flex min-h-screen w-full items-center justify-center bg-background-light dark:bg-background-dark transition-colors duration-500 p-6 md:p-10 overflow-hidden">
 
-      {/* 1. 테마 토글 버튼: 위치를 살짝 아래로 내려 텍스트 가독성 확보 */}
+      {/* Background Atmospheric Effects (MainLayout과 동기화) */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div
+          className="absolute -top-20 -left-20 w-200 h-200 dark:opacity-0 blur-3xl opacity-50"
+          style={{
+            background: 'radial-gradient(circle at center, rgba(254, 240, 138, 0.5) 0%, rgba(254, 215, 170, 0.3) 40%, transparent 70%)'
+          }}
+        />
+        <div
+          className="absolute -top-10 -right-10 w-150 h-150 opacity-0 dark:opacity-100 blur-3xl"
+          style={{
+            background: 'radial-gradient(circle at center, rgba(191, 219, 254, 0.15) 0%, rgba(199, 210, 254, 0.08) 40%, transparent 70%)'
+          }}
+        />
+        <div className="absolute inset-0 opacity-0 dark:opacity-100">
+          {isMounted && [...Array(30)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-1 h-1 bg-white rounded-full animate-pulse"
+              style={{
+                top: `${Math.random() * 100}%`,
+                left: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 6}s`,
+                animationDuration: `${3 + Math.random() * 2}s`,
+                opacity: 0.1 + Math.random() * 0.9
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* 테마 토글 버튼 (Header 스타일과 통합) */}
       <div className="absolute top-10 right-10 z-50">
         <button
           onClick={toggleTheme}
-          type="button"
-          className="relative w-24 h-10 bg-white/80 dark:bg-neutral-900/40 backdrop-blur-xl border border-neutral-200 dark:border-white/10 rounded-full shadow-lg cursor-pointer overflow-hidden transition-colors hover:border-violet-400 outline-none"
+          className="relative w-10 h-10 flex items-center justify-center rounded-full bg-white/80 dark:bg-white/5 border border-neutral-200 dark:border-white/10 hover:border-violet-500/50 backdrop-blur-xl transition-all duration-300 group overflow-hidden shadow-xl"
+          title={isDarkMode ? "라이트 모드로 전환" : "다크 모드로 전환"}
         >
-          <div className={`absolute top-1 w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center text-white transition-transform duration-500 ease-in-out z-20 shadow-md ${isDarkMode ? 'translate-x-14.5' : 'translate-x-1'
-            }`}>
-            {isDarkMode ? <FaMoon size={10} /> : <FaSun size={10} />}
+          <div className="relative w-full h-full flex items-center justify-center">
+            <FaSun
+              size={16}
+              className={`absolute transition-all duration-500 transform ${isDarkMode ? 'translate-y-10 rotate-90 opacity-0' : 'translate-y-0 rotate-0 opacity-100 text-amber-500'}`}
+            />
+            <FaMoon
+              size={16}
+              className={`absolute transition-all duration-500 transform ${isDarkMode ? 'translate-y-0 rotate-0 opacity-100 text-violet-400' : '-translate-y-10 -rotate-90 opacity-0'}`}
+            />
           </div>
-          <div className="relative w-full h-full flex items-center justify-between px-3 z-10">
-            <span className={`text-[8px] font-bold uppercase tracking-widest transition-all duration-500 ${isDarkMode ? 'opacity-100 text-violet-300' : 'opacity-0 translate-x-2'
-              }`}>Night</span>
-            <span className={`text-[8px] font-bold uppercase tracking-widest transition-all duration-500 ${!isDarkMode ? 'opacity-100 text-violet-600' : 'opacity-0 -translate-x-2'
-              }`}>Day</span>
-          </div>
+          <div className="absolute inset-0 bg-violet-500/0 group-hover:bg-violet-500/5 transition-colors duration-300" />
         </button>
       </div>
-
-      {/* 2. 배경 아트워크: 라이트 모드에서는 불투명도를 낮춰 눈 피로도 감소 */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,var(--tw-gradient-stops))] from-violet-900/10 via-transparent to-transparent opacity-50 dark:from-violet-900/20 dark:via-neutral-950 dark:to-neutral-950 dark:opacity-90" />
-      <div className="absolute -top-[10%] -left-[10%] h-[40%] w-[40%] rounded-full bg-violet-600/5 blur-[150px] dark:bg-violet-600/10" />
 
       {/* 4. 뒤로 가기 네비게이션 */}
       <div className="absolute top-6 left-6 z-20 md:top-10 md:left-10">

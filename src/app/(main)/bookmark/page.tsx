@@ -7,6 +7,7 @@ import { FaLayerGroup, FaBookmark, FaTrashCan, FaCheckDouble, FaXmark, FaArrowsR
 import { useRouter } from 'next/navigation';
 import { saveBookmarkAPI, getBookmarkAPI, deleteBookmarkAPI } from '@/app/api/memberservice/bookmarkapi';
 import { bookmarkAtom } from '@/jotai/historyJotai';
+import { BookmarkData } from '@/types/ProductType';
 
 export default function BookmarkPage() {
     const [bookmark, setBookmark] = useAtom(bookmarkAtom);
@@ -35,7 +36,13 @@ export default function BookmarkPage() {
         const syncOnMount = async () => {
             setIsActionLoading(true);
             const savedItems = await getBookmarkAPI(authUser.accessToken);
-            if (savedItems) setBookmark(savedItems);
+            if (savedItems) {
+                // 최신 날짜순(내림차순) 정렬
+                const sorted = [...savedItems].sort((a, b) =>
+                    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+                );
+                setBookmark(sorted);
+            }
             setIsActionLoading(false);
         };
         syncOnMount();
@@ -49,7 +56,13 @@ export default function BookmarkPage() {
         setIsActionLoading(true);
         try {
             const updated = await getBookmarkAPI(authUser.accessToken);
-            if (updated) setBookmark(updated);
+            if (updated) {
+                // 최신 날짜순(내림차순) 정렬
+                const sorted = [...updated].sort((a, b) =>
+                    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+                );
+                setBookmark(sorted);
+            }
         } finally {
             setIsActionLoading(false);
         }

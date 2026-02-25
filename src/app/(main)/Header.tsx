@@ -21,6 +21,7 @@ import { authUserAtom } from '@/jotai/loginjotai';
 import { logoutAPI, getUserInfoAPI } from '../api/memberservice/memberapi';
 import { bookmarkAtom, analysisHistoryAtom, activeHistoryAtom } from '@/jotai/historyJotai';
 import { getBookmarkAPI } from '../api/memberservice/bookmarkapi';
+import { BookmarkData } from '@/types/ProductType';
 import Image from 'next/image';
 import Wizard from '@/assets/wizard.svg';
 
@@ -62,7 +63,13 @@ export default function Header() {
         if (!currentToken) return;
         try {
           const list = await getBookmarkAPI(currentToken);
-          if (list) setBookmark(list);
+          if (list) {
+            // 최신 날짜순 정렬
+            const sorted = [...list].sort((a, b) =>
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+            setBookmark(sorted);
+          }
         } catch (error) {
           console.error("Initial bookmark sync failed:", error);
         }

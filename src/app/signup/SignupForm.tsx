@@ -16,7 +16,8 @@ export default function SignupForm() {
   const router = useRouter();
 
   // 상태 관리
-  const [profileImage, setProfileImage] = useState<string>('');
+  const DEFAULT_IMAGE = "https://fjoylosbfvojioljibku.supabase.co/storage/v1/object/public/profileimage/default.svg";
+  const [profileImage, setProfileImage] = useState<string>(DEFAULT_IMAGE);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -70,41 +71,9 @@ export default function SignupForm() {
       return;
     }
 
-    let fileToUpload = selectedFile;
-
     if (!selectedFile) {
-      const proceed = confirm("프로필 이미지를 선택하지 않았습니다. 기본 프로필 이미지(PNG)로 가입하시겠습니까?");
+      const proceed = confirm("프로필 이미지를 선택하지 않았습니다. 기본 프로필 이미지로 가입하시겠습니까?");
       if (!proceed) return;
-
-      // FaUser 아이콘의 SVG 데이터를 PNG 이미지 파일로 변환 (Canvas 활용)
-      const svgString = `<svg stroke="currentColor" fill="#D1D5DB" stroke-width="0" viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg" width="512" height="512"><path d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6 32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-41.6c0-74.2-60.2-134.4-134.4-134.4z"></path></svg>`;
-
-      const canvas = document.createElement('canvas');
-      canvas.width = 512;
-      canvas.height = 512;
-      const ctx = canvas.getContext('2d');
-
-      const img = new window.Image();
-      const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
-      const url = URL.createObjectURL(svgBlob);
-
-      const pngBlob = await new Promise<Blob | null>((resolve) => {
-        img.onload = () => {
-          ctx?.clearRect(0, 0, 512, 512); // 배경 투명 처리
-          ctx?.drawImage(img, 0, 0, 512, 512);
-          URL.revokeObjectURL(url);
-          canvas.toBlob((blob) => resolve(blob), 'image/png');
-        };
-        img.onerror = () => {
-          URL.revokeObjectURL(url);
-          resolve(null);
-        };
-        img.src = url;
-      });
-
-      if (pngBlob) {
-        fileToUpload = new File([pngBlob], 'default_avatar01.png', { type: 'image/png' });
-      }
     }
 
     setIsSubmitting(true);
@@ -116,40 +85,45 @@ export default function SignupForm() {
         nickname: nickname,
         password: password,
         storeId: selectedStoreId,
-        profileImg: fileToUpload
+        profileImg: selectedFile // 선택하지 않았다면 null 전송
       });
       if (result)
         router.push("/login");
       else
-        alert("회원가입에 실패했습니다.");
+        alert("회원가입에 실패했습니다. 입력 정보를 다시 확인하거나 서버 상태를 점검해주세요.");
     } catch (error) {
       console.error("회원가입 실패:", error);
-      alert("회원가입에 실패했습니다.");
+      alert("서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="flex flex-col gap-12">
+    <div className="relative flex flex-col gap-12">
+      {/* 로딩 오버레이: 회원가입 처리 중일 때 표시 */}
+      {isSubmitting && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/80 backdrop-blur-sm dark:bg-neutral-950/80 rounded-[3rem]">
+          <div className="text-center">
+            <div className="mb-4 h-8 w-8 animate-spin rounded-full border-2 border-violet-600 border-t-transparent mx-auto"></div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-violet-600">회원가입 중...</p>
+          </div>
+        </div>
+      )}
+
       {/* 1. 프로필 이미지 업로드 섹션 (MemberInfo 재활용) */}
       <div className="flex flex-col items-center gap-6">
         <div className="relative group w-32 h-32 md:w-40 md:h-40 rounded-[2.5rem] overflow-hidden bg-neutral-100 dark:bg-neutral-800 border-4 border-white dark:border-neutral-900 shadow-2xl transition-transform hover:scale-[1.05]">
-          {profileImage ? (
-            <Image
-              src={profileImage}
-              alt="Preview"
-              fill
-              className="object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-neutral-300 dark:text-neutral-700">
-              <FaUser size={40} />
-            </div>
-          )}
+          <Image
+            src={profileImage}
+            alt="Preview"
+            fill
+            className="object-cover"
+            priority // 추가: LCP 에러(레이지 로딩 지연) 방지
+          />
           <label className="absolute inset-0 z-10 bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm cursor-pointer">
             <FaCamera size={24} className="text-white mb-2" />
-            <span className="text-[8px] font-bold text-white uppercase tracking-widest">Upload Profile</span>
+            <span className="text-[8px] font-bold text-white uppercase tracking-widest">프로필 업로드</span>
             <input
               type="file"
               onChange={handleImageChange}
@@ -159,8 +133,8 @@ export default function SignupForm() {
           </label>
         </div>
         <div className="text-center space-y-1">
-          <p className="text-[10px] font-bold text-violet-600 uppercase tracking-widest underline decoration-violet-300 decoration-2 underline-offset-4">Visual Identification</p>
-          <p className="text-[9px] text-neutral-400 font-medium">Click to synchronize your avatar</p>
+          <p className="text-[10px] font-bold text-violet-600 uppercase tracking-widest underline decoration-violet-300 decoration-2 underline-offset-4">자신만의 아바타를 정하세요</p>
+          <p className="text-[9px] text-neutral-400 font-medium">프로필을 업로드하려면 클릭하세요</p>
         </div>
       </div>
 
@@ -168,14 +142,14 @@ export default function SignupForm() {
         <div className="space-y-8">
           {/* 닉네임 입력 */}
           <div className="group relative border-b-2 border-neutral-200 py-3 transition-all duration-500 focus-within:border-violet-500 dark:border-white/10">
-            <label className="absolute -top-6 left-0 text-[9px] font-bold uppercase tracking-[0.3em] text-neutral-500 transition-colors group-focus-within:text-violet-600 dark:group-focus-within:text-violet-400">
+            <label className="absolute -top-6 left-0 text-[12px] font-bold uppercase tracking-[0.3em] text-neutral-500 transition-colors group-focus-within:text-violet-600 dark:group-focus-within:text-violet-400">
               닉네임
             </label>
             <input
               ref={nicknameRef}
               type="text"
-              placeholder="Visual Curator Name"
-              className="w-full border-none bg-transparent py-2 text-sm font-light tracking-[0.3em] text-neutral-900 outline-none placeholder:text-neutral-500 dark:text-white dark:placeholder:text-neutral-500"
+              placeholder="Curator Nickname"
+              className="w-full border-none bg-transparent py-2 text-sm font-light tracking-[0.3em] text-neutral-900 outline-none placeholder:text-neutral-400 dark:text-white dark:placeholder:text-neutral-600"
               required
             />
           </div>
@@ -188,7 +162,7 @@ export default function SignupForm() {
             <input
               ref={userIdRef}
               type="text"
-              placeholder="ARCHIVE_KEY_ID"
+              placeholder="Curator ID"
               className="w-full border-none bg-transparent py-2 text-sm font-light tracking-[0.3em] text-neutral-900 outline-none placeholder:text-neutral-500 dark:text-white dark:placeholder:text-neutral-500"
               required
             />
@@ -210,7 +184,7 @@ export default function SignupForm() {
 
           {/* 매장 선택 */}
           <div className="group relative border-b-2 border-neutral-200 py-3 transition-all duration-500 focus-within:border-violet-500 dark:border-white/10">
-            <label className="absolute -top-6 left-0 text-[9px] font-bold uppercase tracking-[0.3em] text-neutral-500 transition-colors group-focus-within:text-violet-600 dark:group-focus-within:text-violet-400 flex items-center gap-2">
+            <label className="absolute -top-6 left-0 text-[12px] font-bold uppercase tracking-[0.3em] text-neutral-500 transition-colors group-focus-within:text-violet-600 dark:group-focus-within:text-violet-400 flex items-center gap-2">
               <FaStore size={10} /> 담당 매장
             </label>
             <select
@@ -232,19 +206,19 @@ export default function SignupForm() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-10">
+        <div className="flex flex-col gap-5">
           <button
             type="submit"
             disabled={isSubmitting}
-            className="group flex w-full items-center justify-center gap-6 bg-neutral-900 py-6 text-[10px] font-bold uppercase tracking-[0.8em] text-white shadow-xl transition-all active:scale-[0.98] hover:bg-violet-600 dark:bg-white dark:text-black dark:hover:bg-violet-600 dark:hover:text-white disabled:opacity-50"
+            className="group flex w-full items-center justify-center gap-6 bg-neutral-900 py-4 text-[16px] font-bold uppercase tracking-[0.8em] text-white shadow-xl transition-all active:scale-[0.98] hover:bg-violet-600 dark:bg-violet-600 dark:hover:bg-violet-500 disabled:opacity-50"
           >
-            {isSubmitting ? 'Initializing Node...' : 'Register Account'}
+            {isSubmitting ? '회원가입 중...' : '회원 가입'}
             {!isSubmitting && <FaArrowRight className="transition-transform group-hover:translate-x-2" />}
           </button>
 
-          <div className="flex flex-col items-center gap-6">
-            <Link href="/login" className="border-b border-transparent pb-1 text-[9px] font-bold uppercase tracking-[0.4em] text-neutral-500 transition-colors hover:border-violet-500 hover:text-violet-600 dark:hover:text-violet-400">
-              Existing Curator? Log In
+          <div className="flex flex-col items-center gap-3 pt-1">
+            <Link href="/login" className="border-b border-transparent pb-1 text-[12px] font-bold uppercase tracking-[0.4em] text-neutral-500 transition-colors hover:border-violet-500 hover:text-violet-600 dark:hover:text-violet-400">
+              이미 가입하셨다면 로그인 페이지로
             </Link>
           </div>
         </div>
