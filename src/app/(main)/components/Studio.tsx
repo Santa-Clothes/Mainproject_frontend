@@ -150,19 +150,14 @@ export default function Studio({ mode }: { mode: StudioMode }) {
             />
           </div>
 
-          {/* Card 2: 첫 번째 추천 결과 그리드 섹션 */}
+          {/* Card 2: 첫 번째 추천 결과(내부 데이터) 그리드 섹션 */}
           <div className="bg-white dark:bg-neutral-900/50 rounded-4xl lg:rounded-[2.5rem] border-2 border-neutral-100 dark:border-white/10 shadow-xl p-6 lg:p-12 h-200 lg:h-225 flex flex-col">
             <ResultGrid
               isActive={true}
               isPending={isPending}
               products={results.internalProducts || []}
               title="9oz 스타일 목록"
-              onProductClick={(product: RecommendData) => {
-                // 추천 상품 클릭 시 상세 페이지(상품 링크)로 이동
-                if (product.productLink) {
-                  window.open(product.productLink, '_blank');
-                }
-              }}
+              showCartButton={false}
             />
           </div>
 

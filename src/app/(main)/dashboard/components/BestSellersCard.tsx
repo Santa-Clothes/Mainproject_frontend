@@ -38,6 +38,7 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
 
     // 이전 날짜 필터 기억용 Ref
     const prevDateRef = React.useRef(`${startDate}_${endDate}`);
+    const today = new Date().toISOString().split('T')[0];
 
     // 부모(Dashboard)에서 비동기로 넘어오는 initialSales (전체 랭킹) 업데이트 동기화
     React.useEffect(() => {
@@ -165,8 +166,9 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
                         nextMap[res.shop] = res.data?.products || [];
                     });
 
-                    if (isDateChanged && !nextMap['전체'] && prev['전체']) {
-                        nextMap['전체'] = prev['전체'];
+                    // 날짜가 초기화된 경우(빈 문자열) initialSales로 복구하거나 0부터 다시 시작
+                    if (isDateChanged && !startDate && !endDate) {
+                        nextMap['전체'] = initialSales;
                     }
                     return nextMap;
                 });
@@ -187,8 +189,10 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
 
     const formatDateDisplay = (dateStr: string) => {
         if (!dateStr) return null;
-        const parts = dateStr.split('-');
-        return `${parts[1]}.${parts[2]}`;
+        const parts = dateStr.split('-'); // ["2024", "02", "25"]
+        // 연도 뒤 두자리만 추출 (2024 -> 24)
+        const yearShort = parts[0].slice(-2);
+        return `${yearShort}.${parts[1]}.${parts[2]}`;
     };
 
     const startDateRef = React.useRef<HTMLInputElement>(null);
@@ -209,9 +213,9 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
 
                 {/* 1. Header with Search and Shop Pills */}
                 <div className="flex flex-col gap-3">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                        <div className="flex items-center gap-4 w-full max-w-lg">
-                            <div className="relative w-full max-w-sm flex-1">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div className="flex items-center gap-4 w-auto max-w-full">
+                            <div className="relative w-full sm:w-64">
                                 <input
                                     type="text"
                                     placeholder="지점 검색 (예: 부산)"
@@ -220,19 +224,19 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
                                     className="w-full bg-neutral-100 dark:bg-white/5 border border-neutral-200 dark:border-white/10 rounded-full px-4 py-2 text-[11px] font-bold text-neutral-800 dark:text-white placeholder:text-neutral-400 focus:ring-2 focus:ring-violet-500 outline-none transition-all"
                                 />
                             </div>
-                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest hidden sm:block shrink-0">최대 3개 지점 선택 가능</span>
+                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest hidden xl:block shrink-0">최대 3개 지점 선택 가능</span>
                         </div>
-                        <div className="flex items-center gap-4 w-full sm:w-auto">
-                            <div className="flex items-center gap-1.5 bg-white dark:bg-neutral-900 rounded-full border border-neutral-200 dark:border-white/10 p-1 shadow-sm w-full sm:max-w-64 shrink-0 transition-all hover:border-violet-300 dark:hover:border-violet-500/50">
+                        <div className="flex items-center gap-4 w-auto sm:ml-auto">
+                            <div className="flex items-center gap-1.5 bg-white dark:bg-neutral-900 rounded-full border border-neutral-200 dark:border-white/10 p-1 shadow-sm w-auto shrink-0 transition-all hover:border-violet-300 dark:hover:border-violet-500/50">
                                 {/* Calendar Icon & Label Wrapper */}
-                                <div className="flex items-center gap-1.5 pl-3 pr-1 border-r border-neutral-100 dark:border-white/5 text-neutral-400 dark:text-neutral-500">
+                                <div className="flex items-center gap-1.5 pl-3 pr-2 border-r border-neutral-100 dark:border-white/5 text-neutral-400 dark:text-neutral-500 shrink-0">
                                     <FaRegCalendarAlt className="text-violet-500" size={12} />
-                                    <span className="text-[12px] font-bold uppercase tracking-widest hidden lg:block">기간설정</span>
+                                    <span className="text-[12px] font-bold uppercase tracking-widest hidden lg:block whitespace-nowrap">기간설정</span>
                                 </div>
 
                                 <div
                                     onClick={() => startDateRef.current?.showPicker()}
-                                    className="relative flex-1 px-2 py-1 flex items-center justify-center gap-2 hover:bg-neutral-50 dark:hover:bg-white/5 transition-all cursor-pointer rounded-l-full border-r border-neutral-100 dark:border-white/5"
+                                    className="relative px-3 py-1 flex items-center justify-center gap-2 hover:bg-neutral-50 dark:hover:bg-white/5 transition-all cursor-pointer rounded-l-full border-r border-neutral-100 dark:border-white/5 whitespace-nowrap"
                                 >
                                     <span className="text-[10px] font-bold text-violet-600 dark:text-violet-400">
                                         {formatDateDisplay(startDate) || 'START'}
@@ -241,13 +245,21 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
                                         ref={startDateRef}
                                         type="date"
                                         value={startDate}
-                                        onChange={(e) => setStartDate(e.target.value)}
+                                        max={today}
+                                        onChange={(e) => {
+                                            const newStart = e.target.value;
+                                            setStartDate(newStart);
+                                            // 시작일이 종료일보다 미래인 경우 종료일 초기화
+                                            if (endDate && newStart > endDate) {
+                                                setEndDate('');
+                                            }
+                                        }}
                                         className="absolute -z-50 opacity-0 pointer-events-none w-0 h-0"
                                     />
                                 </div>
                                 <div
                                     onClick={() => endDateRef.current?.showPicker()}
-                                    className="relative flex-1 px-2 py-1 flex items-center justify-center gap-2 hover:bg-neutral-50 dark:hover:bg-white/5 transition-all cursor-pointer rounded-r-full"
+                                    className="relative px-3 py-1 flex items-center justify-center gap-2 hover:bg-neutral-50 dark:hover:bg-white/5 transition-all cursor-pointer rounded-r-full whitespace-nowrap"
                                 >
                                     <span className="text-[10px] font-bold text-violet-600 dark:text-violet-400">
                                         {formatDateDisplay(endDate) || 'END'}
@@ -256,10 +268,26 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
                                         ref={endDateRef}
                                         type="date"
                                         value={endDate}
+                                        min={startDate}
+                                        max={today}
                                         onChange={(e) => setEndDate(e.target.value)}
                                         className="absolute -z-50 opacity-0 pointer-events-none w-0 h-0"
                                     />
                                 </div>
+
+                                {/* Reset Button */}
+                                {(startDate || endDate) && (
+                                    <button
+                                        onClick={() => {
+                                            setStartDate('');
+                                            setEndDate('');
+                                        }}
+                                        className="flex items-center justify-center w-6 h-6 mr-1 text-neutral-400 hover:text-red-500 hover:bg-neutral-100 dark:hover:bg-white/10 rounded-full transition-all"
+                                        title="기간 초기화"
+                                    >
+                                        <FaTimes size={10} />
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>

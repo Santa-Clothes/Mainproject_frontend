@@ -1,16 +1,18 @@
 import { RecommendData } from "@/types/ProductType";
 import Image from "next/image";
-import { FaCheck, FaCartArrowDown, FaShirt } from "react-icons/fa6";
+import { FaCheck, FaBookmark, FaShirt } from "react-icons/fa6";
 import { useAtom } from "jotai";
-import { cartAtom } from "@/jotai/historyJotai";
+import { bookmarkAtom } from "@/jotai/historyJotai";
+import { authUserAtom } from "@/jotai/loginjotai";
+import { saveBookmarkAPI, deleteBookmarkAPI } from "@/app/api/memberservice/bookmarkapi";
 
 interface ProductCardProps {
     product: RecommendData;
     index?: number;
     selected?: boolean; // 선택 상태 추가
     onClick?: () => void;
-    showCartButton?: boolean; // 장바구니 버튼 표시 여부
-    onCartClickOverride?: (e: React.MouseEvent) => void; // 장바구니 버튼 클릭 이벤트 오버라이드
+    showCartButton?: boolean; // 북마크 버튼 표시 여부
+    onCartClickOverride?: (e: React.MouseEvent) => void; // 북마크 버튼 클릭 이벤트 오버라이드
 }
 
 /**
@@ -30,19 +32,40 @@ export default function ProductCard({ product, index = 0, selected = false, show
     const displayTitle = product.title || (product as any).name || 'Unknown Product';
 
     // 장바구니 상태 관리
-    const [cart, setCart] = useAtom(cartAtom);
+    const [cart, setCart] = useAtom(bookmarkAtom);
+    const [authUser] = useAtom(authUserAtom);
     const isInCart = cart.some((item) => item.productId === product.productId);
 
-    const toggleCart = (e: React.MouseEvent) => {
+    const toggleCart = async (e: React.MouseEvent) => {
         e.stopPropagation(); // 카드 자체의 클릭 이벤트(새 창 열기 등) 방지
+
+        // 로그인 여부 체크
+        if (!authUser) {
+            alert('로그인이 필요한 서비스입니다.');
+            return;
+        }
+
         if (onCartClickOverride) {
             onCartClickOverride(e);
             return;
         }
+
         if (isInCart) {
-            setCart(cart.filter((item) => item.productId !== product.productId));
+            // 서버에서 삭제 시도
+            const success = await deleteBookmarkAPI(authUser.accessToken, product.productId);
+            if (success) {
+                setCart(cart.filter((item) => item.productId !== product.productId));
+            } else {
+                alert('삭제에 실패했습니다.');
+            }
         } else {
-            setCart([...cart, product]);
+            // 서버에 저장 시도
+            const success = await saveBookmarkAPI(authUser.accessToken, product.productId);
+            if (success) {
+                setCart([...cart, product]);
+            } else {
+                alert('저장에 실패했습니다.');
+            }
         }
     };
 
@@ -81,15 +104,15 @@ export default function ProductCard({ product, index = 0, selected = false, show
 
                 <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-all" />
 
-                {/* 우측 상단 장바구니 버튼 */}
+                {/* 우측 상단 북마크 버튼 */}
                 {showCartButton && (
                     <button
                         onClick={toggleCart}
-                        title={isInCart ? 'Remove from Cart' : 'Add to Cart'}
+                        title={isInCart ? 'Remove from Bookmark' : 'Add to Bookmark'}
                         className={`absolute top-4 right-4 z-20 w-8 h-8 rounded-full flex items-center justify-center transition-all bg-white shadow-xl ${isInCart ? 'text-violet-600 scale-110 shadow-violet-500/20' : 'text-neutral-300 hover:text-violet-500 hover:scale-110'
                             }`}
                     >
-                        <FaCartArrowDown size={14} className={isInCart ? 'animate-bounce' : ''} />
+                        <FaBookmark size={14} className={isInCart ? 'animate-bounce' : ''} />
                     </button>
                 )}
             </div>

@@ -42,7 +42,7 @@ export default function MainPage() {
             </div>
           </div>
 
-          <div className="absolute -right-20 -bottom-20 pointer-events-none opacity-10 dark:opacity-15 transition-transform duration-1000 group-hover:rotate-12 group-hover:scale-110 text-neutral-900 dark:text-white">
+          <div className="absolute -right-20 -bottom-20 pointer-events-none opacity-10 dark:opacity-15 transition-transform duration-1000 group-hover:scale-110 text-neutral-900 dark:text-white">
             <FaCloudArrowUp size={380} />
           </div>
         </Link>
@@ -66,7 +66,7 @@ export default function MainPage() {
             </div>
           </div>
 
-          <div className="absolute -right-20 -bottom-20 pointer-events-none opacity-10 dark:opacity-15 transition-transform duration-1000 group-hover:rotate-12 group-hover:scale-110 text-neutral-900 dark:text-white">
+          <div className="absolute -right-20 -bottom-20 pointer-events-none opacity-10 dark:opacity-15 transition-transform duration-1000 group-hover:scale-110 text-neutral-900 dark:text-white">
             <FaShirt size={380} />
           </div>
         </Link>
@@ -91,7 +91,7 @@ export default function MainPage() {
             </div>
           </div>
 
-          <div className="absolute -right-20 -bottom-20 pointer-events-none opacity-10 dark:opacity-15 transition-transform duration-1000 group-hover:rotate-12 group-hover:scale-110 text-neutral-900 dark:text-white">
+          <div className="absolute -right-20 -bottom-20 pointer-events-none opacity-10 dark:opacity-15 transition-transform duration-1000 group-hover:scale-110 text-neutral-900 dark:text-white">
             <FaChartLine size={380} />
           </div>
         </Link>

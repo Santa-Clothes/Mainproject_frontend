@@ -43,7 +43,8 @@ export const getSalesRanking = async (): Promise<RankingData> => {
 
 export const getSalesRankingByShopAndDate = async (shop: string, startDate: string, endDate: string): Promise<RankingData> => {
     try {
-        const response = await fetch(`${BASEURL}/api/sales/rank?storeId=${shop}&startDate=${startDate}&endDate=${endDate}`, {
+        const storeQuery = shop ? `storeId=${shop}&` : '';
+        const response = await fetch(`${BASEURL}/api/sales/rank?${storeQuery}startDate=${startDate}&endDate=${endDate}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

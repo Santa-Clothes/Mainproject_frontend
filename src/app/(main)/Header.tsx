@@ -10,8 +10,7 @@ import {
   FaMoon,
   FaUser,
   FaCamera,
-  FaMagnifyingGlass,
-  FaHouse
+  FaMagnifyingGlass
 } from 'react-icons/fa6';
 import { IoSettingsSharp } from "react-icons/io5";
 
@@ -20,6 +19,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAtom } from 'jotai';
 import { authUserAtom } from '@/jotai/loginjotai';
 import { logoutAPI, getUserInfoAPI } from '../api/memberservice/memberapi';
+import { bookmarkAtom, analysisHistoryAtom, activeHistoryAtom } from '@/jotai/historyJotai';
+import { getBookmarkAPI } from '../api/memberservice/bookmarkapi';
 import Image from 'next/image';
 import Wizard from '@/assets/wizard.svg';
 
@@ -32,6 +33,9 @@ export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const [authInfo, setAuthInfo] = useAtom(authUserAtom); // 전역 인증 상태 (Jotai)
+  const [, setBookmark] = useAtom(bookmarkAtom);
+  const [, setHistory] = useAtom(analysisHistoryAtom);
+  const [, setActiveHistory] = useAtom(activeHistoryAtom);
 
   // [상태 관리]
   const [isProfileOpen, setIsProfileOpen] = useState(false); // 프로필 드롭다운 열림 여부
@@ -50,15 +54,37 @@ export default function Header() {
     }
   }, []);
 
+  // 서비스 진입 시 혹은 로그인 시 북마크 리스트 동기화
+  useEffect(() => {
+    if (isMounted && authInfo) {
+      const syncBookmarks = async () => {
+        const currentToken = authInfo?.accessToken;
+        if (!currentToken) return;
+        try {
+          const list = await getBookmarkAPI(currentToken);
+          if (list) setBookmark(list);
+        } catch (error) {
+          console.error("Initial bookmark sync failed:", error);
+        }
+      };
+      syncBookmarks();
+    }
+  }, [isMounted, authInfo, setBookmark]);
+
   // 세션 유효성 검증 (Header에서 전역적으로 인가 실패 체크)
   useEffect(() => {
     if (isMounted && authInfo) {
       const verifySession = async () => {
+        const currentToken = authInfo?.accessToken;
+        if (!currentToken) return;
         try {
-          const userInfo = await getUserInfoAPI(authInfo.accessToken);
-          if (!userInfo) {
+          const userInfo = await getUserInfoAPI(currentToken);
+          if (!userInfo && authInfo?.accessToken === currentToken) {
             // 인가 실패 혹은 계정 삭제 시 로그아웃 처리
             setAuthInfo(null);
+            setBookmark([]);
+            setHistory([]);
+            setActiveHistory(null);
             router.push('/login');
           }
         } catch (error) {
@@ -111,6 +137,9 @@ export default function Header() {
       const result = await logoutAPI(authInfo);
       if (result) {
         setAuthInfo(null); // 로컬 스토리지 정보도 자동 초기화됨
+        setBookmark([]);
+        setHistory([]);
+        setActiveHistory(null);
         setIsProfileOpen(false);
         alert("로그아웃 되었습니다.");
         router.push("/");

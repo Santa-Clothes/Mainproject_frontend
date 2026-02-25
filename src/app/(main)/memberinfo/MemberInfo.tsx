@@ -37,24 +37,13 @@ export default function MemberInfo() {
   }, []);
 
 
-  // auth 데이터가 로드되면 로컬 상태 변수들에 동기화 및 세션 유효성 검사
+  // auth 데이터가 로드되면 로컬 상태 변수들에 동기화
   useEffect(() => {
     if (auth) {
       setNickname(auth.name || '');
       setProfileImage(auth.profile || '');
-
-      // 세션 유효성 검사 (인가 실패 시 자동 로그아웃)
-      const verifySession = async () => {
-        const userInfo = await getUserInfoAPI(auth.accessToken);
-        if (!userInfo) {
-          // 인가 실패 혹은 서버 에러 시 로그아웃 처리
-          setAuth(null);
-          router.push('/login');
-        }
-      };
-      verifySession();
     }
-  }, [auth, setAuth, router]);
+  }, [auth]);
 
   useEffect(() => {
     if (isMounted) {

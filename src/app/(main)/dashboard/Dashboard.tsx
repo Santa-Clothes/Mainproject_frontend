@@ -158,6 +158,14 @@ export default function Dashboard({
 
   return (
     <div className="space-y-8 pb-20">
+      {/* Bottom Full Width Block: Best Sellers */}
+      <div className="w-full">
+        <BestSellersCard
+          initialSales={sales}
+          fetchSalesFn={getSalesRankingByShopAndDate}
+          isLoading={isLoadingSales}
+        />
+      </div>
 
       {/* Top Side-by-Side Grid: Strategy / Plot */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
@@ -182,16 +190,6 @@ export default function Dashboard({
           />
         </div>
       </div>
-
-      {/* Bottom Full Width Block: Best Sellers */}
-      <div className="w-full">
-        <BestSellersCard
-          initialSales={sales}
-          fetchSalesFn={getSalesRankingByShopAndDate}
-          isLoading={isLoadingSales}
-        />
-      </div>
-
     </div>
   );
 }

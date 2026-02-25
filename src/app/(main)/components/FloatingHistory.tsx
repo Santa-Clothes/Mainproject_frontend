@@ -1,14 +1,17 @@
 'use client';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAtom } from 'jotai';
-import { analysisHistoryAtom, activeHistoryAtom, HistoryItem, cartAtom } from '@/jotai/historyJotai';
+import { analysisHistoryAtom, activeHistoryAtom, HistoryItem, bookmarkAtom } from '@/jotai/historyJotai';
+import { authUserAtom } from '@/jotai/loginjotai';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { FaClockRotateLeft, FaAngleRight, FaAngleLeft, FaCartShopping, FaGhost } from 'react-icons/fa6';
+import { FaClockRotateLeft, FaAngleRight, FaAngleLeft, FaBookmark } from 'react-icons/fa6';
+import { getBookmarkAPI } from '@/app/api/memberservice/bookmarkapi';
 
 export default function FloatingHistory() {
     const [history] = useAtom(analysisHistoryAtom);
-    const [cart] = useAtom(cartAtom);
+    const [bookmark, setBookmark] = useAtom(bookmarkAtom);
+    const [authUser] = useAtom(authUserAtom);
     const [, setActiveHistory] = useAtom(activeHistoryAtom);
     const router = useRouter();
     const [isOpen, setIsOpen] = useState(true);
@@ -25,6 +28,21 @@ export default function FloatingHistory() {
         }
     };
 
+    const handleBookmarkClick = async () => {
+        if (!authUser) {
+            alert('로그인이 필요한 서비스입니다.');
+            return;
+        }
+
+        // 서버로부터 최신 북마크 리스트 동기화
+        const savedItems = await getBookmarkAPI(authUser.accessToken);
+        if (savedItems) {
+            setBookmark(savedItems);
+        }
+
+        router.push('/bookmark');
+    };
+
     return (
         <div className={`fixed top-1/2 -translate-y-1/2 z-50 transition-all duration-300 ${isOpen ? 'right-4' : '-right-20'}`}>
             <div className="relative bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl border-2 border-neutral-100 dark:border-white/10 rounded-3xl p-3 shadow-2xl flex flex-col items-center gap-3">
@@ -37,17 +55,17 @@ export default function FloatingHistory() {
                     {isOpen ? <FaAngleRight size={14} /> : <FaAngleLeft size={14} />}
                 </button>
 
-                {/* Top Section: Cart (Basket) */}
+                {/* Top Section: Bookmark */}
                 <div className="flex flex-col items-center w-full pb-3 border-b-2 border-dashed border-neutral-100 dark:border-white/10 mb-2">
                     <div
-                        title="장바구니"
-                        onClick={() => router.push('/cart')}
+                        title="북마크"
+                        onClick={handleBookmarkClick}
                         className="relative w-12 h-12 flex items-center justify-center rounded-2xl bg-violet-50 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 mb-1 cursor-pointer hover:bg-violet-100 transition-colors shadow-inner"
                     >
-                        <FaCartShopping size={18} />
-                        {cart.length > 0 && (
+                        <FaBookmark size={18} />
+                        {bookmark.length > 0 && (
                             <div className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] bg-red-500 text-white rounded-full flex items-center justify-center text-[9px] font-bold px-1 ring-2 ring-white dark:ring-neutral-900 shadow-md animate-in zoom-in">
-                                {cart.length}
+                                {bookmark.length}
                             </div>
                         )}
                     </div>

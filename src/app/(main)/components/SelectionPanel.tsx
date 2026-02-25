@@ -36,7 +36,7 @@ export default function SelectionPanel({
   const [displayCount, setDisplayCount] = useState(24); // 현재 화면에 렌더링할 상품 개수 (무한 스크롤)
 
   // URL 쿼리 파라미터에서 현재 선택된 정보 추출
-  const selectedCat = searchParams.get('cat') || null;
+  const selectedCat = searchParams.get('cat') || 'All';
   const selectedProductId = searchParams.get('pid') || null;
 
   // 프로젝트에서 사용하는 카테고리 목록
