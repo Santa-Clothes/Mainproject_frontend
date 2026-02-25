@@ -1,6 +1,7 @@
 "use client"
 import React, { useState, useTransition, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { usePathname } from 'next/navigation';
 import { useAtom } from 'jotai';
 import { analysisHistoryAtom, activeHistoryAtom, HistoryItem } from '@/jotai/historyJotai';
 
@@ -23,6 +24,7 @@ export type StudioMode = 'imageInput' | 'imageSelection';
 export default function Studio({ mode }: { mode: StudioMode }) {
   // React 18 Transition을 사용한 매끄러운 상태 전환
   const [isPending, startTransition] = useTransition();
+  const pathname = usePathname();
 
   // [상태 관리]
   const [results, setResults] = useState<RecommendList | null>(null); // 분석 결과 리스트
@@ -34,15 +36,27 @@ export default function Studio({ mode }: { mode: StudioMode }) {
   const [activeHistory, setActiveHistory] = useAtom(activeHistoryAtom);
   const uploadRef = React.useRef<UploadPanelRef>(null);
 
-  // [히스토리 로드] activeHistory 가 설정된 경우 해당 값을 화면에 곧바로 띄움
+  // [히스토리 로드 및 딥링크 처리]
   useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const isResultView = urlParams.get('view') === 'result';
+
+    // 1. URL에 view=result가 없으면 현재 활성화된 기록 상태 해제 (히스토리 목록 자체는 유지)
+    if (!isResultView) {
+      setResults(null);
+      setIsAnalyzing(false);
+      if (activeHistory) setActiveHistory(null); // 현재 보고 있는 기록만 '미선택' 상태로 변경
+      return;
+    }
+
+    // 2. view=result가 있고 activeHistory가 설정된 경우 해당 데이터 로드
     if (activeHistory) {
       setAnalysisImage(activeHistory.sourceImage);
       setAnalysisName(activeHistory.productName);
       setResults(activeHistory.results || null);
       setIsAnalyzing(false);
     }
-  }, [activeHistory]);
+  }, [activeHistory, pathname]); // 경로(pathname)가 바뀔 때도 체크하도록 추가
 
   // 브라우저 뒤로가기(popstate) 처리를 위한 Effect
   useEffect(() => {
@@ -189,7 +203,7 @@ export default function Studio({ mode }: { mode: StudioMode }) {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.98 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
-            className="space-y-10 pb-20 will-change-transform"
+            className="space-y-10 pb-20"
           >
             {/* Card 1: 분석 보고서 섹션 (DNA Matrix) */}
             <div className="bg-white dark:bg-neutral-900/50 rounded-4xl lg:rounded-[2.5rem] border-2 border-neutral-100 dark:border-white/10 shadow-xl p-6 lg:p-12">
@@ -213,7 +227,7 @@ export default function Studio({ mode }: { mode: StudioMode }) {
             <div className="bg-white dark:bg-neutral-900/50 rounded-4xl lg:rounded-[2.5rem] border-2 border-neutral-100 dark:border-white/10 shadow-xl p-6 lg:p-12 h-200 lg:h-225 flex flex-col">
               <ResultGrid
                 isActive={true}
-                isPending={isPending && isAnalyzing}
+                isLoading={isPending && isAnalyzing}
                 products={results.internalProducts || []}
                 title="9oz 스타일 목록"
                 showCartButton={false}
@@ -224,9 +238,10 @@ export default function Studio({ mode }: { mode: StudioMode }) {
             <div className="bg-white dark:bg-neutral-900/50 rounded-4xl lg:rounded-[2.5rem] border-2 border-neutral-100 dark:border-white/10 shadow-xl p-6 lg:p-12 h-200 lg:h-225 flex flex-col">
               <ResultGrid
                 isActive={true}
-                isPending={isPending && isAnalyzing}
+                isLoading={isPending && isAnalyzing}
                 products={results.naverProducts || []}
                 title="외부 상품 추천 목록"
+                showCartButton={true}
                 onProductClick={(product: RecommendData) => {
                   if (product.productLink) {
                     window.open(product.productLink, '_blank');

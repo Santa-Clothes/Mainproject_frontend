@@ -20,12 +20,9 @@ export default function FloatingHistory() {
         // 1. 선택한 히스토리를 active 상태로 만들기
         setActiveHistory(item);
 
-        // 2. 해당 모드 페이지로 푸시 (이미 있으면 알아서 렌더링)
-        if (item.type === 'imageInput') {
-            router.push('/uploadpage');
-        } else {
-            router.push('/selectionpage');
-        }
+        // 2. 해당 모드 페이지로 푸시 (딥링크를 위한 view=result 포함)
+        const path = item.type === 'imageInput' ? '/uploadpage' : '/selectionpage';
+        router.push(`${path}?view=result`);
     };
 
     const handleBookmarkClick = async () => {

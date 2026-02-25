@@ -9,7 +9,7 @@ interface ResultGridProps {
     title?: string;
     subtitle?: string;
     isActive?: boolean;
-    isPending?: boolean; // AI 분석 진행 여부
+    isLoading?: boolean; // 분석 진행 여부
     products?: RecommendData[] | null; // 추천 상품 리스트
     onProductClick?: (product: RecommendData) => void;
     showCartButton?: boolean; // 장바구니 버튼 표시 여부 제어
@@ -20,10 +20,10 @@ interface ResultGridProps {
  * 분석 대기, 로딩, 완료 상태에 따른 시각적 피드백(Skeleton, Spinner)을 제공합니다.
  */
 const ResultGrid: React.FC<ResultGridProps> = ({
-    title = "Archive Selection",
-    subtitle = "Inventory Scan",
+    title = "추천 목록",
+    subtitle = "상품 분석 결과",
     isActive = false,
-    isPending = false,
+    isLoading = false,
     products = null,
     showCartButton = true, // 기본적으로 분석 결과에서는 보이도록 설정
     onProductClick
@@ -33,18 +33,18 @@ const ResultGrid: React.FC<ResultGridProps> = ({
      * 실제 분석 과정(2048차원 벡터 추출 등)을 사용자에게 전문적으로 보여주기 위한 텍스트 리스트
      */
     const loadingMessages = [
-        "Extracting Latent Vector (2048 dims)...",
-        "Encoding Visual DNA Patterns...",
-        "Querying Neural Archive Database...",
-        "Matching Semantic Style Projections...",
-        "Synthesizing Similarity Scores..."
+        "상품의 특징 데이터를 분석 중입니다...",
+        "비슷한 스타일의 상품을 찾는 중입니다...",
+        "데이터베이스 대조 작업 진행 중...",
+        "분석된 스타일 결과 값을 매칭 중...",
+        "최적의 추천 상품을 선별 중입니다..."
     ];
 
     const [messageIndex, setMessageIndex] = React.useState(0);
     // console.log("products", products);
     // 로딩 메시지 순환 타이머
     React.useEffect(() => {
-        if (!isPending) {
+        if (!isLoading) {
             setMessageIndex(0);
             return;
         }
@@ -52,7 +52,7 @@ const ResultGrid: React.FC<ResultGridProps> = ({
             setMessageIndex((prev) => (prev + 1) % loadingMessages.length);
         }, 2500);
         return () => clearInterval(interval);
-    }, [isPending]);
+    }, [isLoading]);
 
     return (
         <div className="flex flex-col h-full min-h-0">
@@ -82,9 +82,9 @@ const ResultGrid: React.FC<ResultGridProps> = ({
 
             {/* 2. 스크롤 가능한 결과 영역 */}
             <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 min-h-0">
-                {isPending ? (
+                {isLoading ? (
                     /* [상태 1] AI 분석 및 로딩 중 */
-                    <div className="flex flex-col items-center justify-center rounded-[2.5rem] bg-gray-50/50 dark:bg-white/5 py-32 border-2 border-violet-100 dark:border-violet-500/20 backdrop-blur-sm will-change-transform">
+                    <div className="flex flex-col items-center justify-center rounded-[2.5rem] bg-gray-50/50 dark:bg-white/5 py-32 border-2 border-violet-100 dark:border-violet-500/20 backdrop-blur-sm">
                         <div className="relative mb-10">
                             {/* 이중 링 스핀 애니메이션 */}
                             <div className="h-24 w-24 rounded-full border-t-2 border-r-2 border-violet-600 animate-spin"></div>
@@ -99,7 +99,7 @@ const ResultGrid: React.FC<ResultGridProps> = ({
                                 {loadingMessages[messageIndex]}
                             </p>
                             <p className="text-[9px] text-gray-400 uppercase tracking-widest animate-pulse font-medium">
-                                Analysis in progress
+                                최적의 추천을 위해 스타일을 분석하고 있습니다
                             </p>
                         </div>
                     </div>
@@ -118,12 +118,12 @@ const ResultGrid: React.FC<ResultGridProps> = ({
                     </div>
                 ) : (
                     /* [상태 3] 분석 대기 중 (기본 상태) */
-                    <div className="flex flex-col items-center justify-center rounded-[2.5rem] border-2 border-dashed border-neutral-200 bg-white dark:bg-neutral-900/50 py-24 transition-colors hover:bg-neutral-100 dark:border-white/10 dark:hover:bg-white/20 group will-change-transform">
+                    <div className="flex flex-col items-center justify-center rounded-[2.5rem] border-2 border-dashed border-neutral-200 bg-white dark:bg-neutral-900/50 py-24 transition-colors hover:bg-neutral-100 dark:border-white/10 dark:hover:bg-white/20 group">
                         <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full border border-neutral-100 bg-white text-neutral-200 shadow-sm transition-all duration-500 group-hover:scale-110 group-hover:text-violet-500 dark:border-white/5 dark:bg-neutral-800 dark:text-neutral-700">
                             <FaMagnifyingGlass size={20} className="animate-pulse" />
                         </div>
                         <p className="max-w-xs text-center text-[10px] font-bold uppercase tracking-widest leading-loose text-neutral-400 transition-colors group-hover:text-violet-600 dark:text-neutral-600">
-                            Awaiting parameters <br /> to initialize curation engine
+                            이미지를 업로드하거나 상품을 선택하여 <br /> 분석을 시작해보세요
                         </p>
                     </div>
                 )}

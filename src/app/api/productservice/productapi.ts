@@ -26,6 +26,13 @@ export const getProductList = async (): Promise<ProductData[]> => {
         }
 
         const data = await response.json();
+        // [매핑] ID 필드 표준화
+        if (Array.isArray(data)) {
+            return data.map((item: any) => ({
+                ...item,
+                productId: item.productId || item.naverProductId
+            }));
+        }
         return data;
     } catch (error) {
         console.error("getProductList error:", error);
@@ -51,7 +58,15 @@ export const getRecommendList = async (productId: string): Promise<RecommendList
             return null;
         }
 
-        const data = await response.json();
+        const data: RecommendList = await response.json();
+
+        // [매핑] 네이버 상품의 경우 naverProductId를 productId로 통일하여 프론트 규격 준수
+        if (data.naverProducts) {
+            data.naverProducts = data.naverProducts.map((p: any) => ({
+                ...p,
+                productId: p.productId || p.naverProductId
+            }));
+        }
 
         return data;
     } catch (error) {
@@ -78,9 +93,16 @@ export const getNaverProductList = async (): Promise<ProductData[]> => {
         }
 
         const data = await response.json();
+        // [매핑] ID 필드 표준화
+        if (Array.isArray(data)) {
+            return data.map((item: any) => ({
+                ...item,
+                productId: item.productId || item.naverProductId
+            }));
+        }
         return data;
     } catch (error) {
-        console.error("getRecommendList error:", error);
+        console.error("getNaverProductList error:", error);
         return [];
     }
 }

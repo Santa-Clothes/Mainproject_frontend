@@ -23,16 +23,20 @@ export const saveBookmarkAPI = async (token: string, productId: string) => {
 };
 
 /**
- * 장바구니 개별 아이템 삭제 API
+ * 장바구니 리스트 삭제 API (단일/다중 통합)
+ * @param productIds 삭제할 ID들의 배열 (Body에 직접 배열로 전송)
  */
-export const deleteBookmarkAPI = async (token: string, productId: string) => {
-    const reqUrl = `${BASEURL}/api/save-products/${productId}`;
+export const deleteBookmarkAPI = async (token: string, productIds: string[]) => {
+    console.log("selectedIds", productIds);
+    const reqUrl = `${BASEURL}/api/save-products`;
     try {
         const response = await fetch(reqUrl, {
             method: 'DELETE',
             headers: {
+                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`,
             },
+            body: JSON.stringify(productIds),
         });
         return response.ok;
     } catch (error) {
@@ -56,8 +60,15 @@ export const getBookmarkAPI = async (token: string): Promise<RecommendData[] | n
         if (!response.ok) return [];
         const data = await response.json();
 
-        // 백엔드 반환 구조에 따라 조정 (예: { items: [...] } 또는 [...])
-        return data;
+        // [매핑] 백엔드 응답 필드(naverProductId 등)를 프론트 표준(productId)으로 통일
+        if (Array.isArray(data)) {
+            return data.map((item: any) => ({
+                ...item,
+                productId: item.productId || item.naverProductId
+            }));
+        }
+
+        return [];
     } catch (error) {
         console.error("getCartAPI error:", error);
         return [];

@@ -26,7 +26,7 @@ export const loginAPI = async (email: string, password: string) => {
 
         if (!response.ok) {
             console.error(`HTTP error! status: ${response.status}`);
-            return [];
+            return null;
         }
 
         const data = await response.json();

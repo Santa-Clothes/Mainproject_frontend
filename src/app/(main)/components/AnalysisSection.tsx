@@ -17,7 +17,7 @@ interface AnalysisSectionProps {
     isSelectionMode?: boolean; // 선택 모드 여부 (이미지 업로드 모드 구분용)
 }
 
-// mockBarData 제거하고 빈 데이터일 경우를 위한 예외 처리용 변수
+// 빈 데이터일 경우를 위한 예외 처리용 변수
 const emptyBarData = [
     { score: 0, label_id: 0, label_name: '데이터 없음' }
 ];
@@ -43,30 +43,30 @@ export default function AnalysisSection({ sourceImage, productName, isLoading, b
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-    // 데이터 가독성을 위한 스케일링: 가장 작은 값을 1(자연수)로 기준 잡아 비례 상향
-    const activeBarData = (barData && barData.length > 0) ? barData : emptyBarData;
-    const minScore = Math.min(...activeBarData.map(d => d.score));
-    const multiplier = (minScore > 0) ? (1 / minScore) : 1;
+    // [최적화] 데이터 가독성을 위한 스케일링 (useMemo 적용)
+    const krBarData = React.useMemo(() => {
+        const activeBarData = (barData && barData.length > 0) ? barData : emptyBarData;
+        const minScore = Math.min(...activeBarData.map(d => d.score));
+        const multiplier = (minScore > 0) ? (1 / minScore) : 1;
 
-    const krBarData = activeBarData.map((item) => {
-        return {
+        return activeBarData.map((item) => ({
             ...item,
-            // 차트 렌더링용 스케일링 값 (최소값이 1이 되도록 비례 확대)
             displayScore: item.score * multiplier,
             label_name: styleName[item.label_name.toLowerCase() as keyof typeof styleName] || item.label_name,
-        };
-    });
+        }));
+    }, [barData]);
 
     // 네이버 검색 트렌드
     const [trendsData, setTrendsData] = useState<any[]>([]);
     const [isLoadingTrends, setIsLoadingTrends] = useState(true);
     const [errorTrends, setErrorTrends] = useState<string | null>(null);
     const [hasAttemptedTrendsFetch, setHasAttemptedTrendsFetch] = useState(false);
-
-    // 가장 높은 점수를 가진 스타일 명칭 추출 (하이라이트용)
-    const highestLabel = (krBarData && krBarData.length > 0)
-        ? [...krBarData].sort((a, b) => b.score - a.score)[0].label_name
-        : null;
+    // [최적화] 가장 높은 점수를 가진 스타일 명칭 추출 (useMemo 적용)
+    const highestLabel = React.useMemo(() => {
+        if (!krBarData || krBarData.length === 0) return null;
+        const sorted = [...krBarData].sort((a, b) => b.score - a.score);
+        return sorted.length > 0 ? sorted[0].label_name : null;
+    }, [krBarData]);
 
     useEffect(() => {
         setIsMounting(false);
@@ -221,44 +221,52 @@ export default function AnalysisSection({ sourceImage, productName, isLoading, b
                 {/* Right Col: Graphs */}
                 <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-10">
                     {/* Bar Chart Section */}
-                    <div className="bg-white dark:bg-neutral-900/50 rounded-4xl p-8 border-2 border-neutral-100 dark:border-white/10 shadow-sm space-y-6 will-change-transform">
-                        <div className="relative z-10 space-y-3">
+                    <div className="bg-white dark:bg-neutral-900/50 rounded-4xl p-8 border-2 border-neutral-100 dark:border-white/10 shadow-sm space-y-6 aspect-3/4 flex flex-col">
+                        <div className="relative z-10 space-y-3 shrink-0">
                             <span className="text-[11px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-[0.3em]">Style Analysis Result</span>
-
                         </div>
-                        <div className="h-64 w-full">
-                            {!isMounting && krBarData && (
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={krBarData} layout="vertical" margin={{ left: -20, right: 20 }}>
-                                        {/* 도메인 제한을 제거하여 자동 스케일링 적용 */}
-                                        <XAxis type="number" hide />
-                                        <YAxis dataKey="label_name" type="category" tick={{ fontSize: 9, fontWeight: 700 }} axisLine={false} tickLine={false} width={70} />
-                                        <Tooltip
-                                            contentStyle={{ backgroundColor: '#121212', borderRadius: '12px', border: 'none', fontSize: '10px', color: '#fff' }}
-                                            itemStyle={{ color: '#fff' }}
-                                            cursor={false}
-                                            // 툴팁에서 스코어 수치 표시를 완전히 제거
-                                            formatter={() => [null as any, null as any]}
-                                        />
-                                        <Bar
-                                            dataKey="displayScore"
-                                            fill="#7c3aed"
-                                            radius={[0, 20, 20, 0]}
-                                            barSize={12}
-                                        />
-                                    </BarChart>
-                                </ResponsiveContainer>
+                        <div className="flex-1 w-full min-h-0 flex items-center justify-center">
+                            {!isMounting && (
+                                (barData && barData.length > 0) ? (
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart data={krBarData} layout="vertical" margin={{ left: -20, right: 20 }}>
+                                            <XAxis type="number" hide />
+                                            <YAxis dataKey="label_name" type="category" tick={{ fontSize: 9, fontWeight: 700 }} axisLine={false} tickLine={false} width={70} />
+                                            <Tooltip
+                                                contentStyle={{ backgroundColor: '#121212', borderRadius: '12px', border: 'none', fontSize: '10px', color: '#fff' }}
+                                                itemStyle={{ color: '#fff' }}
+                                                cursor={false}
+                                                formatter={() => [null as any, null as any]}
+                                            />
+                                            <Bar
+                                                dataKey="displayScore"
+                                                fill="#7c3aed"
+                                                radius={[0, 20, 20, 0]}
+                                                barSize={12}
+                                            />
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center gap-3 animate-in fade-in zoom-in-95 duration-500">
+                                        <div className="w-12 h-12 rounded-full bg-neutral-50 dark:bg-neutral-800/50 flex items-center justify-center border border-neutral-100 dark:border-white/5">
+                                            <FaWaveSquare className="text-neutral-300 dark:text-neutral-600" size={20} />
+                                        </div>
+                                        <p className="text-sm font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
+                                            분석 데이터가 없습니다
+                                        </p>
+                                    </div>
+                                )
                             )}
                         </div>
                     </div>
-                    <div className="lg:col-span-1">
+                    <div>
                         <SearchRankCard
                             trends={trendsData}
                             isLoading={isLoadingTrends}
                             error={errorTrends}
                             onRetry={() => fetchTrends(true)}
                             highlightStyle={highestLabel}
-                            className="h-full"
+                            className="aspect-3/4"
                         />
                     </div>
                 </div>

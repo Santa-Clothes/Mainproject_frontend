@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { FaArrowRotateLeft, FaArrowsRotate, FaCheck, FaFingerprint, FaMagnifyingGlass, FaChartLine, FaCalendarDays, FaShirt } from 'react-icons/fa6';
+import { FaArrowRotateLeft, FaArrowsRotate, FaCheck, FaMagnifyingGlass, FaChartLine, FaCalendarDays, FaShirt } from 'react-icons/fa6';
 import { ProductData, RecommendData, RecommendList } from '@/types/ProductType';
 import Image from 'next/image';
 import ProductCard from './ProductCard';
@@ -230,12 +230,20 @@ export default function SelectionPanel({
           Category: <span className="font-extrabold normal-case text-xs text-violet-500">{selectedCat}</span>
           <span className="ml-2 text-neutral-400 font-normal">({filteredProducts.length} items)</span>
         </span>
-        {/* Data Insights Badges */}
-        <div className="flex flex-wrap gap-2.5">
-          <div className="px-4 py-2 flex flex-row items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="px-4 py-2 flex flex-row items-center gap-2.5 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg">
             <FaChartLine size={10} className="text-neutral-500 dark:text-neutral-400" />
-            <span className="text-[10px] font-black text-neutral-500 dark:text-neutral-400 uppercase tracking-[0.2em]">최근 1년 기준 판매량 순위</span>
+            <span className="text-[10px] font-black text-neutral-500 dark:text-neutral-400 uppercase tracking-[0.2em]">최근 1년 판매량 기준 정렬</span>
           </div>
+
+          <button
+            onClick={handleReset}
+            className="flex items-center gap-2 px-3 py-2 text-neutral-400 hover:text-violet-600 transition-all hover:bg-violet-50 dark:hover:bg-violet-900/20 rounded-lg active:scale-95 group"
+            title="필터 및 선택 초기화"
+          >
+            <FaArrowRotateLeft size={16} className="group-hover:-rotate-45 transition-transform duration-300" />
+            <span className="text-[10px] font-black uppercase tracking-widest">Reset</span>
+          </button>
         </div>
       </div>
       <div
@@ -252,13 +260,7 @@ export default function SelectionPanel({
           /* 상품 리스트 노출 */
           <div className="pt-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
             <div className="flex flex-col gap-4 pb-8">
-              <div className="flex items-center justify-end">
-                <button onClick={handleReset} className="text-neutral-500 hover:text-violet-600 transition-colors">
-                  <FaArrowRotateLeft size={14} />
-                </button>
-              </div>
-
-
+              {/* 이전 리셋 버튼 위치 (제거됨) */}
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-10 pb-20">
@@ -278,7 +280,7 @@ export default function SelectionPanel({
                       similarityScore: undefined // 탐색 단계이므로 유사도 점수 제외
                     }}
                     index={idx}
-                    selected={selectedProductId === product.productId}
+                    // selected={selectedProductId === product.productId} // 이 라인을 제거하여 체크 표시 오버레이 방지
                     onAnalyzeClick={() => startAnalysis(product)}
                     isAnalyzing={isLoading && selectedProductId === product.productId}
                     onClick={() => selectProduct(product)}

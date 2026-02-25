@@ -1,7 +1,7 @@
+import React, { useState } from "react";
 import { RecommendData } from "@/types/ProductType";
 import Image from "next/image";
 import { FaCheck, FaBookmark, FaShirt, FaArrowsRotate, FaXmark, FaMagnifyingGlass } from "react-icons/fa6";
-import { useState } from "react";
 import { useAtom } from "jotai";
 import { bookmarkAtom } from "@/jotai/historyJotai";
 import { authUserAtom } from "@/jotai/loginjotai";
@@ -21,7 +21,7 @@ interface ProductCardProps {
 /**
  * ProductCard: Upload Page 및 Selection Page의 검색/분석 결과로 반환된 추천 상품을 표시하는 개별 아이템 카드 컴포넌트입니다.
  */
-export default function ProductCard({
+const ProductCard = React.memo(({
     product,
     index = 0,
     selected = false,
@@ -30,8 +30,8 @@ export default function ProductCard({
     onAnalyzeClick,
     isAnalyzing = false,
     onClick
-}: ProductCardProps) {
-    // ... 기존 포맷팅 로직 생략 (유지에 주의)
+}: ProductCardProps) => {
+    // ... 기존 포맷팅 로직
     const formattedScore = typeof product.similarityScore === 'number'
         ? `${(product.similarityScore * 100).toFixed(1)}%`
         : product.similarityScore;
@@ -43,13 +43,15 @@ export default function ProductCard({
     const displayImageUrl = product.imageUrl || (product as any).image_url || (product as any).image || '';
     const displayTitle = product.title || (product as any).name || 'Unknown Product';
 
-    // 장바구니 상태 관리
-    const [cart, setCart] = useAtom(bookmarkAtom);
+    // 북마크 상태 관리
+    const [bookmark, setBookmark] = useAtom(bookmarkAtom);
     const [authUser] = useAtom(authUserAtom);
     const [isActionLoading, setIsActionLoading] = useState(false);
-    const isInCart = cart.some((item) => item.productId === product.productId);
 
-    const toggleCart = async (e: React.MouseEvent) => {
+    // [정제] 표준 규격인 productId를 사용한 매칭
+    const isBookmarked = bookmark.some((item) => item.productId === product.productId);
+
+    const toggleBookmark = async (e: React.MouseEvent) => {
         e.stopPropagation(); // 카드 자체의 클릭 이벤트(새 창 열기 등) 방지
         if (isActionLoading) return;
 
@@ -67,11 +69,11 @@ export default function ProductCard({
         setIsActionLoading(true);
         try {
 
-            if (isInCart) {
-                // 서버에서 삭제 시도
-                const success = await deleteBookmarkAPI(authUser.accessToken, product.productId);
+            if (isBookmarked) {
+                // 서버에서 삭제 시도 (배열 형태로 전달)
+                const success = await deleteBookmarkAPI(authUser.accessToken, [product.productId]);
                 if (success) {
-                    setCart(cart.filter((item) => item.productId !== product.productId));
+                    setBookmark(bookmark.filter((item) => item.productId !== product.productId));
                 } else {
                     alert('삭제에 실패했습니다.');
                 }
@@ -79,7 +81,7 @@ export default function ProductCard({
                 // 서버에 저장 시도
                 const success = await saveBookmarkAPI(authUser.accessToken, product.productId);
                 if (success) {
-                    setCart([...cart, product]);
+                    setBookmark([...bookmark, product]);
                 } else {
                     alert('저장에 실패했습니다.');
                 }
@@ -113,6 +115,15 @@ export default function ProductCard({
                 )}
 
 
+                {/* 선택 모드 체크 표시 오버레이 */}
+                {selected && (
+                    <div className="absolute inset-0 z-40 bg-violet-600/30 backdrop-blur-[2px] flex items-center justify-center animate-in fade-in zoom-in-95 duration-200">
+                        <div className="w-12 h-12 bg-white rounded-full shadow-2xl flex items-center justify-center border-4 border-violet-600 animate-in zoom-in-50 duration-300">
+                            <FaCheck size={24} className="text-violet-600" />
+                        </div>
+                    </div>
+                )}
+
                 <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-all" />
 
                 {/* 중앙 분석 시작 버튼 (Hover 시 노출) */}
@@ -141,11 +152,11 @@ export default function ProductCard({
                 {/* 우측 상단 북마크 버튼 */}
                 {showCartButton && (
                     <button
-                        onClick={toggleCart}
+                        onClick={toggleBookmark}
                         disabled={isActionLoading}
-                        title={isInCart ? 'Remove from Bookmark' : 'Add to Bookmark'}
+                        title={isBookmarked ? 'Remove from Bookmark' : 'Add to Bookmark'}
                         className={`absolute top-4 right-4 z-20 w-8 h-8 rounded-full flex items-center justify-center transition-all bg-white shadow-xl group/btn
-                            ${isActionLoading ? 'cursor-wait text-violet-400' : isInCart ? 'text-violet-600 scale-110 shadow-violet-500/20' : 'text-neutral-300 hover:text-violet-500 hover:scale-110'}`}
+                            ${isActionLoading ? 'cursor-wait text-violet-400' : isBookmarked ? 'text-violet-600 scale-110 shadow-violet-500/20' : 'text-neutral-300 hover:text-violet-500 hover:scale-110'}`}
                     >
                         {isActionLoading ? (
                             <FaArrowsRotate size={14} className="animate-spin" />
@@ -153,9 +164,9 @@ export default function ProductCard({
                             <div className="relative w-full h-full flex items-center justify-center">
                                 <FaBookmark
                                     size={14}
-                                    className={`transition-all duration-300 ${isInCart ? 'animate-bounce group-hover/btn:opacity-0 group-hover/btn:scale-50' : ''}`}
+                                    className={`transition-all duration-300 ${isBookmarked ? 'opacity-100 group-hover/btn:opacity-0 group-hover/btn:scale-50' : ''}`}
                                 />
-                                {isInCart && (
+                                {isBookmarked && (
                                     <FaXmark
                                         size={14}
                                         className="absolute inset-0 m-auto opacity-0 group-hover/btn:opacity-100 group-hover/btn:scale-110 transition-all duration-300 text-red-500"
@@ -189,4 +200,6 @@ export default function ProductCard({
             </div>
         </div>
     );
-}
+});
+
+export default ProductCard;

@@ -183,6 +183,8 @@ export default function Header() {
                 key={item.id}
                 href={item.path}
                 onClick={(e) => {
+                  // 네비게이션 시 항상 분석 기록 활성 상태 초기화
+                  setActiveHistory(null);
                   if (pathname === item.path) {
                     e.preventDefault();
                     window.location.href = item.path;
