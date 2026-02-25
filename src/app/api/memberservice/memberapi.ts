@@ -81,6 +81,7 @@ export const signupAPI = async (JoinRequest: JoinRequest) => {
         formData.append('id', JoinRequest.id);
         formData.append('nickname', JoinRequest.nickname);
         formData.append('password', JoinRequest.password);
+        formData.append('storeId', JoinRequest.storeId);
 
         if (JoinRequest.profileImg) {
             formData.append('file', JoinRequest.profileImg);

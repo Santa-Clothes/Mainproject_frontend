@@ -1,6 +1,7 @@
 import { RecommendData } from "@/types/ProductType";
 import Image from "next/image";
-import { FaCheck, FaBookmark, FaShirt } from "react-icons/fa6";
+import { FaCheck, FaBookmark, FaShirt, FaArrowsRotate, FaXmark } from "react-icons/fa6";
+import { useState } from "react";
 import { useAtom } from "jotai";
 import { bookmarkAtom } from "@/jotai/historyJotai";
 import { authUserAtom } from "@/jotai/loginjotai";
@@ -16,7 +17,7 @@ interface ProductCardProps {
 }
 
 /**
- * ProductCard: Upload Studio 및 Explore Catalog의 검색/분석 결과로 반환된 추천 상품을 표시하는 개별 아이템 카드 컴포넌트입니다.
+ * ProductCard: Upload Page 및 Selection Page의 검색/분석 결과로 반환된 추천 상품을 표시하는 개별 아이템 카드 컴포넌트입니다.
  */
 export default function ProductCard({ product, index = 0, selected = false, showCartButton = false, onCartClickOverride, onClick }: ProductCardProps) {
     // ... 기존 포맷팅 로직 생략 (유지에 주의)
@@ -34,10 +35,12 @@ export default function ProductCard({ product, index = 0, selected = false, show
     // 장바구니 상태 관리
     const [cart, setCart] = useAtom(bookmarkAtom);
     const [authUser] = useAtom(authUserAtom);
+    const [isActionLoading, setIsActionLoading] = useState(false);
     const isInCart = cart.some((item) => item.productId === product.productId);
 
     const toggleCart = async (e: React.MouseEvent) => {
         e.stopPropagation(); // 카드 자체의 클릭 이벤트(새 창 열기 등) 방지
+        if (isActionLoading) return;
 
         // 로그인 여부 체크
         if (!authUser) {
@@ -50,22 +53,28 @@ export default function ProductCard({ product, index = 0, selected = false, show
             return;
         }
 
-        if (isInCart) {
-            // 서버에서 삭제 시도
-            const success = await deleteBookmarkAPI(authUser.accessToken, product.productId);
-            if (success) {
-                setCart(cart.filter((item) => item.productId !== product.productId));
+        setIsActionLoading(true);
+        try {
+
+            if (isInCart) {
+                // 서버에서 삭제 시도
+                const success = await deleteBookmarkAPI(authUser.accessToken, product.productId);
+                if (success) {
+                    setCart(cart.filter((item) => item.productId !== product.productId));
+                } else {
+                    alert('삭제에 실패했습니다.');
+                }
             } else {
-                alert('삭제에 실패했습니다.');
+                // 서버에 저장 시도
+                const success = await saveBookmarkAPI(authUser.accessToken, product.productId);
+                if (success) {
+                    setCart([...cart, product]);
+                } else {
+                    alert('저장에 실패했습니다.');
+                }
             }
-        } else {
-            // 서버에 저장 시도
-            const success = await saveBookmarkAPI(authUser.accessToken, product.productId);
-            if (success) {
-                setCart([...cart, product]);
-            } else {
-                alert('저장에 실패했습니다.');
-            }
+        } finally {
+            setIsActionLoading(false);
         }
     };
 
@@ -108,11 +117,27 @@ export default function ProductCard({ product, index = 0, selected = false, show
                 {showCartButton && (
                     <button
                         onClick={toggleCart}
+                        disabled={isActionLoading}
                         title={isInCart ? 'Remove from Bookmark' : 'Add to Bookmark'}
-                        className={`absolute top-4 right-4 z-20 w-8 h-8 rounded-full flex items-center justify-center transition-all bg-white shadow-xl ${isInCart ? 'text-violet-600 scale-110 shadow-violet-500/20' : 'text-neutral-300 hover:text-violet-500 hover:scale-110'
-                            }`}
+                        className={`absolute top-4 right-4 z-20 w-8 h-8 rounded-full flex items-center justify-center transition-all bg-white shadow-xl group/btn
+                            ${isActionLoading ? 'cursor-wait text-violet-400' : isInCart ? 'text-violet-600 scale-110 shadow-violet-500/20' : 'text-neutral-300 hover:text-violet-500 hover:scale-110'}`}
                     >
-                        <FaBookmark size={14} className={isInCart ? 'animate-bounce' : ''} />
+                        {isActionLoading ? (
+                            <FaArrowsRotate size={14} className="animate-spin" />
+                        ) : (
+                            <div className="relative w-full h-full flex items-center justify-center">
+                                <FaBookmark
+                                    size={14}
+                                    className={`transition-all duration-300 ${isInCart ? 'animate-bounce group-hover/btn:opacity-0 group-hover/btn:scale-50' : ''}`}
+                                />
+                                {isInCart && (
+                                    <FaXmark
+                                        size={14}
+                                        className="absolute inset-0 m-auto opacity-0 group-hover/btn:opacity-100 group-hover/btn:scale-110 transition-all duration-300 text-red-500"
+                                    />
+                                )}
+                            </div>
+                        )}
                     </button>
                 )}
             </div>

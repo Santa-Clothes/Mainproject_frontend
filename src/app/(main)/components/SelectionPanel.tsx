@@ -164,10 +164,10 @@ export default function SelectionPanel({
   };
 
   return (
-    <div className="flex flex-col h-full gap-y-8 overflow-hidden relative">
+    <div className="flex flex-col h-full gap-y-8 overflow-hidden relative p-6 lg:p-12">
       {/* 전체 카드 로딩 오버레이 (초기 진입 시에만) */}
       {isFetching && (
-        <div className="absolute inset-x-0 inset-y-0 z-50 flex flex-col items-center justify-center bg-white/70 dark:bg-neutral-900/70 backdrop-blur-md rounded-[3rem]">
+        <div className="absolute inset-x-0 inset-y-0 z-50 flex flex-col items-center justify-center bg-white/70 dark:bg-neutral-900/70 backdrop-blur-md rounded-[inherit]">
           <div className="w-20 h-20 bg-white dark:bg-black rounded-full shadow-2xl flex items-center justify-center border border-neutral-100 dark:border-white/10 mb-6">
             <FaArrowsRotate className="animate-spin text-violet-600" size={32} />
           </div>

@@ -172,7 +172,7 @@ export default function AnalysisSection({ sourceImage, productName, isLoading, b
                 {/* Right Col: Graphs */}
                 <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-10">
                     {/* Bar Chart Section */}
-                    <div className="bg-white dark:bg-neutral-900/50 rounded-4xl p-8 border-2 border-neutral-100 dark:border-white/10 shadow-sm space-y-6">
+                    <div className="bg-white dark:bg-neutral-900/50 rounded-4xl p-8 border-2 border-neutral-100 dark:border-white/10 shadow-sm space-y-6 will-change-transform">
                         <div className="relative z-10 space-y-3">
                             <span className="text-[11px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-[0.3em]">Style Analysis Result</span>
 

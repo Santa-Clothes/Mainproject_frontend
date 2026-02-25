@@ -4,8 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { useAtom } from 'jotai';
 import { authUserAtom } from '@/jotai/loginjotai';
 import { updateMemberInfoAPI, deleteMemberAPI, updateProfileImg, getUserInfoAPI } from '@/app/api/memberservice/memberapi';
+import { getShopList, ShopInfo } from '@/app/api/salesservice/salesapi';
 import { useRouter } from 'next/navigation';
-import { FaUser, FaLock, FaTrash, FaCamera, FaCircleCheck, FaTriangleExclamation, FaXmark } from 'react-icons/fa6';
+import { FaUser, FaLock, FaTrash, FaCamera, FaCircleCheck, FaTriangleExclamation, FaXmark, FaStore } from 'react-icons/fa6';
 import Image from 'next/image';
 
 /**
@@ -24,6 +25,13 @@ export default function MemberInfo() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [shops, setShops] = useState<ShopInfo[]>([]);
+
+  useEffect(() => {
+    getShopList().then(setShops);
+  }, []);
+
+  const storeName = shops.find(s => s.storeId === auth?.storeId)?.storeName || '매장 정보 없음';
 
   // OAuth2 계정 여부 판단
   const isOAuth2 = auth?.provider && auth.provider !== 'local';
@@ -267,8 +275,11 @@ export default function MemberInfo() {
               <p className="text-xs font-black text-violet-600 uppercase tracking-wider">{auth.provider || 'LOCAL'}</p>
             </div>
             <div className="flex flex-col gap-1">
-              <label className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest">아이디</label>
-              <p className="text-xs font-medium text-neutral-900 dark:text-white truncate">{auth.userId}</p>
+              <label className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest">담당 매장</label>
+              <div className="flex items-center gap-2">
+                <FaStore size={10} className="text-violet-500" />
+                <p className="text-xs font-medium text-neutral-900 dark:text-white truncate">{storeName}</p>
+              </div>
             </div>
           </div>
         </div>

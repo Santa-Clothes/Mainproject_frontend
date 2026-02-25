@@ -15,9 +15,16 @@ export default function BookmarkPage() {
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
     const [isEditMode, setIsEditMode] = useState(false);
     const [isActionLoading, setIsActionLoading] = useState(false);
+    const [isMounted, setIsMounted] = useState(false);
+
+    React.useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     // 로그인 검증 및 리다이렉트
     React.useEffect(() => {
+        if (!isMounted) return;
+
         if (!authUser) {
             alert('로그인이 필요한 페이지입니다.');
             router.push('/login');
@@ -32,7 +39,7 @@ export default function BookmarkPage() {
             setIsActionLoading(false);
         };
         syncOnMount();
-    }, [authUser, router, setBookmark]);
+    }, [isMounted, authUser, router, setBookmark]);
 
 
 
