@@ -213,7 +213,7 @@ export default function Studio({ mode }: { mode: StudioMode }) {
             <div className="bg-white dark:bg-neutral-900/50 rounded-4xl lg:rounded-[2.5rem] border-2 border-neutral-100 dark:border-white/10 shadow-xl p-6 lg:p-12 h-200 lg:h-225 flex flex-col">
               <ResultGrid
                 isActive={true}
-                isPending={isPending}
+                isPending={isPending && isAnalyzing}
                 products={results.internalProducts || []}
                 title="9oz 스타일 목록"
                 showCartButton={false}
@@ -224,7 +224,7 @@ export default function Studio({ mode }: { mode: StudioMode }) {
             <div className="bg-white dark:bg-neutral-900/50 rounded-4xl lg:rounded-[2.5rem] border-2 border-neutral-100 dark:border-white/10 shadow-xl p-6 lg:p-12 h-200 lg:h-225 flex flex-col">
               <ResultGrid
                 isActive={true}
-                isPending={isPending}
+                isPending={isPending && isAnalyzing}
                 products={results.naverProducts || []}
                 title="외부 상품 추천 목록"
                 onProductClick={(product: RecommendData) => {
