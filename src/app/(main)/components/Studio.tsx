@@ -7,8 +7,9 @@ import { analysisHistoryAtom, activeHistoryAtom, HistoryItem } from '@/jotai/his
 // UI 컴포넌트 임포트
 import ResultGrid from './ResultGrid';
 import SelectionPanel from './SelectionPanel';
-import UploadPanel from './UploadPanel';
+import UploadPanel, { UploadPanelRef, resizeImage } from './UploadPanel';
 import AnalysisSection from './AnalysisSection';
+import { imageAnalyze } from '@/app/api/imageservice/imageapi';
 
 import { RecommendData, RecommendList } from '@/types/ProductType';
 
@@ -31,6 +32,7 @@ export default function Studio({ mode }: { mode: StudioMode }) {
 
   const [history, setHistory] = useAtom(analysisHistoryAtom);
   const [activeHistory, setActiveHistory] = useAtom(activeHistoryAtom);
+  const uploadRef = React.useRef<UploadPanelRef>(null);
 
   // [히스토리 로드] activeHistory 가 설정된 경우 해당 값을 화면에 곧바로 띄움
   useEffect(() => {
@@ -107,6 +109,61 @@ export default function Studio({ mode }: { mode: StudioMode }) {
   };
 
   /**
+   * 분석 취소 핸들러
+   */
+  const handleCancelAnalysis = () => {
+    setIsAnalyzing(false);
+    setResults(null);
+  };
+
+  /**
+   * 직접 파일 분석 처리 (AnalysisSection 등에서 호출)
+   */
+  const handleFileAnalysis = (file: File) => {
+    startTransition(async () => {
+      try {
+        // 1. 초기 UI 상태 변경 (로딩 시작)
+        setIsAnalyzing(true);
+        setResults(null);
+
+        // 2. 이미지 리사이징
+        const { dataUrl, blob } = await resizeImage(file, 300);
+        setAnalysisImage(dataUrl);
+        setAnalysisName(file.name);
+
+        // 3. 서버 분석 요청
+        const resizedFile = new File([blob], file.name, { type: 'image/jpeg' });
+        const uploadResult: any = await imageAnalyze(resizedFile);
+
+        if (uploadResult) {
+          handleSearchResult(uploadResult);
+        } else {
+          alert("분석에 실패했습니다.");
+          handleCancelAnalysis();
+        }
+      } catch (e) {
+        console.error("분석 중 오류:", e);
+        alert("분석 중 오류가 발생했습니다.");
+        handleCancelAnalysis();
+      }
+    });
+  };
+
+  // 분석 타임아웃 처리 (30초)
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (isPending || isAnalyzing) {
+      timer = setTimeout(() => {
+        if (isPending || isAnalyzing) {
+          alert('분석 시간이 너무 오래 소요되어 중단되었습니다. 다시 시도해주세요.');
+          handleCancelAnalysis();
+        }
+      }, 30000); // 30초
+    }
+    return () => clearTimeout(timer);
+  }, [isPending, isAnalyzing]);
+
+  /**
    * 초기 화면으로 돌아가기 핸들러
    */
   const handleBackToSearch = () => {
@@ -147,6 +204,8 @@ export default function Studio({ mode }: { mode: StudioMode }) {
                 productName={analysisName}
                 isLoading={isAnalyzing}
                 barData={results?.results?.[0]?.topk || []}
+                isSelectionMode={mode === 'imageSelection'}
+                onImageUpload={handleFileAnalysis}
               />
             </div>
 
@@ -198,15 +257,17 @@ export default function Studio({ mode }: { mode: StudioMode }) {
                 <SelectionPanel
                   onResultFound={handleSearchResult}
                   onAnalysisStart={handleAnalysisStart}
-                  isPending={isPending}
+                  onAnalysisCancel={handleCancelAnalysis}
+                  isLoading={isPending && isAnalyzing}
                   startTransition={startTransition}
                 />
               ) : (
                 <UploadPanel
+                  ref={uploadRef}
                   onResultFound={handleSearchResult}
                   onAnalysisStart={handleAnalysisStart}
-                  onAnalysisCancel={() => setAnalysisImage(null)}
-                  isPending={isPending}
+                  onAnalysisCancel={handleCancelAnalysis}
+                  isLoading={isPending && isAnalyzing}
                   startTransition={startTransition}
                 />
               )}

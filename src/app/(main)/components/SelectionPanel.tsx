@@ -11,7 +11,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 interface SelectionPanelProps {
   onResultFound: (results: RecommendList | null, category?: string) => void;
   onAnalysisStart: (imgUrl: string, name?: string) => void;
-  isPending: boolean;
+  onAnalysisCancel: () => void;
+  isLoading: boolean; // isPending 대신 제어 가능한 isLoading 사용
   startTransition: React.TransitionStartFunction;
 }
 
@@ -23,8 +24,9 @@ interface SelectionPanelProps {
 export default function SelectionPanel({
   onResultFound,
   onAnalysisStart,
+  onAnalysisCancel,
   startTransition,
-  isPending
+  isLoading
 }: SelectionPanelProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -129,21 +131,23 @@ export default function SelectionPanel({
   };
 
   /**
-   * [핵심] 선택된 상품으로 유사 스타일 검색 시작
+   * [핵심] 특정 상품으로 유사 스타일 검색 시작
    */
-  const startAnalysis = () => {
-    if (!selectedProductId) return;
+  const startAnalysis = (product?: ProductData) => {
+    const targetId = product?.productId || selectedProductId;
+    if (!targetId) return;
+
     startTransition(async () => {
       try {
         // [수정] 새로고침 직후 등 onAnalysisStart가 누락되어 회색박스(No Image)가 뜨는 현상 방지
-        const targetProduct = allProducts.find(p => p.productId === selectedProductId);
+        const targetProduct = product || allProducts.find(p => p.productId === targetId);
         if (targetProduct) {
           const safeImageUrl = targetProduct.imageUrl || (targetProduct as any).image_url || (targetProduct as any).image || '';
           const safeName = targetProduct.productName || (targetProduct as any).name || 'Unknown Product';
           onAnalysisStart(safeImageUrl, safeName);
         }
 
-        const result: RecommendList | null = await getRecommendList(selectedProductId);
+        const result: RecommendList | null = await getRecommendList(targetId);
 
         onResultFound(result, selectedCat || 'All');
       } catch (e) {
@@ -175,6 +179,30 @@ export default function SelectionPanel({
           <p className="mt-2 text-[9px] font-bold text-neutral-500 uppercase tracking-widest">Please Wait</p>
         </div>
       )}
+
+      {/* 스타일 분석 중 로딩 오버레이 */}
+      {isLoading && (
+        <div className="absolute inset-x-0 inset-y-0 z-50 flex flex-col items-center justify-center bg-white/40 dark:bg-neutral-900/40 backdrop-blur-sm rounded-[inherit] animate-in fade-in duration-300">
+          <div className="flex flex-col items-center gap-6">
+            <div className="w-16 h-16 bg-white dark:bg-neutral-800 rounded-2xl shadow-2xl flex items-center justify-center border border-neutral-100 dark:border-white/10">
+              <FaArrowsRotate className="animate-spin text-violet-600" size={24} />
+            </div>
+            <div className="text-center space-y-1">
+              <p className="text-[11px] font-black text-neutral-900 dark:text-white uppercase tracking-[0.3em]">Analyzing Style...</p>
+              <p className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest">Finding matches in database</p>
+            </div>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onAnalysisCancel();
+              }}
+              className="mt-4 px-6 py-2.5 bg-white/80 dark:bg-neutral-800/80 backdrop-blur-md border border-neutral-200 dark:border-white/10 rounded-full text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-50 transition-all shadow-xl"
+            >
+              분석 취소
+            </button>
+          </div>
+        </div>
+      )}
       {/* 1. 고정 영역: 카테고리 칩 및 검색 시작 버튼 */}
       <div className="flex-none space-y-6">
         <div className={`flex flex-wrap justify-center gap-3 transition-all duration-500 ${isFetching ? 'opacity-40 grayscale pointer-events-none' : 'opacity-100'}`}>
@@ -183,7 +211,7 @@ export default function SelectionPanel({
               key={cat}
               type="button"
               onClick={() => selectCategory(cat)}
-              className={`px-6 py-3 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all 
+              className={`px-6 py-3 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all
                 ${selectedCat === cat
                   ? 'bg-violet-600 text-white border-violet-600 shadow-md scale-105'
                   : 'bg-transparent text-neutral-400 border-neutral-300 dark:border-white/10 hover:border-violet-400 hover:text-violet-600'
@@ -194,23 +222,6 @@ export default function SelectionPanel({
           ))}
         </div>
 
-        <button
-          onClick={startAnalysis}
-          disabled={!selectedProductId || isPending}
-          className="w-full py-5 bg-violet-600 text-white text-[16px] font-bold uppercase tracking-[0.2em] rounded-full disabled:opacity-20 transition-all active:scale-[0.98] shadow-xl"
-        >
-          {isPending ? (
-            <div className="flex items-center justify-center gap-3">
-              <FaArrowsRotate className="animate-spin" size={14} />
-              <span>스타일 분석중 ...</span>
-            </div>
-          ) : (
-            <div className="flex items-center justify-center gap-3">
-              <FaMagnifyingGlass size={14} />
-              <span>선택한 상품 분석하기</span>
-            </div>
-          )}
-        </button>
       </div>
 
       {/* 2. 스크롤 영역: 상품 그리드 리스트 */}
@@ -268,6 +279,8 @@ export default function SelectionPanel({
                     }}
                     index={idx}
                     selected={selectedProductId === product.productId}
+                    onAnalyzeClick={() => startAnalysis(product)}
+                    isAnalyzing={isLoading && selectedProductId === product.productId}
                     onClick={() => selectProduct(product)}
                   />
                 </div>
@@ -286,6 +299,6 @@ export default function SelectionPanel({
           </div>
         )}
       </div>
-    </div>
+    </div >
   );
 }

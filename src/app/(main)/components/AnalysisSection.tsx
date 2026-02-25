@@ -2,10 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import {
-    BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer
-} from 'recharts';
-import { FaWaveSquare, FaCircleCheck, FaShirt } from 'react-icons/fa6';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { FaWaveSquare, FaShirt, FaMagnifyingGlass, FaArrowsRotate } from 'react-icons/fa6';
 import { getShoppingTrends } from '@/app/api/statservice/trendapi';
 import SearchRankCard from './SearchRankCard';
 import { BarDataType } from '@/types/ProductType';
@@ -15,6 +13,8 @@ interface AnalysisSectionProps {
     productName?: string;
     isLoading?: boolean;
     barData?: BarDataType[];
+    onImageUpload?: (file: File) => void; // 신규 이미지 업로드 핸들러
+    isSelectionMode?: boolean; // 선택 모드 여부 (이미지 업로드 모드 구분용)
 }
 
 // mockBarData 제거하고 빈 데이터일 경우를 위한 예외 처리용 변수
@@ -38,14 +38,17 @@ const styleName = {
  * AnalysisSection: Studio 상단 영역에서, 사용자가 선택/업로드한 원본 이미지를 보여주고
  * 이에 대한 간단한 분석 진행률이나 통계 리포트(차트 포함)를 시각화하는 패널 컴포넌트입니다.
  */
-export default function AnalysisSection({ sourceImage, productName, isLoading, barData }: AnalysisSectionProps) {
+export default function AnalysisSection({ sourceImage, productName, isLoading, barData, onImageUpload, isSelectionMode = false }: AnalysisSectionProps) {
     const [isMounting, setIsMounting] = useState(true);
+    const [isDragging, setIsDragging] = useState(false);
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
 
     // 데이터 가독성을 위한 스케일링: 가장 작은 값을 1(자연수)로 기준 잡아 비례 상향
-    const minScore = barData && barData.length > 0 ? Math.min(...barData.map(d => d.score)) : 0;
+    const activeBarData = (barData && barData.length > 0) ? barData : emptyBarData;
+    const minScore = Math.min(...activeBarData.map(d => d.score));
     const multiplier = (minScore > 0) ? (1 / minScore) : 1;
 
-    const krBarData = barData?.map((item) => {
+    const krBarData = activeBarData.map((item) => {
         return {
             ...item,
             // 차트 렌더링용 스케일링 값 (최소값이 1이 되도록 비례 확대)
@@ -119,6 +122,32 @@ export default function AnalysisSection({ sourceImage, productName, isLoading, b
         }
     };
 
+    /**
+     * 신규 이미지 업로드 처리
+     */
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file && onImageUpload) onImageUpload(file);
+    };
+
+    const handleDragOver = (e: React.DragEvent) => {
+        if (isSelectionMode) return;
+        e.preventDefault();
+        setIsDragging(true);
+    };
+
+    const handleDragLeave = () => {
+        setIsDragging(false);
+    };
+
+    const handleDrop = (e: React.DragEvent) => {
+        if (isSelectionMode) return;
+        e.preventDefault();
+        setIsDragging(false);
+        const file = e.dataTransfer.files?.[0];
+        if (file && onImageUpload) onImageUpload(file);
+    };
+
 
     return (
         <div className="space-y-8">
@@ -137,9 +166,26 @@ export default function AnalysisSection({ sourceImage, productName, isLoading, b
             {/* 2. Content Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
 
-                {/* Left Col: Source Image Preview */}
+                {/* Left Col: Source Image Preview & Input Slot */}
                 <div className="lg:col-span-4 space-y-6">
-                    <div className="aspect-square relative rounded-4xl overflow-hidden border-2 border-neutral-100 dark:border-white/10 bg-gray-50 dark:bg-neutral-800 shadow-inner group">
+                    <div
+                        onClick={() => !isSelectionMode && fileInputRef.current?.click()}
+                        onDragOver={handleDragOver}
+                        onDragLeave={handleDragLeave}
+                        onDrop={handleDrop}
+                        className={`aspect-3/4 relative rounded-4xl overflow-hidden border-2 shadow-inner group transition-all duration-300
+                            ${!isSelectionMode ? 'cursor-pointer' : ''}
+                            ${isDragging ? 'border-violet-500 bg-violet-50/50 scale-[0.98] ring-8 ring-violet-500/10' : 'border-neutral-100 dark:border-white/10 bg-neutral-50/50 dark:bg-neutral-800/50'}
+                        `}
+                    >
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            className="hidden"
+                            accept="image/*"
+                            onChange={handleFileChange}
+                        />
+
                         {isLoading ? (
                             <div className="absolute inset-0 flex items-center justify-center bg-neutral-100 dark:bg-neutral-900 animate-pulse">
                                 <FaWaveSquare className="text-violet-500/20" size={40} />
@@ -150,7 +196,7 @@ export default function AnalysisSection({ sourceImage, productName, isLoading, b
                                 alt="Original Reference"
                                 fill
                                 sizes='(min-width: 1024px) 50vw, (min-width: 768px) 75vw, 100vw'
-                                className="object-cover"
+                                className="object-contain p-4"
                                 unoptimized={true}
                             />
                         ) : (
@@ -159,11 +205,14 @@ export default function AnalysisSection({ sourceImage, productName, isLoading, b
                                 <span className="text-[12px] font-bold uppercase tracking-widest opacity-50">No Image</span>
                             </div>
                         )}
-                        {!isLoading && (
-                            <div className="absolute top-6 right-6">
-                                <div className="bg-white/90 dark:bg-black/60 backdrop-blur-md p-2 rounded-full border border-neutral-100 dark:border-white/10 text-violet-600 shadow-lg">
-                                    <FaCircleCheck size={14} />
+
+                        {/* {!isLoading && !isSelectionMode && ( */}
+                        {!isSelectionMode && (
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center backdrop-blur-[2px] gap-3">
+                                <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-violet-600 shadow-xl">
+                                    <FaMagnifyingGlass size={18} />
                                 </div>
+                                <span className="text-[10px] font-black text-white uppercase tracking-[0.2em]">새 이미지로 분석하기</span>
                             </div>
                         )}
                     </div>
@@ -178,33 +227,27 @@ export default function AnalysisSection({ sourceImage, productName, isLoading, b
 
                         </div>
                         <div className="h-64 w-full">
-                            {!isMounting && (
-                                krBarData && krBarData.length > 0 ? (
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <BarChart data={krBarData} layout="vertical" margin={{ left: -20, right: 20 }}>
-                                            {/* 도메인 제한을 제거하여 자동 스케일링 적용 */}
-                                            <XAxis type="number" hide />
-                                            <YAxis dataKey="label_name" type="category" tick={{ fontSize: 9, fontWeight: 700 }} axisLine={false} tickLine={false} width={70} />
-                                            <Tooltip
-                                                contentStyle={{ backgroundColor: '#121212', borderRadius: '12px', border: 'none', fontSize: '10px', color: '#fff' }}
-                                                itemStyle={{ color: '#fff' }}
-                                                cursor={false}
-                                                // 툴팁에서 스코어 수치 표시를 완전히 제거
-                                                formatter={() => [null as any, null as any]}
-                                            />
-                                            <Bar
-                                                dataKey="displayScore"
-                                                fill="#7c3aed"
-                                                radius={[0, 20, 20, 0]}
-                                                barSize={12}
-                                            />
-                                        </BarChart>
-                                    </ResponsiveContainer>
-                                ) : (
-                                    <div className="flex w-full h-full items-center justify-center text-xs text-neutral-400 font-medium">
-                                        분석 데이터가 없습니다.
-                                    </div>
-                                )
+                            {!isMounting && krBarData && (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart data={krBarData} layout="vertical" margin={{ left: -20, right: 20 }}>
+                                        {/* 도메인 제한을 제거하여 자동 스케일링 적용 */}
+                                        <XAxis type="number" hide />
+                                        <YAxis dataKey="label_name" type="category" tick={{ fontSize: 9, fontWeight: 700 }} axisLine={false} tickLine={false} width={70} />
+                                        <Tooltip
+                                            contentStyle={{ backgroundColor: '#121212', borderRadius: '12px', border: 'none', fontSize: '10px', color: '#fff' }}
+                                            itemStyle={{ color: '#fff' }}
+                                            cursor={false}
+                                            // 툴팁에서 스코어 수치 표시를 완전히 제거
+                                            formatter={() => [null as any, null as any]}
+                                        />
+                                        <Bar
+                                            dataKey="displayScore"
+                                            fill="#7c3aed"
+                                            radius={[0, 20, 20, 0]}
+                                            barSize={12}
+                                        />
+                                    </BarChart>
+                                </ResponsiveContainer>
                             )}
                         </div>
                     </div>

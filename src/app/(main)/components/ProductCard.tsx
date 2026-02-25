@@ -1,6 +1,6 @@
 import { RecommendData } from "@/types/ProductType";
 import Image from "next/image";
-import { FaCheck, FaBookmark, FaShirt, FaArrowsRotate, FaXmark } from "react-icons/fa6";
+import { FaCheck, FaBookmark, FaShirt, FaArrowsRotate, FaXmark, FaMagnifyingGlass } from "react-icons/fa6";
 import { useState } from "react";
 import { useAtom } from "jotai";
 import { bookmarkAtom } from "@/jotai/historyJotai";
@@ -14,12 +14,23 @@ interface ProductCardProps {
     onClick?: () => void;
     showCartButton?: boolean; // 북마크 버튼 표시 여부
     onCartClickOverride?: (e: React.MouseEvent) => void; // 북마크 버튼 클릭 이벤트 오버라이드
+    onAnalyzeClick?: (e: React.MouseEvent) => void; // 분석 시작 버튼 클릭 핸들러
+    isAnalyzing?: boolean; // 분석 진행 중 상태
 }
 
 /**
  * ProductCard: Upload Page 및 Selection Page의 검색/분석 결과로 반환된 추천 상품을 표시하는 개별 아이템 카드 컴포넌트입니다.
  */
-export default function ProductCard({ product, index = 0, selected = false, showCartButton = false, onCartClickOverride, onClick }: ProductCardProps) {
+export default function ProductCard({
+    product,
+    index = 0,
+    selected = false,
+    showCartButton = false,
+    onCartClickOverride,
+    onAnalyzeClick,
+    isAnalyzing = false,
+    onClick
+}: ProductCardProps) {
     // ... 기존 포맷팅 로직 생략 (유지에 주의)
     const formattedScore = typeof product.similarityScore === 'number'
         ? `${(product.similarityScore * 100).toFixed(1)}%`
@@ -81,11 +92,10 @@ export default function ProductCard({ product, index = 0, selected = false, show
     return (
         <div
             onClick={onClick}
-            className={`group space-y-4 cursor-pointer transition-all ${selected ? 'scale-[1.02]' : ''}`}
+            className={`group space-y-4 cursor-pointer transition-all`}
         >
             {/* 1. 이미지 컨테이너 */}
-            <div className={`aspect-3/4 overflow-hidden rounded-3xl bg-white dark:bg-neutral-900/50 border-2 relative shadow-sm transition-all
-                ${selected ? 'border-violet-600 ring-4 ring-violet-600/10 shadow-2xl' : 'border-neutral-100 dark:border-white/15 group-hover:border-violet-200'}`}>
+            <div className={`aspect-3/4 overflow-hidden rounded-3xl bg-neutral-50/50 dark:bg-neutral-800/50 border-2 relative shadow-sm transition-all border-neutral-100 dark:border-white/15 group-hover:border-violet-500 group-hover:ring-4 group-hover:ring-violet-500/10`}>
                 {displayImageUrl ? (
                     <Image
                         src={displayImageUrl}
@@ -93,7 +103,7 @@ export default function ProductCard({ product, index = 0, selected = false, show
                         fill
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         priority={index < 4}
-                        className={`group-hover:scale-110 transition-transform duration-1000 object-cover ${selected ? 'brightness-75' : ''}`}
+                        className={`group-hover:scale-105 transition-transform duration-700 object-contain p-2`}
                     />
                 ) : (
                     <div className="absolute inset-0 flex flex-col items-center justify-center bg-neutral-100 dark:bg-neutral-800 text-neutral-300 dark:text-neutral-600">
@@ -102,16 +112,31 @@ export default function ProductCard({ product, index = 0, selected = false, show
                     </div>
                 )}
 
-                {/* 선택 시 체크 표시 오버레이 */}
-                {selected && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-violet-600/20 backdrop-blur-[2px] animate-in zoom-in duration-300">
-                        <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-violet-600 shadow-2xl">
-                            <FaCheck size={18} />
-                        </div>
-                    </div>
-                )}
 
                 <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-all" />
+
+                {/* 중앙 분석 시작 버튼 (Hover 시 노출) */}
+                {onAnalyzeClick && (
+                    <div className={`absolute inset-0 z-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 ${isAnalyzing ? 'opacity-100' : ''}`}>
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onAnalyzeClick(e);
+                            }}
+                            disabled={isAnalyzing}
+                            className="bg-white/90 dark:bg-neutral-900/90 backdrop-blur-md text-violet-600 px-5 py-2.5 rounded-full shadow-2xl flex items-center gap-2.5 hover:scale-110 active:scale-95 transition-all group/analyze disabled:opacity-50"
+                        >
+                            {isAnalyzing ? (
+                                <FaArrowsRotate size={12} className="animate-spin text-violet-500" />
+                            ) : (
+                                <FaMagnifyingGlass size={12} className="group-hover/analyze:scale-110 transition-transform" />
+                            )}
+                            <span className="text-[10px] font-black uppercase tracking-[0.2em] whitespace-nowrap">
+                                {isAnalyzing ? 'Analyzing...' : 'Search Similar'}
+                            </span>
+                        </button>
+                    </div>
+                )}
 
                 {/* 우측 상단 북마크 버튼 */}
                 {showCartButton && (
@@ -143,7 +168,7 @@ export default function ProductCard({ product, index = 0, selected = false, show
             </div>
 
             {/* 2. 상품 정보 컨테이너 */}
-            <div className={`space-y-1.5 px-1 transition-colors ${selected ? 'text-violet-600' : ''}`}>
+            <div className={`space-y-1.5 px-1 transition-colors`}>
                 <div className="flex justify-between items-center h-4">
                     {product.similarityScore !== undefined && (
                         <div className="flex items-center gap-1.5">
@@ -153,12 +178,12 @@ export default function ProductCard({ product, index = 0, selected = false, show
                             </span>
                         </div>
                     )}
-                    <span className={`text-[10px] font-normal italic transition-colors ${selected ? 'text-violet-500' : 'text-gray-500'}`}>
+                    <span className={`text-[10px] font-normal italic transition-colors text-gray-500`}>
                         {formattedPrice}
                     </span>
                 </div>
 
-                <h4 className={`text-sm font-medium italic tracking-tight transition-all duration-300 truncate ${selected ? 'translate-x-1 text-violet-600 font-bold' : 'text-neutral-900 dark:text-neutral-100 group-hover:translate-x-1'}`}>
+                <h4 className={`text-sm font-medium italic tracking-tight transition-all duration-300 truncate text-neutral-900 dark:text-neutral-100 group-hover:translate-x-1`}>
                     {displayTitle}
                 </h4>
             </div>
