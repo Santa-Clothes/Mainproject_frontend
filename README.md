@@ -1,88 +1,87 @@
-# Neural Interface - Analytic Dashboard Frontend
+# Neural Interface - 분석 대시보드 프론트엔드
 
-A modern, high-performance web application built with **Next.js 16 (App Router)** for visualizing fashion trend data, managing inventory, and handling AI-powered style analysis. This project features a premium UI design with glassmorphism effects, dynamic interactive charts, and a sophisticated AI discovery system.
+**Next.js 16 (App Router)** 기반의 고성능 웹 애플리케이션으로, 패션 트렌드 데이터 시각화, 재고 관리 및 AI 스타일 분석 기능을 제공합니다. 프리미엄 UI 디자인(글래스모피즘)과 역동적인 인터랙티브 차트를 특징으로 합니다.
 
-## 🛠 Tech Stack
+## 🛠 기술 스택
 
-- **Framework**: [Next.js 16.1.6](https://nextjs.org/) (App Router & Turbopack)
-- **Language**: [TypeScript](https://www.typescriptlang.org/)
-- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
-- **State Management**: [Jotai](https://jotai.org/) (Atomic state management)
-- **Visualizations**: 
-  - [Plotly.js](https://plotly.com/javascript/react-plotly.js/) (t-SNE Neural Map) via dynamic import
-  - [Recharts](https://recharts.org/) (Style DNA Analysis & Market Trends)
-- **Animations**: [Framer Motion](https://www.framer.com/motion/)
-- **Icons**: [React Icons](https://react-icons.github.io/react-icons/) (FontAwesome 6, Simple Icons)
+- **프레임워크**: [Next.js 16.1.6](https://nextjs.org/) (App Router & Turbopack)
+- **언어**: [TypeScript](https://www.typescriptlang.org/)
+- **스타일링**: [Tailwind CSS 4](https://tailwindcss.com/)
+- **상태 관리**: [Jotai](https://jotai.org/) (원자적 상태 관리)
+- **데이터 시각화**: 
+  - [Plotly.js](https://plotly.com/javascript/react-plotly.js/): UMAP 시각화 맵 (Dynamic Import 사용)
+  - [Recharts](https://recharts.org/): 스타일 분석 및 시장 트렌드 차트
+- **애니메이션**: [Framer Motion](https://www.framer.com/motion/)
+- **아이콘**: [React Icons](https://react-icons.github.io/react-icons/) (FontAwesome 6 등)
 
-## 🚀 Key Features
+## 🚀 주요 기능
 
-### 1. AI Style Discovery (Studio)
-An integrated system for analyzing fashion styles and discovering similar products.
-- **Dual Modes**: 
-  - **Upload Mode (`/main/uploadpage`)**: Direct image upload with drag-and-drop support and real-time preview.
-  - **Discovery Mode (`/main/selectionpage`)**: Search by selecting products from the internal curated catalog.
-- **Deep Style Analysis**:
-  - **Style DNA Matrix**: Visualizes the style distribution (Casual, Contemporary, etc.) using interactive bar charts via Recharts.
-  - **Market Trend Comparison**: Real-time integration with Naver shopping trends to compare current style popularity.
-- **UX Excellence**:
-  - **Direct Re-analysis**: Upload or drag a new image directly onto the results page image slot for instant re-comparison.
-  - **Safe UI**: Loading overlays with "Cancel" capability and a 30-second watchdog timeout to prevent hanging requests.
-  - **Analysis History**: Keeps track of recent analysis results using global atomic state (Jotai).
+### 1. 스타일 분석 및 상품 추천 (Studio)
+패션 스타일을 분석하고 유사한 상품을 추천받는 통합 시스템입니다.
+- **두 가지 입력 모드**: 
+  - **이미지 업로드 (`/main/uploadpage`)**: 드래그 앤 드롭 지원 및 실시간 미리보기 기능을 갖춘 직접 업로드 방식.
+  - **상품 선택 (`/main/selectionpage`)**: 내부 카탈로그에서 상품을 선택하여 유사 스타일을 탐색하는 방식.
+- **상세 분석 기능**:
+  - **스타일 분포 분석**: Recharts를 사용하여 스타일(캐주얼, 컨템포러리 등) 분포를 막대 그래프로 시각화.
+  - **트렌드 비교**: 네이버 쇼핑 트렌드 API와 연동하여 현재 스타일의 시장 인기도를 실시간으로 비교.
+- **사용자 경험(UX) 최적화**:
+  - **즉시 재분석**: 결과 페이지의 이미지 영역에 새 이미지를 클릭하거나 드래그하여 즉시 다시 분석 가능.
+  - **안전한 분석 프로세스**: 분석 중 취소 버튼 제공 및 30초 타임아웃 처리를 통해 무한 로딩 방지.
+  - **분석 히스토리**: Jotai를 활용해 최근 분석한 결과를 최대 3개까지 유지 및 관리.
 
-### 2. Analytics Dashboard (`/main/dashboard`)
-- **Real-time Metrics**: Displays internal inventory and Naver shopping product counts using async polling with retry logic.
-- **Trend Analysis**: Visualizes shopping trends with custom style distribution cards.
-- **Interactive t-SNE Map**: A 2D projection of high-dimensional style vectors using `react-plotly.js`. Supports zoom, pan, and interactive tooltips.
-- **Sales Ranking**: Best-selling items tracking with sorting capabilities.
+### 2. 분석 대시보드 (`/main/dashboard`)
+- **실시간 지표**: 내부 재고와 네이버 쇼핑 상품 수를 폴링 로직(Retry 포함)으로 표시.
+- **트렌드 시각화**: 커스텀 스타일 분포 카드를 통한 시장 동향 분석.
+- **UMAP 스타일 맵**: 고차원 스타일 벡터를 2D로 투영한 인터랙티브 맵(확대/축소, 툴팁 지원).
+- **판매 랭킹**: 판매량 기반 베스트 아이템 트래킹 및 정렬.
 
-### 3. Member Management & Profiles
-- **Profile Customization**: Update nickname, password (local auth), and profile image with real-time preview.
-- **OAuth2 Integration**: Seamless identity management for social login users (Google, Naver, Kakao).
-- **Bookmarks**: Save and manage discovered products for future reference.
+### 3. 회원 관리 및 프로필
+- **프로필 설정**: 닉네임, 비밀번호, 프로필 이미지 변경 및 실시간 미리보기.
+- **소셜 로그인**: Google, Naver, Kakao 등 OAuth2 통합 계정 관리.
+- **북마크**: 탐색 중 마음에 드는 상품을 저장하고 마이페이지에서 관리.
 
-## 📂 Project Structure
+## 📂 프로젝트 구조
 
 ```bash
 src/
 ├── app/
-│   ├── api/             # API Service Layer (fetch wrappers for backend)
-│   ├── (main)/          # Main dashboard area (grouped)
-│   │   ├── dashboard/   # Analytics overview
-│   │   ├── uploadpage/  # AI Upload interface
-│   │   ├── selectionpage/ # AI Selection interface
-│   │   ├── bookmark/    # Bookmarked items
-│   │   └── components/  # Page-specific items (Studio, AnalysisSection, Panels)
-│   ├── login/           # Auth entrance
-│   └── layout.tsx       # Root Layout (Theme & Global Styles)
-├── components/          # Shared Reusable UI Components
-├── jotai/               # Global State Atoms (Auth, History, Analysis)
-└── types/               # TypeScript Interfaces (API Responses, ProductData)
+│   ├── api/             # API 서비스 레이어 (백엔드 통신용 래퍼)
+│   ├── (main)/          # 대시보드 및 주요 기능 그룹
+│   │   ├── dashboard/   # 통계 및 지표 대시보드
+│   │   ├── uploadpage/  # 이미지 업로드 분석 페이지
+│   │   ├── selectionpage/ # 상품 선택 분석 페이지
+│   │   ├── bookmark/    # 저장된 상품 목록
+│   │   └── components/  # 페이지 전용 컴포넌트 (분석 섹션, 각 모드 패널 등)
+│   ├── login/           # 인증 게이트웨이
+│   └── layout.tsx       # 전체 레이아웃 (테마 및 글로벌 스타일)
+├── components/          # 공통 재사용 UI 컴포넌트
+├── jotai/               # 글로벌 상태 정의 (인증, 히스토리, 분석 상태 등)
+└── types/               # TypeScript 인터페이스 (API 응답, 데이터 모델)
 ```
 
-## 🏗 Architecture & Build Strategy
+## 🏗 아키텍처 및 빌드 전략
 
-- **Static Shell + Client Hydration**: Pre-rendered layout for speed, with dynamic JS hydration for interactive charts and private data.
-- **Dynamic Imports**: Plotly and other heavy visualization libraries are loaded on-demand to maintain core performance and avoid SSR errors.
-- **Responsive & Atmospheric**: Support for Dark/Light modes with dynamic lighting effects (Sunlight/Stars) across all main pages.
+- **Static Shell + Client Hydration**: 초기 로딩 속도를 위해 레이아웃은 서버에서 렌더링하고, 인터랙티브한 차트와 데이터는 클라이언트에서 활성화합니다.
+- **Dynamic Imports**: Plotly와 같이 무겁거나 서버 사이드 렌더링이 불필요한 라이브러리는 동적으로 로드하여 초기 성능을 최적화합니다.
+- **반응형 및 테마 지원**: 모든 페이지에서 다크/라이트 모드를 지원하며, 모드별 대기 성능 효과(태양광/별빛)가 적용되어 있습니다.
 
-## 📦 Getting Started
+## 📦 시작하기
 
-1. **Install Dependencies**
+1. **의존성 설치**
    ```bash
    npm install
    ```
 
-2. **Run Development Server**
+2. **개발 서버 실행**
    ```bash
    npm run dev
    ```
-   Access the app at [http://localhost:3000](http://localhost:3000).
 
-3. **Build for Production**
+3. **프로덕션 빌드**
    ```bash
    npm run build
    ```
 
-## 📝 License
+## 📝 라이선스
 
-This project is proprietary software. All rights reserved.
+이 프로젝트는 독점 소프트웨어입니다. 모든 권리는 보호됩니다.
