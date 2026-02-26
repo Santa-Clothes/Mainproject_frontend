@@ -122,7 +122,10 @@ export const getUserInfoAPI = async (token: string) => {
 
         if (!response.ok) {
             console.error(`User info fetch failed: ${response.status}`);
-            return null;
+            if (response.status === 401 || response.status === 403 || response.status === 404) {
+                return { error: 'unauthorized' };
+            }
+            return null; // 단순 네트워크 에러나 500 에러 시에는 로그아웃시키지 않음
         }
 
         const userData = await response.json();

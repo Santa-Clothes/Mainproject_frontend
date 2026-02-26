@@ -91,8 +91,8 @@ export default function Header() {
         if (!currentToken) return;
         try {
           const userInfo = await getUserInfoAPI(currentToken);
-          if (!userInfo && authInfo?.accessToken === currentToken) {
-            // 인가 실패 혹은 계정 삭제 시 로그아웃 처리
+          if (userInfo?.error === 'unauthorized' && authInfo?.accessToken === currentToken) {
+            // 인가 실패 일때만 로그아웃 처리 (단순 네트워크 장애/서버 오프라인 시에는 유지)
             setAuthInfo(null);
             setBookmark([]);
             setHistory([]);
@@ -222,9 +222,6 @@ export default function Header() {
             <button
               onClick={() => {
                 setModelMode(modelMode === 'normal' ? '768' : 'normal');
-                setTimeout(() => {
-                  window.location.reload();
-                }, 50);
               }}
               className="relative flex items-center h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-white/10 p-0.5 overflow-hidden shadow-inner w-18"
               title={modelMode === 'normal' ? "기본 분석 모드" : "768 분석 모드"}

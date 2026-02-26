@@ -93,7 +93,7 @@ export default function ScatterPlot({
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [fetchDataFn]);
 
     // 로딩 중에만 메시지 변경 타이머 가동 (불필요한 리렌더링 방지)
     useEffect(() => {

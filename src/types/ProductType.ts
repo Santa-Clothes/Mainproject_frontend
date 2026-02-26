@@ -60,3 +60,15 @@ export interface BookmarkData {
   originalStyleName?: string,    // 상품이 원래 가지고 있던 스타일
   originalStyleScore?: number,   // 상품의 원래 스타일 수치(확률 또는 점수)
 }
+
+export interface RecommendStyle768 {
+  style: string,
+  score: number
+}
+
+export interface RecommendResult768 {
+  dimension: number,
+  styles: RecommendStyle768[],
+  internalProducts: RecommendData[],
+  naverProducts: RecommendData[],
+}

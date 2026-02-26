@@ -30,7 +30,7 @@ export default function AuthHandler() {
                     // 백엔드에서 유저 정보 가져오기
                     const userInfo = await getUserInfoAPI(token);
 
-                    if (userInfo) {
+                    if (userInfo && !userInfo.error) {
                         // Jotai 상태에 저장 (atomWithStorage에 의해 localStorage에 자동 저장됨)
                         setAuth({
                             accessToken: token,

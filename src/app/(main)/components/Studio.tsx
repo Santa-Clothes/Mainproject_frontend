@@ -67,6 +67,16 @@ export default function Studio({ mode }: { mode: StudioMode }) {
     }
   }, [activeHistory, pathname, isResultView, history]); // URL 파라미터나 경로가 바뀔 때도 체크하도록 추가
 
+  // 모델 토글 시 보고 있던 분석 결과 화면 초기화 (새로고침 대체)
+  useEffect(() => {
+    if (isResultView) {
+      setResults(null);
+      setActiveHistory(null);
+      setIsAnalyzing(false);
+      router.push(pathname, { scroll: false });
+    }
+  }, [modelMode]);
+
   // 브라우저 뒤로가기 처리를 위한 Effect (URL 파라미터 감지)
   useEffect(() => {
     // 뒤로가기를 눌러서 현재 URL에서 view=result가 사라졌다면 초기 화면으로 복귀

@@ -101,15 +101,33 @@ export const image768Analyze = async (file: File) => {
 
         if (!response.ok) {
             console.error("Server error:", response.status, response.statusText);
-            return []; // 실패 시 빈 배열 반환
+            return null; // 실패 시 null 반환
         }
 
         const data = await response.json();
-        console.log("imageAnalyze data:", data);
+
+        // 새 API 응답 형식(RecommendResult768)을 기존 UI 구조(RecommendList)에 맞게 변환 (어댑터 처리)
+        if (data && data.styles) {
+            return {
+                results: [
+                    {
+                        dimension: data.dimension || 768,
+                        // 새 API의 { style, score } 를 기존 UI가 쓰는 { label_name, score, label_id } 로 매핑
+                        topk: data.styles.map((s: any, idx: number) => ({
+                            label_name: s.style,
+                            score: s.score,
+                            label_id: idx
+                        }))
+                    }
+                ],
+                internalProducts: data.internalProducts || [],
+                naverProducts: data.naverProducts || []
+            };
+        }
 
         return data;
     } catch (error) {
-        console.error("imageAnalyze error:", error);
-        return []; // 에러 시 빈 배열 반환하여 UI 깨짐 방지
+        console.error("image768Analyze error:", error);
+        return null; // 에러 시 null 반환하여 UI 로직에 맞춤
     }
 }
