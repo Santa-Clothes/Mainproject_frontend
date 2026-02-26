@@ -50,8 +50,6 @@ export const deleteBookmarkAPI = async (token: string, productIds: string[]) => 
  */
 import { BookmarkData } from "@/types/ProductType";
 
-// ... (중략)
-
 /**
  * 장바구니 리스트 불러오기 API
  */
@@ -66,6 +64,7 @@ export const getBookmarkAPI = async (token: string): Promise<BookmarkData[] | nu
         });
         if (!response.ok) return [];
         const data = await response.json();
+        console.log("getBookmarkAPI data:", data);
 
         if (Array.isArray(data)) {
             return data.map((item: any) => ({

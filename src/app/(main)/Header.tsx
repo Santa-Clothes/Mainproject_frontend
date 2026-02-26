@@ -164,9 +164,9 @@ export default function Header() {
 
   // 네비게이션 아이템 정의
   const navItems = [
-    { id: 'uploadpage', label: '이미지 분석 기반 추천', icon: <FaCloudArrowUp size={18} />, path: '/uploadpage' },
-    { id: 'selectionpage', label: '보유 상품 기반 추천', icon: <FaShirt size={18} />, path: '/selectionpage' },
-    { id: 'dashboard', label: '대시보드', icon: <FaChartLine size={18} />, path: '/dashboard' },
+    { id: 'uploadpage', label: '이미지 분석 기반 추천', icon: <FaCloudArrowUp size={18} />, path: '/uploadpage', hoverTextClass: 'hover:text-violet-600 dark:hover:text-violet-400', activeClass: 'bg-violet-600 text-white shadow-lg shadow-violet-500/30' },
+    { id: 'selectionpage', label: '보유 상품 기반 추천', icon: <FaShirt size={18} />, path: '/selectionpage', hoverTextClass: 'hover:text-blue-600 dark:hover:text-blue-400', activeClass: 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' },
+    { id: 'dashboard', label: '대시보드', icon: <FaChartLine size={18} />, path: '/dashboard', hoverTextClass: 'hover:text-emerald-600 dark:hover:text-emerald-400', activeClass: 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/30' },
   ];
 
   return (
@@ -203,8 +203,8 @@ export default function Header() {
                   }
                 }}
                 className={`px-2.5 sm:px-3 lg:px-4 py-2 rounded-full text-[12px] font-bold uppercase tracking-wider lg:tracking-[0.2em] flex items-center gap-1.5 md:gap-2 transition-all shrink-0 ${pathname === item.path
-                  ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/30'
-                  : 'text-gray-500 hover:text-violet-600 dark:text-gray-400 dark:hover:text-white bg-transparent hover:bg-neutral-50 dark:hover:bg-white/5'
+                  ? item.activeClass
+                  : `text-gray-500 dark:text-gray-400 bg-transparent hover:bg-neutral-50 dark:hover:bg-white/5 ${item.hoverTextClass}`
                   }`}
               >
                 {item.icon}

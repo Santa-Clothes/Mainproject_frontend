@@ -22,7 +22,7 @@ interface ResultGridProps {
  */
 const ResultGrid: React.FC<ResultGridProps> = ({
     title = "추천 목록",
-    subtitle = "상품 분석 결과",
+    subtitle = "스타일 유사도 비교 결과",
     isActive = false,
     isLoading = false,
     products = null,
