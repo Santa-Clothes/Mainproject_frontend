@@ -5,8 +5,10 @@ import { FaArrowRotateLeft, FaArrowsRotate, FaCheck, FaMagnifyingGlass, FaChartL
 import { ProductData, RecommendData, RecommendList } from '@/types/ProductType';
 import Image from 'next/image';
 import ProductCard from './ProductCard';
-import { getProductList, getRecommendList } from '@/app/api/productservice/productapi';
+import { getProductList, getRecommendList, getRecommend768List } from '@/app/api/productservice/productapi';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useAtom } from 'jotai';
+import { modelModeAtom } from '@/jotai/modelJotai';
 
 interface SelectionPanelProps {
   onResultFound: (results: RecommendList | null, category?: string) => void;
@@ -30,6 +32,7 @@ export default function SelectionPanel({
 }: SelectionPanelProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [modelMode] = useAtom(modelModeAtom); // 현재 분석 모드 (normal / 768) 가져오기
 
   // 상태 관리
   const [isFetching, setIsFetching] = useState(false);  // 전체 데이터 로딩 상태
@@ -152,12 +155,21 @@ export default function SelectionPanel({
 
     startTransition(async () => {
       try {
+        // 현재 모드에 따라 768 고정밀 분석 또는 일반 분석 호출
+        const result: any = modelMode === '768'
+          ? await getRecommend768List(targetId)
+          : await getRecommendList(targetId);
 
-        const result: RecommendList | null = await getRecommendList(targetId);
-
-        onResultFound(result, selectedCat || 'All');
+        if (result && !Array.isArray(result)) {
+          onResultFound(result, selectedCat || 'All');
+        } else {
+          alert("스타일 분석에 실패했습니다.");
+          onResultFound(null);
+        }
       } catch (e) {
         console.error("검색 실패:", e);
+        alert("스타일 분석 중 오류가 발생했습니다.");
+        onResultFound(null);
       } finally {
         setAnalyzingTargetId(null);
       }

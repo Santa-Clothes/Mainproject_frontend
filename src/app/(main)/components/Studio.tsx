@@ -10,7 +10,8 @@ import ResultGrid from './ResultGrid';
 import SelectionPanel from './SelectionPanel';
 import UploadPanel, { UploadPanelRef, resizeImage } from './UploadPanel';
 import AnalysisSection from './AnalysisSection';
-import { imageAnalyze } from '@/app/api/imageservice/imageapi';
+import { imageAnalyze, image768Analyze } from '@/app/api/imageservice/imageapi';
+import { modelModeAtom } from '@/jotai/modelJotai';
 
 import { RecommendData, RecommendList } from '@/types/ProductType';
 
@@ -37,6 +38,7 @@ export default function Studio({ mode }: { mode: StudioMode }) {
 
   const [history, setHistory] = useAtom(analysisHistoryAtom);
   const [activeHistory, setActiveHistory] = useAtom(activeHistoryAtom);
+  const [modelMode] = useAtom(modelModeAtom);
   const uploadRef = React.useRef<UploadPanelRef>(null);
 
   // [히스토리 로드 및 딥링크 처리]
@@ -138,9 +140,11 @@ export default function Studio({ mode }: { mode: StudioMode }) {
         setAnalysisImage(dataUrl);
         setAnalysisName(file.name);
 
-        // 3. 서버 분석 요청
+        // 3. 서버 분석 요청 (선택된 모델에 따라 분기)
         const resizedFile = new File([blob], file.name, { type: 'image/jpeg' });
-        const uploadResult: any = await imageAnalyze(resizedFile);
+        const uploadResult: RecommendList = modelMode === '768'
+          ? await image768Analyze(resizedFile)
+          : await imageAnalyze(resizedFile);
 
         if (uploadResult) {
           handleSearchResult(uploadResult);

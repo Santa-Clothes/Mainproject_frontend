@@ -8,10 +8,12 @@ import BestSellersCard from './components/BestSellersCard';
 // import DashboardCard from './components/DashboardCard';
 import { getInternalStyleCount } from '@/app/api/productservice/productapi';
 import { getSalesRanking, getSalesRankingByShopAndDate, SalesRankItem } from '@/app/api/salesservice/salesapi';
-import { getScatterPoints } from '@/app/api/statservice/plotapi';
+import { getScatterPoints, getScatter768Points } from '@/app/api/statservice/plotapi';
 import ScatterPlot from './components/ScatterPlot';
 // import { getInternalProductCount } from '@/app/api/productservice/productapi';
 import { InternalStyleCount } from '@/types/ProductType';
+import { useAtom } from 'jotai';
+import { modelModeAtom } from '@/jotai/modelJotai';
 
 
 /**
@@ -39,6 +41,8 @@ export default function Dashboard({
   initialData?: any[],
   initialSales?: SalesRankItem[]
 }) {
+  // 전역 분석 모델 모드 상태 
+  const [modelMode] = useAtom(modelModeAtom);
 
   //산점도용
   const [ScatterData, setScatterData] = useState<DashboardStyleItem[]>(
@@ -181,12 +185,12 @@ export default function Dashboard({
 
         <div className="flex flex-col gap-6">
           <ScatterPlot
-            title="스타일 클러스터"
+            title={modelMode === '768' ? "스타일 클러스터 (고정밀 768맵)" : "스타일 클러스터"}
             subtitle="잠재벡터 2차원 투영"
             description="스타일별로 고차원 제품 특징을 차원축소 알고리즘을 통해 2차원 평면에 압축하여 시각화한 맵입니다."
             bottomTextFormat="총 {count}개의 데이터가 매핑되었습니다."
             className="flex-1 h-full"
-            fetchDataFn={getScatterPoints}
+            fetchDataFn={modelMode === '768' ? getScatter768Points : getScatterPoints}
           />
         </div>
       </div>

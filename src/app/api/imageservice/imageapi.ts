@@ -87,3 +87,29 @@ export const imageAnalyze = async (file: File) => {
         return []; // 에러 시 빈 배열 반환하여 UI 깨짐 방지
     }
 }
+
+export const image768Analyze = async (file: File) => {
+    const reqUrl = `${BASEURL}/api/recommand/768/analyze`;
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+        const response = await fetch(reqUrl, {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (!response.ok) {
+            console.error("Server error:", response.status, response.statusText);
+            return []; // 실패 시 빈 배열 반환
+        }
+
+        const data = await response.json();
+        console.log("imageAnalyze data:", data);
+
+        return data;
+    } catch (error) {
+        console.error("imageAnalyze error:", error);
+        return []; // 에러 시 빈 배열 반환하여 UI 깨짐 방지
+    }
+}

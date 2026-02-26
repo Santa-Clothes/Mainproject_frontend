@@ -25,7 +25,6 @@ export interface RecommendResult {
   unknown: boolean;
   topk: BarDataType[];
   top1_score: number;
-  top2_score: number;
   gap_top1_top2: number;
 }
 

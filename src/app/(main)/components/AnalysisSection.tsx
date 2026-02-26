@@ -61,6 +61,7 @@ export default function AnalysisSection({ sourceImage, productName, isLoading, b
     const [isLoadingTrends, setIsLoadingTrends] = useState(true);
     const [errorTrends, setErrorTrends] = useState<string | null>(null);
     const [hasAttemptedTrendsFetch, setHasAttemptedTrendsFetch] = useState(false);
+
     // [최적화] 가장 높은 점수를 가진 스타일 명칭 추출 (useMemo 적용)
     const highestLabel = React.useMemo(() => {
         if (!krBarData || krBarData.length === 0) return null;
@@ -73,29 +74,11 @@ export default function AnalysisSection({ sourceImage, productName, isLoading, b
     }, []);
 
     useEffect(() => {
-        // if (naverProductCount === 0 && !hasAttemptedNaverProductCount) {
-        //     fetchNaverProductCount();
-        // }
         if (trendsData.length === 0 && !hasAttemptedTrendsFetch) {
             fetchTrends();
         }
-    }, [/* naverProductCount, hasAttemptedNaverProductCount, */ trendsData.length, hasAttemptedTrendsFetch]);
+    }, [trendsData.length, hasAttemptedTrendsFetch]);
 
-    // const fetchNaverProductCount = async (isRetry = false) => {
-    //     if (!isRetry && hasAttemptedNaverProductCount) return;
-    //     setHasAttemptedNaverProductCount(true);
-    //     setIsLoadingNaverProductCount(true);
-    //     setErrorNaverProductCount(null);
-    //     try {
-    //         const result = await getNaverProductCount();
-    //         setNaverProductCount(result);
-    //     } catch (err) {
-    //         console.error('Failed to fetch product count:', err);
-    //         setErrorNaverProductCount('Connection Failed');
-    //     } finally {
-    //         setIsLoadingNaverProductCount(false);
-    //     }
-    // };
 
     const fetchTrends = async (isRetry = false) => {
         if (!isRetry && hasAttemptedTrendsFetch) return;
@@ -158,7 +141,7 @@ export default function AnalysisSection({ sourceImage, productName, isLoading, b
                         <span className="text-[11px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-[0.3em] font-sans">스타일 분석 영역</span>
                     </div>
                     <h3 className="font-bold text-5xl italic tracking-tight text-neutral-900 dark:text-white">
-                        {isLoading ? "스타일 분석중..." : `스타일 분석: ${productName || "Reference Item"}`}
+                        {isLoading ? "스타일 분석중..." : `스타일 분석: ${highestLabel || productName || "Reference Item"}`}
                     </h3>
                 </div>
             </div>
@@ -223,7 +206,7 @@ export default function AnalysisSection({ sourceImage, productName, isLoading, b
                     {/* Bar Chart Section */}
                     <div className="bg-white dark:bg-neutral-900/50 rounded-4xl p-8 border-2 border-neutral-100 dark:border-white/10 shadow-sm space-y-6 aspect-3/4 flex flex-col">
                         <div className="relative z-10 space-y-3 shrink-0">
-                            <span className="text-[11px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-[0.3em]">스타일 분석 결과</span>
+                            <span className="text-[12px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-[0.3em]">스타일 분석 결과</span>
                         </div>
                         <div className="flex-1 w-full min-h-0 flex items-center justify-center">
                             {!isMounting && (

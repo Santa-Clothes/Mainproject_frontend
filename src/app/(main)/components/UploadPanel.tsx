@@ -4,8 +4,10 @@ import React, { useState, useRef, useImperativeHandle, forwardRef } from 'react'
 import { FaCloudArrowUp, FaXmark, FaMagnifyingGlass, FaCircleInfo, FaFileImage, FaArrowsRotate } from 'react-icons/fa6';
 import Image from 'next/image';
 import { RecommendList } from '@/types/ProductType';
-import { imageAnalyze } from '@/app/api/imageservice/imageapi';
+import { imageAnalyze, image768Analyze } from '@/app/api/imageservice/imageapi';
 import sampleImg from '@/assets/sample.jpg';
+import { useAtom } from 'jotai';
+import { modelModeAtom } from '@/jotai/modelJotai';
 
 export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
@@ -76,6 +78,7 @@ const UploadPanel = forwardRef<UploadPanelRef, UploadPanelProps>(({ onResultFoun
   const [selectedFile, setSelectedFile] = useState<File | null>(null); // 실제 서버로 보낼 파일 객체
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [modelMode] = useAtom(modelModeAtom); // 분석 모델 모드 상태 가져오기
 
   // 부모(Studio)에서 호출할 수 있도록 handleSearch 노출
   useImperativeHandle(ref, () => ({
@@ -162,54 +165,18 @@ const UploadPanel = forwardRef<UploadPanelRef, UploadPanelProps>(({ onResultFoun
     }
 
     startTransition(async () => {
-      // 1. 즉시 로딩 화면으로 전환 (결과 그리드 초기화)
-      // onResultFound(null); // Studio.tsx의 isAnalyzing 상태를 해제하지 않도록 주석 처리
-
-      // try {
-      // 2. 이미지 서버로 업로드 (Server Action 호출)
-      //   const uploadResult = await searchByImage(selectedFile);
-      //   console.log("Upload Success:", uploadResult);
-      //   if (uploadResult /* && uploadResult.success */) {
-      //     // 3. 분석 결과를 바탕으로 유사 상품 추천 리스트 조회
-      //     const results: RecommendData[] = uploadResult.results.map((item) => {
-      //       return {
-      //         productId: item.product_id,
-      //         title: item.title,
-      //         price: item.price,
-      //         productLink: '',
-      //         imageUrl: item.image_url,
-      //         similarityScore: item.score
-      //       };
-      //     });
-      //     console.log("Upload Success:", uploadResult);
-      //     onResultFound(results);
-      //   } else {
-      //     alert("이미지 업로드에 실패했습니다.");
-      //     onResultFound(null);
-      //   }
-      // } catch (e) {
-      //   console.error("검색 실패:", e);
-      //   onResultFound(null); // 실패 시 초기 상태로
-      // }
-
       try {
-        // 2. 이미지 서버로 업로드 (Server Action 호출)
-        const uploadResult: any = await imageAnalyze(selectedFile);
+        // 2. 이미지 서버로 업로드 (Server Action 호출, 선택된 모델에 따라 API 분기)
+        const uploadResult: any = modelMode === '768'
+          ? await image768Analyze(selectedFile)
+          : await imageAnalyze(selectedFile);
 
-        if (uploadResult) {
-          // 3. 분석 결과를 바탕으로 유사 상품 추천 리스트 조회 (Studio.tsx의 RecommendList 구조 맞춤)
-          const legacyProducts = Array.isArray(uploadResult.similarProducts) ? uploadResult.similarProducts : uploadResult;
-
-          if (Array.isArray(legacyProducts)) {
-            onResultFound({
-              internalProducts: legacyProducts,
-              similarProducts: [] // UploadPanel은 외부 API 분석이 추후 연계될 시 점진적으로 추가
-            } as any);
-          } else {
-            onResultFound(uploadResult);
-          }
+        if (uploadResult && !Array.isArray(uploadResult)) {
+          // 3. API 응답값이 RecommendList 형식(객체)이므로 그대로 전달
+          onResultFound(uploadResult);
         } else {
-          alert("이미지 업로드에 실패했습니다.");
+          // 응답이 없거나 배열(기존 에러 처리 반환값)인 경우 실패 처리
+          alert("이미지 분석에 실패했습니다.");
           onResultFound(null);
         }
       } catch (e) {

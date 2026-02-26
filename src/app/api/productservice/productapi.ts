@@ -76,6 +76,41 @@ export const getRecommendList = async (productId: string): Promise<RecommendList
 }
 
 /**
+ * 특정 상품ID를 기반으로 AI가 분석한 유사 스타일 상품 리스트를 가져옵니다 (768 차원).
+ * @param productId 기준이 될 상품 식별자
+ */
+export const getRecommend768List = async (productId: string): Promise<RecommendList | null> => {
+    try {
+        const response = await fetch(`${BASEURL}/api/recommand/768/${productId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            console.error(`서버 에러: ${response.status}`);
+            return null;
+        }
+
+        const data: RecommendList = await response.json();
+
+        // [매핑] 네이버 상품의 경우 naverProductId를 productId로 통일하여 프론트 규격 준수
+        if (data.naverProducts) {
+            data.naverProducts = data.naverProducts.map((p: any) => ({
+                ...p,
+                productId: p.productId || p.naverProductId
+            }));
+        }
+
+        return data;
+    } catch (error) {
+        console.error("getRecommend768List error:", error);
+        return null;
+    }
+}
+
+/**
  * 네이버 상품 리스트를 가져옵니다.
  */
 export const getNaverProductList = async (): Promise<ProductData[]> => {

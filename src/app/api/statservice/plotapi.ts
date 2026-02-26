@@ -48,3 +48,35 @@ export const getScatterPoints = async (): Promise<ScatterPoint[]> => {
         return [];
     }
 };
+
+/**
+ * 고정밀(768) 산점도 좌표 데이터를 가져오는 API
+ * @returns {Promise<ScatterPoint[]>} 산점도 포인트 배열
+ */
+export const getScatter768Points = async (): Promise<ScatterPoint[]> => {
+    try {
+        const response = await fetch(`${BASEURL}/api/products/768/map`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            console.error(`서버 에러: ${response.status}`);
+            return [];
+        }
+
+        const data: rawData = await response.json();
+        return data.productIds.map((id, i) => ({
+            productId: id,
+            productName: data.productNames?.[i] ?? 'Unknown',
+            style: data.styles?.[i] ?? 'None',
+            xcoord: data.xcoords?.[i] ?? 0,
+            ycoord: data.ycoords?.[i] ?? 0
+        }));
+    } catch (error) {
+        console.error("getScatter768Points error:", error);
+        return [];
+    }
+};

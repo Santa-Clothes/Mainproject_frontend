@@ -24,6 +24,8 @@ import { getBookmarkAPI } from '../api/memberservice/bookmarkapi';
 import { BookmarkData } from '@/types/ProductType';
 import Image from 'next/image';
 import Wizard from '@/assets/wizard.svg';
+import { modelModeAtom } from '@/jotai/modelJotai';
+import { FaWandMagicSparkles, FaCube } from 'react-icons/fa6';
 
 /**
  * Header Component
@@ -37,6 +39,7 @@ export default function Header() {
   const [, setBookmark] = useAtom(bookmarkAtom);
   const [, setHistory] = useAtom(analysisHistoryAtom);
   const [, setActiveHistory] = useAtom(activeHistoryAtom);
+  const [modelMode, setModelMode] = useAtom(modelModeAtom);
 
   // [상태 관리]
   const [isProfileOpen, setIsProfileOpen] = useState(false); // 프로필 드롭다운 열림 여부
@@ -211,8 +214,32 @@ export default function Header() {
           {/* 톱니바퀴만 오른쪽 끝으로 밀어내기 위한 여백(Spacer) */}
           <div className="flex-1" />
 
-          {/* 테마 설정 섹션: 네비게이션 아이템과 어우러지는 컴팩트한 원형 디자인 */}
-          <div className="flex items-center px-2">
+          {/* 테마 설정 및 모델 선택 섹션 */}
+          <div className="flex items-center px-1 md:px-2 gap-1 md:gap-2">
+            {/* 분석 모델 스위치 */}
+            <button
+              onClick={() => setModelMode(modelMode === 'normal' ? '768' : 'normal')}
+              className="relative flex items-center h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-white/10 p-0.5 overflow-hidden shadow-inner w-[72px]"
+              title={modelMode === 'normal' ? "기본 분석 모드" : "고정밀(768) 분석 모드"}
+            >
+              {/* 토글 배경 슬라이더 */}
+              <div
+                className={`absolute w-8 h-7 bg-white dark:bg-neutral-600 rounded-full shadow-sm transition-transform duration-300 ease-in-out ${modelMode === 'normal' ? 'translate-x-0' : 'translate-x-[36px]'}`}
+              />
+
+              <div className="relative z-10 flex w-full justify-between px-2">
+                <FaWandMagicSparkles
+                  size={12}
+                  className={`transition-colors duration-300 ${modelMode === 'normal' ? 'text-violet-600' : 'text-neutral-400 dark:text-neutral-500'}`}
+                />
+                <FaCube
+                  size={12}
+                  className={`transition-colors duration-300 ${modelMode === '768' ? 'text-violet-600' : 'text-neutral-400 dark:text-neutral-500'}`}
+                />
+              </div>
+            </button>
+
+            {/* 테마 토글 */}
             <button
               onClick={toggleTheme}
               className="relative w-9 h-9 flex items-center justify-center rounded-full bg-neutral-100/50 dark:bg-white/5 border border-neutral-200 dark:border-white/10 hover:border-violet-500/50 transition-all duration-300 group overflow-hidden"
