@@ -161,6 +161,7 @@ export default function SelectionPanel({
           : await getRecommendList(targetId);
 
         if (result && !Array.isArray(result)) {
+          console.log("result:", result);
           onResultFound(result, selectedCat || 'All');
         } else {
           alert("스타일 분석에 실패했습니다.");

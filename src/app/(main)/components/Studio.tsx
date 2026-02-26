@@ -41,52 +41,48 @@ export default function Studio({ mode }: { mode: StudioMode }) {
   const [modelMode] = useAtom(modelModeAtom);
   const uploadRef = React.useRef<UploadPanelRef>(null);
 
-  // [히스토리 로드 및 딥링크 처리]
+  // 1. 브라우저 뒤로가기 / URL 파라미터 감지 (isResultView가 없는 경우 상태 초기화)
   useEffect(() => {
-    // 1. URL에 view=result가 없으면 현재 활성화된 기록 상태 해제 (히스토리 목록 자체는 유지)
-    if (!isResultView) {
-      setResults(null);
-      setIsAnalyzing(false);
-      if (activeHistory) setActiveHistory(null); // 현재 보고 있는 기록만 '미선택' 상태로 변경
-      return;
-    }
-
-    // 2. view=result가 있고 activeHistory가 설정된 경우 해당 데이터 로드
-    if (activeHistory) {
-      setAnalysisImage(activeHistory.sourceImage);
-      setAnalysisName(activeHistory.productName);
-      setResults(activeHistory.results || null);
-      setIsAnalyzing(false);
-    } else if (isResultView && history.length > 0 && !results) {
-      // 3. 브라우저 앞으로 가기로 view=result에 접근 시, activeHistory가 해제되었다면 가장 최근 히스토리로 복원 시도
-      const recent = history[0];
-      setAnalysisImage(recent.sourceImage);
-      setAnalysisName(recent.productName);
-      setResults(recent.results || null);
-      setIsAnalyzing(false);
-    }
-  }, [activeHistory, pathname, isResultView, history]); // URL 파라미터나 경로가 바뀔 때도 체크하도록 추가
-
-  // 모델 토글 시 보고 있던 분석 결과 화면 초기화 (새로고침 대체)
-  useEffect(() => {
-    if (isResultView) {
-      setResults(null);
-      setActiveHistory(null);
-      setIsAnalyzing(false);
-      router.push(pathname, { scroll: false });
-    }
-  }, [modelMode]);
-
-  // 브라우저 뒤로가기 처리를 위한 Effect (URL 파라미터 감지)
-  useEffect(() => {
-    // 뒤로가기를 눌러서 현재 URL에서 view=result가 사라졌다면 초기 화면으로 복귀
-    // 의존성 배열에 넣지 않아 발생할 수 있는 클로저 스냅샷(stale) 문제를 방지하기 위해 setState에 콜백 사용
     if (!isResultView) {
       setResults(null);
       setIsAnalyzing(false);
       setActiveHistory(null);
     }
   }, [isResultView, setActiveHistory]);
+
+  // 2. [히스토리 로드 및 결과 표시 처리]
+  useEffect(() => {
+    if (isResultView) {
+      if (activeHistory) {
+        setAnalysisImage(activeHistory.sourceImage);
+        setAnalysisName(activeHistory.productName);
+        setResults(activeHistory.results || null);
+        setIsAnalyzing(false);
+      } else if (history.length > 0 && !results) {
+        // 새로고침이나 앞으로 가기로 진입 시 가장 최근 결과를 보여줌
+        const recent = history[0];
+        setAnalysisImage(recent.sourceImage);
+        setAnalysisName(recent.productName);
+        setResults(recent.results || null);
+        setIsAnalyzing(false);
+      }
+    }
+  }, [activeHistory, isResultView, history, results]);
+
+  // 3. 모델 토글 시 보고 있던 분석 결과 화면 초기화 (새로고침 대체)
+  const prevModelModeRef = React.useRef(modelMode);
+
+  useEffect(() => {
+    if (prevModelModeRef.current !== modelMode) {
+      prevModelModeRef.current = modelMode;
+      if (isResultView) {
+        setResults(null);
+        setActiveHistory(null);
+        setIsAnalyzing(false);
+        router.push(pathname, { scroll: false });
+      }
+    }
+  }, [modelMode, isResultView, pathname, router, setActiveHistory]);
 
   /**
    * 결과 수신 핸들러: 분석이 완료되었을 때 호출
@@ -151,7 +147,7 @@ export default function Studio({ mode }: { mode: StudioMode }) {
         setAnalysisName(file.name);
 
         // 3. 서버 분석 요청 (선택된 모델에 따라 분기)
-        const resizedFile = new File([blob], file.name, { type: 'image/jpeg' });
+        const resizedFile = new File([blob], file.name, { type: file.type || 'image/jpeg' });
         const uploadResult: RecommendList = modelMode === '768'
           ? await image768Analyze(resizedFile)
           : await imageAnalyze(resizedFile);
@@ -219,7 +215,11 @@ export default function Studio({ mode }: { mode: StudioMode }) {
                 sourceImage={analysisImage}
                 productName={analysisName}
                 isLoading={isAnalyzing}
-                barData={results?.results?.[0]?.topk || []}
+                radarData={[
+                  { styleName: results?.targetTop1Style || '', score: results?.targetTop1Score || 0 },
+                  { styleName: results?.targetTop2Style || '', score: results?.targetTop2Score || 0 },
+                  { styleName: results?.targetTop3Style || '', score: results?.targetTop3Score || 0 },
+                ].filter(s => s.styleName)}
                 isSelectionMode={mode === 'imageSelection'}
                 onImageUpload={handleFileAnalysis}
               />
@@ -244,7 +244,7 @@ export default function Studio({ mode }: { mode: StudioMode }) {
                 products={results.naverProducts || []}
                 title="외부 상품 추천 목록"
                 showCartButton={true}
-                top1Style={results?.results?.[0]?.topk?.[0]?.label_name}
+                top1Style={results?.targetTop1Style}
                 onProductClick={(product: RecommendData) => {
                   if (product.productLink) {
                     window.open(product.productLink, '_blank');

@@ -32,7 +32,7 @@ const SearchRankCard: React.FC<RankProps> = ({ trends, isLoading, error, onRetry
             const container = listRef.current;
             const element = highlightedRef.current;
 
-            // 컨테이너 중앙에 배치하도록 스크롤 위치 계산
+            // 컨테이너 중앙에 배치하도록 내부에서만 스크롤 위치 계산
             const elementTop = element.offsetTop;
             const elementHeight = element.clientHeight;
             const containerHeight = container.clientHeight;

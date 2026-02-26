@@ -6,6 +6,7 @@ import { useAtom } from "jotai";
 import { bookmarkAtom } from "@/jotai/historyJotai";
 import { authUserAtom } from "@/jotai/loginjotai";
 import { saveBookmarkAPI, deleteBookmarkAPI } from "@/app/api/memberservice/bookmarkapi";
+import { modelModeAtom } from "@/jotai/modelJotai";
 
 const STYLE_KO_DICT: Record<string, string> = {
     'casual': '캐주얼',
@@ -61,6 +62,8 @@ const ProductCard = React.memo(({
     top1Style,
     onClick
 }: ProductCardProps) => {
+    const [modelMode] = useAtom(modelModeAtom);
+
     // ... 기존 포맷팅 로직
     const similarityScore = (product as RecommendData).similarityScore;
     const formattedScore = typeof similarityScore === 'number'
@@ -74,21 +77,29 @@ const ProductCard = React.memo(({
     const displayImageUrl = product.imageUrl || (product as any).image_url || (product as any).image || '';
     const displayTitle = (product as any).title || (product as any).name || 'Unknown Product';
 
-    // 북마크 데이터 특화 속성 추출 (API 연동 전 더미/구조화용)
-    const savedStyle = (product as BookmarkData).savedStyleName;
-    const originalStyle = (product as BookmarkData).originalStyleName;
-    const originalScore = (product as BookmarkData).originalStyleScore;
+    // 북마크 데이터 특화 속성 추출 (API 연동 전/후 모두 대응)
+    const isBookmarkType = 'saveId' in product;
 
-    const displaySavedStyle = translateStyleName(savedStyle);
-    const displayOriginalStyle = translateStyleName(originalStyle);
+    // 모드(512 vs 768)에 따른 동적 선택. Jotai에서는 'normal'이 512모델의 기본값을 의미함
+    const savedStyle = isBookmarkType ? (product as BookmarkData).userStyle : undefined;
+    const originalStyle = isBookmarkType
+        ? (modelMode === 'normal' ? (product as BookmarkData).styleTop1_512 : (product as BookmarkData).styleTop1_768)
+        : undefined;
+    const originalScore = isBookmarkType
+        ? (modelMode === 'normal' ? (product as BookmarkData).styleScore1_512 : (product as BookmarkData).styleScore1_768)
+        : undefined;
+
+    const displaySavedStyle = translateStyleName(savedStyle || undefined);
+    const displayOriginalStyle = translateStyleName(originalStyle || undefined);
 
     // 북마크 상태 관리
     const [bookmark, setBookmark] = useAtom(bookmarkAtom);
     const [authUser] = useAtom(authUserAtom);
     const [isActionLoading, setIsActionLoading] = useState(false);
 
-    // [정제] 표준 규격인 productId를 사용한 매칭
-    const isBookmarked = bookmark.some((item) => item.productId === product.productId);
+    // [정제] BookmarkData는 naverProductId, RecommendData는 productId를 식별자로 사용
+    const currentProductId = isBookmarkType ? (product as BookmarkData).naverProductId : (product as RecommendData).productId;
+    const isBookmarked = bookmark.some((item) => item.naverProductId === currentProductId);
 
     const toggleBookmark = async (e: React.MouseEvent) => {
         e.stopPropagation(); // 카드 자체의 클릭 이벤트(새 창 열기 등) 방지
@@ -110,20 +121,20 @@ const ProductCard = React.memo(({
 
             if (isBookmarked) {
                 // 서버에서 삭제 시도 (배열 형태로 전달)
-                const success = await deleteBookmarkAPI(authUser.accessToken, [product.productId]);
+                const success = await deleteBookmarkAPI(authUser.accessToken, [currentProductId]);
                 if (success) {
-                    setBookmark(bookmark.filter((item) => item.productId !== product.productId));
+                    setBookmark(bookmark.filter((item) => item.naverProductId !== currentProductId));
                 } else {
                     alert('삭제에 실패했습니다.');
                 }
             } else {
                 // 서버에 저장 시도
-                const success = await saveBookmarkAPI(authUser.accessToken, product.productId, top1Style);
+                const success = await saveBookmarkAPI(authUser.accessToken, currentProductId, top1Style);
                 if (success) {
                     // BookmarkData 규격을 맞추기 위해 임시 객체 생성 (any 타입 활용)
                     const newBookmarkItem: any = {
                         ...product,
-                        naverProductId: product.productId,
+                        naverProductId: currentProductId,
                         createdAt: new Date().toISOString(), // 임시 날짜
                     };
                     setBookmark([...bookmark, newBookmarkItem]);
@@ -178,7 +189,7 @@ const ProductCard = React.memo(({
                     </div>
                 )}
 
-                <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-all" />
+                {/* Overlay removed as requested to keep brightness consistent */}
 
                 {/* 중앙 분석 시작 버튼 (Hover 시 노출) */}
                 {onAnalyzeClick && (

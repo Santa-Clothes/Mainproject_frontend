@@ -5,13 +5,14 @@ import { useAtom } from 'jotai';
 import { authUserAtom } from '@/jotai/loginjotai';
 import { FaLayerGroup, FaBookmark, FaTrashCan, FaCheckDouble, FaXmark, FaArrowsRotate } from 'react-icons/fa6';
 import { useRouter } from 'next/navigation';
-import { saveBookmarkAPI, getBookmarkAPI, deleteBookmarkAPI } from '@/app/api/memberservice/bookmarkapi';
+import { getBookmarkAPI, deleteBookmarkAPI } from '@/app/api/memberservice/bookmarkapi';
 import { bookmarkAtom } from '@/jotai/historyJotai';
-import { BookmarkData } from '@/types/ProductType';
+import { modelModeAtom } from '@/jotai/modelJotai';
 
 export default function BookmarkPage() {
     const [bookmark, setBookmark] = useAtom(bookmarkAtom);
     const [authUser] = useAtom(authUserAtom);
+    const [modelMode] = useAtom(modelModeAtom);
     const router = useRouter();
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
     const [isEditMode, setIsEditMode] = useState(false);
@@ -70,7 +71,7 @@ export default function BookmarkPage() {
 
     const handleClearBookmark = async () => {
         if (!authUser) return;
-        const allIds = bookmark.map((item) => item.productId);
+        const allIds = bookmark.map((item) => item.naverProductId);
         if (confirm('북마크 리스트를 완전히 비우시겠습니까?')) {
             setIsActionLoading(true);
             try {
@@ -190,28 +191,29 @@ export default function BookmarkPage() {
                         <div className="grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-4 pb-12">
                             {bookmark.map((item, idx) => (
                                 <div
-                                    key={`${item.productId}-${idx}`}
+                                    key={`${item.naverProductId}-${idx}`}
                                     style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}
                                 >
                                     <ProductCard
                                         product={{
                                             ...item,
-                                            // 백엔드 API 연동 전 더미 데이터 강제 주입 (랜덤 생성)
-                                            // 실제 API가 완성되면 서버에서 받아온 값으로 자동 대체되도록 설계되어 있습니다.
-                                            savedStyleName: item.savedStyleName || ['casual', 'street', 'natural'][Math.floor(Math.random() * 3)],
-                                            originalStyleName: item.originalStyleName || ['street', 'casual', 'contemporary'][Math.floor(Math.random() * 3)],
-                                            originalStyleScore: item.originalStyleScore || Math.random() * 0.5 + 0.4
+                                            // 서버 API 연동 후에도 값이 없다면 더미 데이터 제공
+                                            userStyle: item.userStyle || (modelMode === 'normal' ? (item.styleTop1_512 || 'casual') : (item.styleTop1_768 || 'casual')),
+                                            styleTop1_512: item.styleTop1_512 || 'casual',
+                                            styleScore1_512: item.styleScore1_512 || 0.99,
+                                            styleTop1_768: item.styleTop1_768 || 'casual',
+                                            styleScore1_768: item.styleScore1_768 || 0.99,
                                         }}
                                         index={idx}
-                                        selected={selectedIds.includes(item.productId)}
+                                        selected={selectedIds.includes(item.naverProductId)}
                                         showCartButton={!isEditMode}
                                         showStyleLabels={true}
                                         onClick={() => {
                                             if (isEditMode) {
                                                 setSelectedIds(prev =>
-                                                    prev.includes(item.productId)
-                                                        ? prev.filter(id => id !== item.productId)
-                                                        : [...prev, item.productId]
+                                                    prev.includes(item.naverProductId)
+                                                        ? prev.filter(id => id !== item.naverProductId)
+                                                        : [...prev, item.naverProductId]
                                                 );
                                             } else {
                                                 if (item.productLink) {

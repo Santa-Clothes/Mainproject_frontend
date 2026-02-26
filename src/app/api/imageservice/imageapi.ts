@@ -92,7 +92,7 @@ export const image768Analyze = async (file: File) => {
     const reqUrl = `${BASEURL}/api/recommand/768/analyze`;
     const formData = new FormData();
     formData.append('file', file);
-
+    console.log("image768Analyze data:", reqUrl);
     try {
         const response = await fetch(reqUrl, {
             method: 'POST',

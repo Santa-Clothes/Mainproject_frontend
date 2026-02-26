@@ -93,6 +93,7 @@ export default function ScatterPlot({
 
     useEffect(() => {
         fetchData();
+        // fetchDataFn이 새로 들어올 때마다(modelMode 변경 시 등) 즉각 재호출되도록 설정
     }, [fetchDataFn]);
 
     // 로딩 중에만 메시지 변경 타이머 가동 (불필요한 리렌더링 방지)
@@ -105,15 +106,42 @@ export default function ScatterPlot({
         return () => clearInterval(messageTimer);
     }, [isLoading]);
 
-    // 동적 색상 생성 함수: 문자열(style)을 기반으로 고유한 HSL 색상을 생성합니다.
+    // 스타일별 확실히 구분되는 원색(Primary Colors) 팔레트 정의
+    const STYLE_COLORS: Record<string, string> = {
+        '캐주얼': '#0000FF',        // Pure Blue
+        'casual': '#0000FF',
+        '컨템포러리': '#00FF00',    // Pure Green
+        'contemporary': '#00FF00',
+        '에스닉': '#FF8000',        // Vivid Orange
+        'ethnic': '#FF8000',
+        '페미닌': '#FF00FF',        // Magenta / Pink
+        'feminine': '#FF00FF',
+        '젠더리스': '#00FFFF',      // Cyan
+        'genderless': '#00FFFF',
+        '매니시': '#800000',        // Maroon / Brown
+        'mannish': '#800000',
+        '내추럴': '#80FF00',        // Lime Green
+        'natural': '#80FF00',
+        '스포츠': '#FF0000',        // Pure Red
+        'sporty': '#FF0000',
+        '서브컬처': '#8000FF',      // Pure Purple
+        'subculture': '#8000FF',
+        '트레디셔널': '#FFFF00',    // Pure Yellow
+        'traditional': '#FFFF00',
+    };
+
+    // 동적 색상 생성 함수: 미리 정의된 색상을 우선 사용하고, 없으면 HSL로 생성합니다.
     const generateColor = (str: string) => {
+        if (STYLE_COLORS[str]) return STYLE_COLORS[str];
+        const keyLower = str.toLowerCase();
+        if (STYLE_COLORS[keyLower]) return STYLE_COLORS[keyLower];
+
         let hash = 0;
         for (let i = 0; i < str.length; i++) {
             hash = str.charCodeAt(i) + ((hash << 5) - hash);
         }
-        // HSL 색상 공간을 사용하여 채도(70%)와 명도(60%)를 고정하고 색상(Hue)만 변경
         const h = Math.abs(hash % 360);
-        return `hsl(${h}, 70%, 60%)`;
+        return `hsl(${h}, 85%, 60%)`; // 채도를 더 높여서 뚜렷하게
     };
 
     const plotData = useMemo(() => {
@@ -242,54 +270,58 @@ export default function ScatterPlot({
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl p-8 md:p-16 flex flex-col"
+                        className="fixed inset-0 z-50 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl overflow-y-auto custom-scrollbar"
                     >
-                        <div className="flex justify-between items-center mb-8">
-                            <div className="space-y-2">
-                                <span className="text-[10px] font-bold text-violet-500 uppercase tracking-widest">Interactive Mode</span>
-                                <div className="flex items-end gap-4">
-                                    <h2 className="text-4xl font-normal italic text-black dark:text-white">Full Scale Analysis</h2>
-                                    <p className="text-[12px] font-bold text-gray-400 dark:text-gray-500 tracking-widest mb-1.5 bg-neutral-100 dark:bg-white/5 px-3 py-1 rounded-full">
-                                        {bottomTextFormat.replace('{count}', data.length.toLocaleString())}
-                                    </p>
+                        <div className="min-h-full p-4 md:p-16 flex flex-col justify-start max-w-[1600px] mx-auto w-full">
+                            <div className="flex justify-between items-start md:items-center mb-8 shrink-0 flex-col md:flex-row gap-6">
+                                <div className="space-y-2">
+                                    <span className="text-[10px] font-bold text-violet-500 uppercase tracking-widest">Interactive Mode</span>
+                                    <div className="flex items-end gap-4">
+                                        <h2 className="text-4xl font-normal italic text-black dark:text-white">Full Scale Analysis</h2>
+                                        <p className="text-[12px] font-bold text-gray-400 dark:text-gray-500 tracking-widest mb-1.5 bg-neutral-100 dark:bg-white/5 px-3 py-1 rounded-full">
+                                            {bottomTextFormat.replace('{count}', data.length.toLocaleString())}
+                                        </p>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => setIsExpanded(false)}
+                                    className="px-8 py-4 rounded-full bg-black text-white dark:bg-white dark:text-black font-bold uppercase tracking-widest hover:scale-105 transition-transform shrink-0"
+                                >
+                                    Close View
+                                </button>
+                            </div>
+
+                            <div className="w-full flex-1 flex justify-center items-start pb-16">
+                                <div className="w-full max-w-[1200px] aspect-square rounded-3xl border border-neutral-200 dark:border-white/10 overflow-hidden bg-white dark:bg-black/20 shadow-2xl relative p-2 md:p-4">
+                                    <Plot
+                                        data={plotData}
+                                        layout={{
+                                            autosize: true,
+                                            margin: { l: 60, r: 60, b: 80, t: 60 },
+                                            showlegend: true,
+                                            legend: {
+                                                orientation: 'h',
+                                                y: -0.15,
+                                                font: { size: 14, family: 'Inter', color: '#6b7280' },
+                                                itemsizing: 'constant'
+                                            },
+                                            hovermode: 'closest',
+                                            paper_bgcolor: 'rgba(0,0,0,0)',
+                                            plot_bgcolor: 'rgba(0,0,0,0)',
+                                            xaxis: { showgrid: true, gridcolor: '#e5e7eb', zeroline: false, showticklabels: true },
+                                            yaxis: { showgrid: true, gridcolor: '#e5e7eb', zeroline: false, showticklabels: true },
+                                            dragmode: 'pan',
+                                        }}
+                                        config={{
+                                            displayModeBar: true,
+                                            scrollZoom: true, // 스크롤 줌 활성화
+                                            responsive: true,
+                                        }}
+                                        useResizeHandler={true}
+                                        style={{ width: '100%', height: '100%' }}
+                                    />
                                 </div>
                             </div>
-                            <button
-                                onClick={() => setIsExpanded(false)}
-                                className="px-8 py-4 rounded-full bg-black text-white dark:bg-white dark:text-black font-bold uppercase tracking-widest hover:scale-105 transition-transform"
-                            >
-                                Close View
-                            </button>
-                        </div>
-
-                        <div className="flex-1 rounded-3xl border border-neutral-200 dark:border-white/10 overflow-hidden bg-gray-50/50 dark:bg-black/20 shadow-2xl relative p-2 md:p-4">
-                            <Plot
-                                data={plotData}
-                                layout={{
-                                    autosize: true,
-                                    margin: { l: 60, r: 60, b: 80, t: 60 },
-                                    showlegend: true,
-                                    legend: {
-                                        orientation: 'h',
-                                        y: -0.15,
-                                        font: { size: 14, family: 'Inter', color: '#6b7280' },
-                                        itemsizing: 'constant'
-                                    },
-                                    hovermode: 'closest',
-                                    paper_bgcolor: 'rgba(0,0,0,0)',
-                                    plot_bgcolor: 'rgba(0,0,0,0)',
-                                    xaxis: { showgrid: true, gridcolor: '#e5e7eb', zeroline: false, showticklabels: true },
-                                    yaxis: { showgrid: true, gridcolor: '#e5e7eb', zeroline: false, showticklabels: true },
-                                    dragmode: 'pan',
-                                }}
-                                config={{
-                                    displayModeBar: true,
-                                    scrollZoom: true, // 스크롤 줌 활성화
-                                    responsive: true,
-                                }}
-                                useResizeHandler={true}
-                                style={{ width: '100%', height: '100%' }}
-                            />
                         </div>
                     </motion.div>
                 )}

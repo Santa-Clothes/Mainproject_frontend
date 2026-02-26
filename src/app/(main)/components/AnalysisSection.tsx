@@ -6,15 +6,16 @@ import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Responsi
 import { FaWaveSquare, FaShirt, FaMagnifyingGlass, FaArrowsRotate } from 'react-icons/fa6';
 import { getShoppingTrends } from '@/app/api/statservice/trendapi';
 import SearchRankCard from './SearchRankCard';
-import { BarDataType } from '@/types/ProductType';
+import { RadarDataType } from '@/types/ProductType';
 
 interface AnalysisSectionProps {
     sourceImage?: string | null;
     productName?: string;
     isLoading?: boolean;
-    barData?: BarDataType[];
-    onImageUpload?: (file: File) => void; // 신규 이미지 업로드 핸들러
-    isSelectionMode?: boolean; // 선택 모드 여부 (이미지 업로드 모드 구분용)
+    // RadarDataType[] 형태로 묶어서 받음
+    radarData?: RadarDataType[];
+    onImageUpload?: (file: File) => void;
+    isSelectionMode?: boolean;
 }
 
 // 빈 데이터일 경우를 위한 예외 처리용 변수
@@ -38,54 +39,50 @@ const styleName = {
  * AnalysisSection: Studio 상단 영역에서, 사용자가 선택/업로드한 원본 이미지를 보여주고
  * 이에 대한 간단한 분석 진행률이나 통계 리포트(차트 포함)를 시각화하는 패널 컴포넌트입니다.
  */
-export default function AnalysisSection({ sourceImage, productName, isLoading, barData, onImageUpload, isSelectionMode = false }: AnalysisSectionProps) {
+export default function AnalysisSection({
+    sourceImage,
+    productName,
+    isLoading,
+    radarData,
+    onImageUpload,
+    isSelectionMode = false
+}: AnalysisSectionProps) {
     const [isMounting, setIsMounting] = useState(true);
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-    // [최적화] 레이더 차트를 위해 상위 최대 3개의 항목만 추출하고 비율 보정 (useMemo 적용)
+    // [최적화] 레이더 차트를 위해 전달받은 radarData를 보정
+    // [최적화] 레이더 차트를 위해 전달받은 radarData를 보정
     const krBarData = React.useMemo(() => {
-        const activeBarData = (barData && barData.length > 0) ? barData : emptyBarData;
+        const top3 = radarData && radarData.length > 0 ? [...radarData] : [];
 
-        // 1. 점수 기준으로 내림차순 정렬 후 최대 상위 3개 자르기 (절대값 기준)
-        const top3 = [...activeBarData]
-            .sort((a, b) => Math.abs(b.score) - Math.abs(a.score))
-            .slice(0, 3);
-
-        // 2. 레이더 차트는 최소 3개의 점(축)이 있어야 다각형이 그려집니다.
-        // 요소가 1~2개뿐이면 화면 중앙에 선(가끔 짧은 세로선 등)만 보이게 되므로 더미 공간을 추가해 뼈대를 유지합니다.
+        // 레이더 차트 구성을 위해 최소 3개 축 유지
         while (top3.length < 3) {
             top3.push({
                 score: 0,
-                label_id: -Math.random(),
-                label_name: ' ' // 표출되지 않도록 공백 처리
+                styleName: ' '
             });
         }
 
-        // 3. 점수(비율)에 따른 시각화 보정 (최대 점수 기준으로 10% 단위 그룹핑, 절대값 처리)
         const maxScore = top3[0].score !== 0 ? Math.abs(top3[0].score) : 1;
 
         return top3.map((item) => {
-            // 패딩된 더미 축은 그대로 0점 부여
-            if (item.score === 0 && item.label_name === ' ') {
-                return { ...item, displayScore: 0, originalScore: 0 };
+            if (item.score === 0 && item.styleName === ' ') {
+                return { ...item, displayScore: 0, originalScore: 0, label_name: ' ' };
             }
 
             const absScore = Math.abs(item.score);
-            // maxScore에 대한 상대 비율 (0 ~ 1)
             const ratio = maxScore > 0 ? (absScore / maxScore) : 0;
-            // 10% (0.1) 단위로 버림 처리 (예: 0.95 -> 0.9, 0.42 -> 0.4)
-            // 디자인적으로 최소한의 크기를 보장하기 위해 0.1 이하일 경우에도 최소값 부여
             const adjustedRatio = Math.max(Math.floor(ratio * 10) * 0.1, 0.1);
 
             return {
                 ...item,
-                displayScore: adjustedRatio * 100, // 10%, 20% 등 10 단위로 표시하기 위해 100을 곱함
+                displayScore: adjustedRatio * 100,
                 originalScore: absScore,
-                label_name: styleName[item.label_name.toLowerCase() as keyof typeof styleName] || item.label_name,
+                label_name: item.styleName ? (styleName[item.styleName.toLowerCase() as keyof typeof styleName] || item.styleName) : '분석 결과 없음',
             };
         });
-    }, [barData]);
+    }, [radarData]);
 
     // 네이버 검색 트렌드
     const [trendsData, setTrendsData] = useState<any[]>([]);
@@ -96,7 +93,7 @@ export default function AnalysisSection({ sourceImage, productName, isLoading, b
     // [최적화] 가장 높은 점수를 가진 스타일 명칭 추출 (useMemo 적용)
     const highestLabel = React.useMemo(() => {
         if (!krBarData || krBarData.length === 0) return null;
-        const sorted = [...krBarData].sort((a, b) => Math.abs(b.originalScore) - Math.abs(a.originalScore));
+        const sorted = [...krBarData].sort((a, b) => Math.abs(b.originalScore || 0) - Math.abs(a.originalScore || 0));
         return sorted.length > 0 ? sorted[0].label_name : null;
     }, [krBarData]);
 
@@ -212,6 +209,8 @@ export default function AnalysisSection({ sourceImage, productName, isLoading, b
                                 sizes='(min-width: 1024px) 50vw, (min-width: 768px) 75vw, 100vw'
                                 className="object-contain p-4"
                                 unoptimized={true}
+                                priority
+                                loading="eager"
                             />
                         ) : (
                             <div className="absolute inset-0 flex flex-col items-center justify-center bg-neutral-100 dark:bg-neutral-800 text-neutral-300 dark:text-neutral-600">
@@ -243,7 +242,8 @@ export default function AnalysisSection({ sourceImage, productName, isLoading, b
                         </div>
                         <div className="flex-1 w-full min-h-0 flex items-center justify-center relative z-10">
                             {!isMounting && (
-                                (barData && barData.length > 0) ? (
+                                (radarData && radarData.length > 0 && radarData[0].styleName.trim() !== '') ? (
+
                                     <ResponsiveContainer width="100%" height="100%">
                                         <RadarChart cx="50%" cy="50%" outerRadius="55%" margin={{ top: 20, right: 30, bottom: 20, left: 30 }} data={krBarData}>
                                             <PolarGrid stroke="#a3a3a3" strokeDasharray="3 3" className="dark:stroke-white/30" />

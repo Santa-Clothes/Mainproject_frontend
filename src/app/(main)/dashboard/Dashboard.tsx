@@ -6,9 +6,9 @@ import { useState, useEffect } from 'react';
 import StyleDistributionCard from './components/StyleDistributionCard';
 import BestSellersCard from './components/BestSellersCard';
 // import DashboardCard from './components/DashboardCard';
-import { getInternalStyleCount } from '@/app/api/productservice/productapi';
+import { getInternalStyleCount512, getInternalStyleCount768 } from '@/app/api/productservice/productapi';
 import { getSalesRanking, getSalesRankingByShopAndDate, SalesRankItem } from '@/app/api/salesservice/salesapi';
-import { getScatterPoints, getScatter768Points } from '@/app/api/statservice/plotapi';
+import { getScatter512Points, getScatter768Points } from '@/app/api/statservice/plotapi';
 import ScatterPlot from './components/ScatterPlot';
 // import { getInternalProductCount } from '@/app/api/productservice/productapi';
 import { InternalStyleCount } from '@/types/ProductType';
@@ -44,24 +44,7 @@ export default function Dashboard({
   // 전역 분석 모델 모드 상태 
   const [modelMode] = useAtom(modelModeAtom);
 
-  //산점도용
-  const [ScatterData, setScatterData] = useState<DashboardStyleItem[]>(
-    initialData.length > 0
-      ? initialData.map((t, i) => ({
-        ...t,
-        score: t.value !== undefined ? Math.abs(t.value) : 0,
-        value: t.value !== undefined ? Math.abs(t.value) : 0,
-        percentStr: t.percentStr || '0%',
-        // 데모를 위해 초기 좌표를 무작위로 생성 (백엔드 좌표 연동 시 수정 필요)
-        xcoord: Math.random() * 200 - 100,
-        ycoord: Math.random() * 200 - 100,
-        productId: `init-${i}`,
-        productName: t.style || `Style-${i}`
-      })).sort((a, b) => b.value - a.value)
-      : []
-  );
-  const [isLoadingScatter, setIsLoadingScatter] = useState(initialData.length === 0);
-  const [errorScatter, setErrorScatter] = useState<string | null>(null);
+
 
   //랭킹용
   const [sales, setSales] = useState<SalesRankItem[]>(
@@ -76,7 +59,6 @@ export default function Dashboard({
   const [errorInternalStyles, setErrorInternalStyles] = useState<string | null>(null);
 
   // 무한 페칭 방지를 위한 요청 시도 플래그
-  const [hasAttemptedScatterFetch, setHasAttemptedScatterFetch] = useState(false);
   const [hasAttemptedSalesFetch, setHasAttemptedSalesFetch] = useState(false);
   const [hasAttemptedInternalStylesFetch, setHasAttemptedInternalStylesFetch] = useState(false);
 
@@ -92,7 +74,9 @@ export default function Dashboard({
     setIsLoadingInternalStyles(true);
     setErrorInternalStyles(null);
     try {
-      const result = await getInternalStyleCount();
+      const result = modelMode === '768'
+        ? await getInternalStyleCount768()
+        : await getInternalStyleCount512();
       setInternalStyles(result);
     } catch (err) {
       console.error('Failed to fetch product count:', err);
@@ -102,33 +86,7 @@ export default function Dashboard({
     }
   };
 
-  const fetchScatterData = async (isRetry = false) => {
-    if (!isRetry && hasAttemptedScatterFetch) return;
-    setHasAttemptedScatterFetch(true);
-    setIsLoadingScatter(true);
-    setErrorScatter(null);
 
-    try {
-      const result = await getScatterPoints();
-      const processedData = result.map((item: any, i: number) => ({
-        ...item,
-        score: item.value !== undefined ? Math.abs(item.value) : 0,
-        value: item.value !== undefined ? Math.abs(item.value) : 0,
-        percentStr: item.percentStr || '0%',
-        xcoord: Math.random() * 200 - 100, // 클라이언트 사이드 랜덤 좌표 생성
-        ycoord: Math.random() * 200 - 100,
-        productId: `trend-${i}`,
-        productName: item.style || `Style-${i}`
-      })).sort((a: any, b: any) => b.value - a.value);
-
-      setScatterData(processedData);
-    } catch (err) {
-      console.error('Failed to fetch trends:', err);
-      setErrorScatter('Connection Failed');
-    } finally {
-      setIsLoadingScatter(false);
-    }
-  };
 
   /**
    * 베스트 셀러(매출 랭킹) 데이터를 조회하여 내림차순 정렬합니다.
@@ -154,11 +112,10 @@ export default function Dashboard({
   };
 
   useEffect(() => {
-    if (initialData.length === 0 && !hasAttemptedScatterFetch) fetchScatterData();
     if (initialSales.length === 0 && !hasAttemptedSalesFetch) fetchSales();
-    if (internalStyles.length === 0 && !hasAttemptedInternalStylesFetch) fetchInternalStyles();
-
-  }, []);
+    // 모드 변경 시에도 데이터를 다시 불러오도록 로직 수정
+    fetchInternalStyles(true);
+  }, [modelMode]);
 
   return (
     <div className="space-y-8 pb-20">
@@ -190,7 +147,7 @@ export default function Dashboard({
             description="스타일별로 고차원 제품 특징을 차원축소 알고리즘을 통해 2차원 평면에 압축하여 시각화한 맵입니다."
             bottomTextFormat="총 {count}개의 데이터가 매핑되었습니다."
             className="flex-1 h-full"
-            fetchDataFn={modelMode === '768' ? getScatter768Points : getScatterPoints}
+            fetchDataFn={modelMode === '768' ? getScatter768Points : getScatter512Points}
           />
         </div>
       </div>

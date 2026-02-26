@@ -48,7 +48,7 @@ export const resizeImage = (file: File, maxSize: number = 300): Promise<{ dataUr
         // 2. 서버 전송용 Blob
         canvas.toBlob((blob) => {
           if (blob) resolve({ dataUrl, blob });
-        }, 'image/jpeg', 0.8);
+        }, file.type || 'image/jpeg', 0.8);
       };
       img.src = e.target?.result as string;
     };
@@ -127,7 +127,7 @@ const UploadPanel = forwardRef<UploadPanelRef, UploadPanelProps>(({ onResultFoun
     const { dataUrl, blob } = await resizeImage(file, 300);
 
     // 서버 전송용은 Blob을 File 객체로 변환하여 저장
-    const resizedFile = new File([blob], file.name, { type: 'image/jpeg' });
+    const resizedFile = new File([blob], file.name, { type: file.type || 'image/jpeg' });
     setSelectedFile(resizedFile);
 
     // 히스토리 및 분석용 DataURL 전달

@@ -208,3 +208,49 @@ export const getInternalStyleCount = async () => {
         return [];
     }
 };
+
+export const getInternalStyleCount512 = async () => {
+    try {
+        const response = await fetch(`${BASEURL}/api/products/style-count/512`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            console.error(`서버 에러: ${response.status}`);
+            return [];
+        }
+
+        const data = await response.json();
+        console.log("512", data);
+        return data;
+    } catch (error) {
+        console.error("getStyleCount512 error:", error);
+        return [];
+    }
+};
+
+export const getInternalStyleCount768 = async () => {
+    try {
+        const response = await fetch(`${BASEURL}/api/products/style-count/768`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            console.error(`서버 에러: ${response.status}`);
+            return [];
+        }
+
+        const data = await response.json();
+        console.log("768", data);
+        return data;
+    } catch (error) {
+        console.error("getStyleCount768 error:", error);
+        return [];
+    }
+};

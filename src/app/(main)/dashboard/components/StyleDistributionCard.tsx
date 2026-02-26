@@ -20,18 +20,35 @@ interface Props {
  * Recharts를 사용하여 데이터를 렌더링하며, 상세 범례를 포함합니다.
  */
 const StyleDistributionCard: React.FC<Props> = ({ data, isLoading, error, onRetry, className = "" }) => {
-    // 차트 각 섹션에 순차적으로 적용될 컬러 팔레트
-    const CHART_COLORS = [
-        '#8B5CF6', '#3B82F6', '#EC4899', '#818CF8',
-        '#2DD4BF', '#60A5FA', '#F472B6', '#A78BFA'
-    ];
+    // 스타일별 확실히 구분되는 원색(Primary Colors) 팔레트 정의
+    const STYLE_COLOR_MAP: Record<string, string> = {
+        '캐주얼': '#0000FF',        // Pure Blue
+        'casual': '#0000FF',
+        '컨템포러리': '#00FF00',    // Pure Green
+        'contemporary': '#00FF00',
+        '에스닉': '#FF8000',        // Vivid Orange
+        'ethnic': '#FF8000',
+        '페미닌': '#FF00FF',        // Magenta / Pink
+        'feminine': '#FF00FF',
+        '젠더리스': '#00FFFF',      // Cyan
+        'genderless': '#00FFFF',
+        '매니시': '#800000',        // Maroon / Brown
+        'mannish': '#800000',
+        '내추럴': '#80FF00',        // Lime Green
+        'natural': '#80FF00',
+        '스포츠': '#FF0000',        // Pure Red
+        'sporty': '#FF0000',
+        '서브컬처': '#8000FF',      // Pure Purple
+        'subculture': '#8000FF',
+        '트레디셔널': '#FFFF00',    // Pure Yellow
+        'traditional': '#FFFF00',
+    };
 
-    // 범례(Legend) 아이콘에 적용될 배경색 클래스
-    const legendColors = [
-        'bg-[#8B5CF6]', 'bg-[#3B82F6]', 'bg-[#EC4899]', 'bg-[#818CF8]',
-        'bg-[#2DD4BF]', 'bg-[#60A5FA]', 'bg-[#F472B6]', 'bg-[#A78BFA]',
-        'bg-gray-400', 'bg-gray-300', 'bg-gray-200', 'bg-gray-100'
-    ];
+    const getColor = (style: string) => {
+        if (STYLE_COLOR_MAP[style]) return STYLE_COLOR_MAP[style];
+        const keyLower = style.toLowerCase();
+        return STYLE_COLOR_MAP[keyLower] || '#94a3b8'; // 기본값 slate-400
+    };
 
     const totalCnt = data.reduce((acc, item) => acc + item.count, 0);
 
@@ -61,8 +78,8 @@ const StyleDistributionCard: React.FC<Props> = ({ data, isLoading, error, onRetr
                             nameKey="name"
                             stroke="none"
                         >
-                            {data.slice(0, 8).map((_, index) => (
-                                <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                            {data.slice(0, 10).map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={getColor(entry.styleName || '')} />
                             ))}
                         </Pie>
                         <Tooltip
@@ -87,7 +104,7 @@ const StyleDistributionCard: React.FC<Props> = ({ data, isLoading, error, onRetr
                     {data.slice(0, 10).map((item, i) => (
                         <div key={i} className="flex items-center justify-between group px-2 py-1 rounded-lg hover:bg-neutral-50 dark:hover:bg-white/5 transition-colors">
                             <div className="flex items-center gap-2">
-                                <div className={`w-2 h-2 rounded-full ${legendColors[i % legendColors.length]}`}></div>
+                                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: getColor(item.styleName || '') }}></div>
                                 <span className="text-[11px] font-bold text-black dark:text-white uppercase tracking-widest truncate max-w-28">
                                     {item.styleName || 'Unknown'}
                                 </span>

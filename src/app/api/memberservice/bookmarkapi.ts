@@ -5,6 +5,8 @@ import { RecommendData } from "@/types/ProductType";
  * 장바구니 리스트 저장 API
  */
 export const saveBookmarkAPI = async (token: string, productId: string, styleName?: string) => {
+    console.log("saveBookmarkAPI productId:", productId);
+    console.log("saveBookmarkAPI styleName:", styleName);
     const reqUrl = `${BASEURL}/api/save-products`;
     try {
         const response = await fetch(reqUrl, {
