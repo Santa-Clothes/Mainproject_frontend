@@ -157,9 +157,13 @@ const UploadPanel = forwardRef<UploadPanelRef, UploadPanelProps>(({ onResultFoun
   const handleSearch = () => {
     if (!selectedFile) return;
 
+    if (preview) {
+      onAnalysisStart(preview, selectedFile.name);
+    }
+
     startTransition(async () => {
       // 1. 즉시 로딩 화면으로 전환 (결과 그리드 초기화)
-      onResultFound(null);
+      // onResultFound(null); // Studio.tsx의 isAnalyzing 상태를 해제하지 않도록 주석 처리
 
       // try {
       // 2. 이미지 서버로 업로드 (Server Action 호출)
@@ -368,14 +372,6 @@ const UploadPanel = forwardRef<UploadPanelRef, UploadPanelProps>(({ onResultFoun
                 </div>
               </div>
             </div>
-
-            {/* Bottom Side Info
-            <div className="p-5 rounded-3xl border-2 border-neutral-100 dark:border-white/10 bg-neutral-50/50 dark:bg-neutral-800/30 space-y-2">
-              <h4 className="text-[10px] font-black uppercase tracking-widest text-neutral-800 dark:text-neutral-200">Formats & Quality</h4>
-              <p className="text-[10px] text-neutral-500 dark:text-neutral-400 leading-relaxed">
-                Standard JPG/PNG
-              </p>
-            </div> */}
           </div>
         </div>
 

@@ -56,7 +56,7 @@ const DashboardCard: React.FC<Props> = ({
             )}
 
             {/* 카드 콘텐츠 영역: 에러/로딩/컨텐츠 통합 관리 */}
-            <div className="relative z-10 flex-1 flex flex-col">
+            <div className="relative z-10 flex-1 flex flex-col min-h-0">
                 {error ? (
                     <div className="flex-1 flex flex-col items-center justify-center py-4 space-y-4 animate-in fade-in duration-300">
                         <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 mb-2">
@@ -86,7 +86,7 @@ const DashboardCard: React.FC<Props> = ({
                         </div>
                     </div>
                 ) : (
-                    <div className="flex-1 flex flex-col">
+                    <div className="flex-1 flex flex-col min-h-0">
                         {isMetric && (
                             <div className="relative z-10 flex-1 flex flex-col justify-center py-2">
                                 <h3 className="text-5xl font-bold italic text-neutral-900 dark:text-white tracking-tight flex items-center gap-3">

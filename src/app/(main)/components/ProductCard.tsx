@@ -150,7 +150,7 @@ const ProductCard = React.memo(({
                                 <FaMagnifyingGlass size={12} className="group-hover/analyze:scale-110 transition-transform" />
                             )}
                             <span className="text-[10px] font-black uppercase tracking-[0.2em] whitespace-nowrap">
-                                {isAnalyzing ? 'Analyzing...' : 'Search Similar'}
+                                {isAnalyzing ? '분석중...' : '스타일 분석하기'}
                             </span>
                         </button>
                     </div>
@@ -161,7 +161,7 @@ const ProductCard = React.memo(({
                     <button
                         onClick={toggleBookmark}
                         disabled={isActionLoading}
-                        title={isBookmarked ? 'Remove from Bookmark' : 'Add to Bookmark'}
+                        title={isBookmarked ? '북마크에서 삭제' : '북마크에 추가'}
                         className={`absolute top-4 right-4 z-20 w-8 h-8 rounded-full flex items-center justify-center transition-all bg-white shadow-xl group/btn
                             ${isActionLoading ? 'cursor-wait text-violet-400' : isBookmarked ? 'text-violet-600 scale-110 shadow-violet-500/20' : 'text-neutral-300 hover:text-violet-500 hover:scale-110'}`}
                     >

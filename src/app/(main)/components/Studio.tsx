@@ -1,7 +1,7 @@
 "use client"
 import React, { useState, useTransition, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useAtom } from 'jotai';
 import { analysisHistoryAtom, activeHistoryAtom, HistoryItem } from '@/jotai/historyJotai';
 
@@ -25,6 +25,9 @@ export default function Studio({ mode }: { mode: StudioMode }) {
   // React 18 Transition을 사용한 매끄러운 상태 전환
   const [isPending, startTransition] = useTransition();
   const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const isResultView = searchParams.get('view') === 'result';
 
   // [상태 관리]
   const [results, setResults] = useState<RecommendList | null>(null); // 분석 결과 리스트
@@ -38,9 +41,6 @@ export default function Studio({ mode }: { mode: StudioMode }) {
 
   // [히스토리 로드 및 딥링크 처리]
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const isResultView = urlParams.get('view') === 'result';
-
     // 1. URL에 view=result가 없으면 현재 활성화된 기록 상태 해제 (히스토리 목록 자체는 유지)
     if (!isResultView) {
       setResults(null);
@@ -55,30 +55,26 @@ export default function Studio({ mode }: { mode: StudioMode }) {
       setAnalysisName(activeHistory.productName);
       setResults(activeHistory.results || null);
       setIsAnalyzing(false);
+    } else if (isResultView && history.length > 0 && !results) {
+      // 3. 브라우저 앞으로 가기로 view=result에 접근 시, activeHistory가 해제되었다면 가장 최근 히스토리로 복원 시도
+      const recent = history[0];
+      setAnalysisImage(recent.sourceImage);
+      setAnalysisName(recent.productName);
+      setResults(recent.results || null);
+      setIsAnalyzing(false);
     }
-  }, [activeHistory, pathname]); // 경로(pathname)가 바뀔 때도 체크하도록 추가
+  }, [activeHistory, pathname, isResultView, history]); // URL 파라미터나 경로가 바뀔 때도 체크하도록 추가
 
-  // 브라우저 뒤로가기(popstate) 처리를 위한 Effect
+  // 브라우저 뒤로가기 처리를 위한 Effect (URL 파라미터 감지)
   useEffect(() => {
-    const handlePopState = (event: PopStateEvent) => {
-      // 뒤로가기를 눌렀을 때, 현재 URL에 view=result가 없다면 초기 화면으로 돌아간 것으로 간주
-      const urlParams = new URLSearchParams(window.location.search);
-      if (!urlParams.has('view')) {
-        setResults(null);
-        setIsAnalyzing(false);
-        setActiveHistory(null);
-      } else if (event.state && event.state.results) {
-        // 앞으로 가기로 다시 view=result 에 접근한 경우, state 값으로 복원 (재분석 안함)
-        setResults(event.state.results);
-        setAnalysisImage(event.state.analysisImage);
-        setAnalysisName(event.state.analysisName);
-        setIsAnalyzing(false);
-      }
-    };
-
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, [setActiveHistory]);
+    // 뒤로가기를 눌러서 현재 URL에서 view=result가 사라졌다면 초기 화면으로 복귀
+    // 의존성 배열에 넣지 않아 발생할 수 있는 클로저 스냅샷(stale) 문제를 방지하기 위해 setState에 콜백 사용
+    if (!isResultView) {
+      setResults(null);
+      setIsAnalyzing(false);
+      setActiveHistory(null);
+    }
+  }, [isResultView, setActiveHistory]);
 
   /**
    * 결과 수신 핸들러: 분석이 완료되었을 때 호출
@@ -87,15 +83,11 @@ export default function Studio({ mode }: { mode: StudioMode }) {
     setResults(data);
     setIsAnalyzing(false);
 
-    // 데이터가 있고 분석 모드로 전환되는 경우 브라우저 히스토리 스택 추가
-    if (data && (data.internalProducts?.length > 0 || data.naverProducts?.length > 0)) {
-      const newUrl = new URL(window.location.href);
-      newUrl.searchParams.set('view', 'result');
-      window.history.pushState({
-        results: data,
-        analysisImage: analysisImage,
-        analysisName: analysisName
-      }, '', newUrl.toString());
+    // 데이터가 수신된 경우 브라우저 히스토리 추가 빛 URL 업데이트
+    if (data) {
+      if (!isResultView) {
+        router.push(`${pathname}?view=result`, { scroll: false });
+      }
 
       if (analysisImage) {
         setHistory((prev) => {
@@ -134,11 +126,12 @@ export default function Studio({ mode }: { mode: StudioMode }) {
    * 직접 파일 분석 처리 (AnalysisSection 등에서 호출)
    */
   const handleFileAnalysis = (file: File) => {
+    // 1. 초기 UI 상태 변경 (로딩 시작) - startTransition 외부에 두어 즉시 반영 (React 18 트랜지션 무시 방지)
+    setIsAnalyzing(true);
+    setResults(null);
+
     startTransition(async () => {
       try {
-        // 1. 초기 UI 상태 변경 (로딩 시작)
-        setIsAnalyzing(true);
-        setResults(null);
 
         // 2. 이미지 리사이징
         const { dataUrl, blob } = await resizeImage(file, 300);
@@ -184,12 +177,7 @@ export default function Studio({ mode }: { mode: StudioMode }) {
     setResults(null);
     setActiveHistory(null);
     setIsAnalyzing(false);
-
-    const url = new URL(window.location.href);
-    if (url.searchParams.has('view')) {
-      url.searchParams.delete('view');
-      window.history.pushState({}, '', url.toString());
-    }
+    router.push(pathname, { scroll: false });
   };
 
   return (
@@ -211,7 +199,7 @@ export default function Studio({ mode }: { mode: StudioMode }) {
                 onClick={handleBackToSearch}
                 className="flex items-center gap-2 text-violet-600 font-bold text-xs uppercase tracking-widest hover:underline mb-10 transition-all hover:gap-3"
               >
-                ← Back to Discovery
+                ← 뒤로가기
               </button>
               <AnalysisSection
                 sourceImage={analysisImage}

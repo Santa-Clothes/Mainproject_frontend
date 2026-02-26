@@ -103,7 +103,7 @@ export default function SignupForm() {
     <div className="relative flex flex-col gap-12">
       {/* 로딩 오버레이: 회원가입 처리 중일 때 표시 */}
       {isSubmitting && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/80 backdrop-blur-sm dark:bg-neutral-950/80 rounded-[3rem]">
+        <div className="fixed inset-0 z-100 flex items-center justify-center bg-white/80 backdrop-blur-sm dark:bg-neutral-950/80">
           <div className="text-center">
             <div className="mb-4 h-8 w-8 animate-spin rounded-full border-2 border-violet-600 border-t-transparent mx-auto"></div>
             <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-violet-600">회원가입 중...</p>

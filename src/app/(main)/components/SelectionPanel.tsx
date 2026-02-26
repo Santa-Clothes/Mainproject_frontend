@@ -99,6 +99,8 @@ export default function SelectionPanel({
     }
   }, [displayCount, filteredProducts.length]);
 
+  const [analyzingTargetId, setAnalyzingTargetId] = useState<string | null>(null);
+
   /**
    * 카테고리 선택 처리
    */
@@ -110,7 +112,7 @@ export default function SelectionPanel({
     router.replace(`?${params.toString()}`, { scroll: false });
 
     setIsFiltering(true);
-    onResultFound(null); // 이전 결과 초기화
+    // onResultFound(null); Studio.tsx의 상태 초기화를 방지하기 위해 분석 시작/취소만 사용
     setTimeout(() => setIsFiltering(false), 300);
   };
 
@@ -137,21 +139,27 @@ export default function SelectionPanel({
     const targetId = product?.productId || selectedProductId;
     if (!targetId) return;
 
+    setAnalyzingTargetId(targetId);
+
+    // [핵심] startTransition 외부에 배치하여 isAnalyzing 상태 변화가 즉시(Urgent) 반영되도록 함. 
+    // 내부에 두면 React 18의 useTransition 특성상 화면에 로딩 상태가 업데이트되지 않고 무시됩니다.
+    const targetProduct = product || allProducts.find(p => p.productId === targetId);
+    if (targetProduct) {
+      const safeImageUrl = targetProduct.imageUrl || (targetProduct as any).image_url || (targetProduct as any).image || '';
+      const safeName = targetProduct.productName || (targetProduct as any).name || 'Unknown Product';
+      onAnalysisStart(safeImageUrl, safeName);
+    }
+
     startTransition(async () => {
       try {
-        // [수정] 새로고침 직후 등 onAnalysisStart가 누락되어 회색박스(No Image)가 뜨는 현상 방지
-        const targetProduct = product || allProducts.find(p => p.productId === targetId);
-        if (targetProduct) {
-          const safeImageUrl = targetProduct.imageUrl || (targetProduct as any).image_url || (targetProduct as any).image || '';
-          const safeName = targetProduct.productName || (targetProduct as any).name || 'Unknown Product';
-          onAnalysisStart(safeImageUrl, safeName);
-        }
 
         const result: RecommendList | null = await getRecommendList(targetId);
 
         onResultFound(result, selectedCat || 'All');
       } catch (e) {
         console.error("검색 실패:", e);
+      } finally {
+        setAnalyzingTargetId(null);
       }
     });
   };
@@ -282,7 +290,7 @@ export default function SelectionPanel({
                     index={idx}
                     // selected={selectedProductId === product.productId} // 이 라인을 제거하여 체크 표시 오버레이 방지
                     onAnalyzeClick={() => startAnalysis(product)}
-                    isAnalyzing={isLoading && selectedProductId === product.productId}
+                    isAnalyzing={isLoading && analyzingTargetId === product.productId}
                     onClick={() => selectProduct(product)}
                   />
                 </div>
