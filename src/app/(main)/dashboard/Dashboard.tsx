@@ -49,8 +49,8 @@ export default function Dashboard({
     initialData.length > 0
       ? initialData.map((t, i) => ({
         ...t,
-        score: t.value || 0,
-        value: t.value || 0,
+        score: t.value !== undefined ? Math.abs(t.value) : 0,
+        value: t.value !== undefined ? Math.abs(t.value) : 0,
         percentStr: t.percentStr || '0%',
         // 데모를 위해 초기 좌표를 무작위로 생성 (백엔드 좌표 연동 시 수정 필요)
         xcoord: Math.random() * 200 - 100,
@@ -112,8 +112,8 @@ export default function Dashboard({
       const result = await getScatterPoints();
       const processedData = result.map((item: any, i: number) => ({
         ...item,
-        score: item.value || 0,
-        value: item.value || 0,
+        score: item.value !== undefined ? Math.abs(item.value) : 0,
+        value: item.value !== undefined ? Math.abs(item.value) : 0,
         percentStr: item.percentStr || '0%',
         xcoord: Math.random() * 200 - 100, // 클라이언트 사이드 랜덤 좌표 생성
         ycoord: Math.random() * 200 - 100,

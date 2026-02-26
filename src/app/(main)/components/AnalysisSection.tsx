@@ -47,9 +47,9 @@ export default function AnalysisSection({ sourceImage, productName, isLoading, b
     const krBarData = React.useMemo(() => {
         const activeBarData = (barData && barData.length > 0) ? barData : emptyBarData;
 
-        // 1. 점수 기준으로 내림차순 정렬 후 최대 상위 3개 자르기
+        // 1. 점수 기준으로 내림차순 정렬 후 최대 상위 3개 자르기 (절대값 기준)
         const top3 = [...activeBarData]
-            .sort((a, b) => b.score - a.score)
+            .sort((a, b) => Math.abs(b.score) - Math.abs(a.score))
             .slice(0, 3);
 
         // 2. 레이더 차트는 최소 3개의 점(축)이 있어야 다각형이 그려집니다.
@@ -62,8 +62,8 @@ export default function AnalysisSection({ sourceImage, productName, isLoading, b
             });
         }
 
-        // 3. 점수(비율)에 따른 시각화 보정 (최대 점수 기준으로 10% 단위 그룹핑)
-        const maxScore = top3[0].score > 0 ? top3[0].score : 1;
+        // 3. 점수(비율)에 따른 시각화 보정 (최대 점수 기준으로 10% 단위 그룹핑, 절대값 처리)
+        const maxScore = top3[0].score !== 0 ? Math.abs(top3[0].score) : 1;
 
         return top3.map((item) => {
             // 패딩된 더미 축은 그대로 0점 부여
@@ -71,8 +71,9 @@ export default function AnalysisSection({ sourceImage, productName, isLoading, b
                 return { ...item, displayScore: 0, originalScore: 0 };
             }
 
+            const absScore = Math.abs(item.score);
             // maxScore에 대한 상대 비율 (0 ~ 1)
-            const ratio = maxScore > 0 ? (item.score / maxScore) : 0;
+            const ratio = maxScore > 0 ? (absScore / maxScore) : 0;
             // 10% (0.1) 단위로 버림 처리 (예: 0.95 -> 0.9, 0.42 -> 0.4)
             // 디자인적으로 최소한의 크기를 보장하기 위해 0.1 이하일 경우에도 최소값 부여
             const adjustedRatio = Math.max(Math.floor(ratio * 10) * 0.1, 0.1);
@@ -80,7 +81,7 @@ export default function AnalysisSection({ sourceImage, productName, isLoading, b
             return {
                 ...item,
                 displayScore: adjustedRatio * 100, // 10%, 20% 등 10 단위로 표시하기 위해 100을 곱함
-                originalScore: item.score,
+                originalScore: absScore,
                 label_name: styleName[item.label_name.toLowerCase() as keyof typeof styleName] || item.label_name,
             };
         });
@@ -95,7 +96,7 @@ export default function AnalysisSection({ sourceImage, productName, isLoading, b
     // [최적화] 가장 높은 점수를 가진 스타일 명칭 추출 (useMemo 적용)
     const highestLabel = React.useMemo(() => {
         if (!krBarData || krBarData.length === 0) return null;
-        const sorted = [...krBarData].sort((a, b) => b.score - a.score);
+        const sorted = [...krBarData].sort((a, b) => Math.abs(b.originalScore) - Math.abs(a.originalScore));
         return sorted.length > 0 ? sorted[0].label_name : null;
     }, [krBarData]);
 
@@ -121,8 +122,8 @@ export default function AnalysisSection({ sourceImage, productName, isLoading, b
 
             const processedData = result.map((item: any, i: number) => ({
                 ...item,
-                score: item.value || 0,
-                value: item.value || 0,
+                score: item.value !== undefined ? Math.abs(item.value) : 0,
+                value: item.value !== undefined ? Math.abs(item.value) : 0,
                 percentStr: item.percentStr || '0%',
             })).sort((a: any, b: any) => b.value - a.value);
 
@@ -238,17 +239,17 @@ export default function AnalysisSection({ sourceImage, productName, isLoading, b
                         {/* 빛 반사 디자인 효과 */}
                         <div className="absolute top-0 right-0 w-64 h-64 bg-violet-500/10 dark:bg-violet-500/20 rounded-full blur-[80px] z-0 pointer-events-none" />
                         <div className="relative z-10 space-y-3 shrink-0">
-                            <span className="text-[12px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-[0.3em]">스타일 분석 결과</span>
+                            <span className="text-[16px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-[0.3em]">스타일 분석 결과</span>
                         </div>
                         <div className="flex-1 w-full min-h-0 flex items-center justify-center relative z-10">
                             {!isMounting && (
                                 (barData && barData.length > 0) ? (
                                     <ResponsiveContainer width="100%" height="100%">
-                                        <RadarChart cx="50%" cy="50%" outerRadius="65%" data={krBarData}>
+                                        <RadarChart cx="50%" cy="50%" outerRadius="55%" margin={{ top: 20, right: 30, bottom: 20, left: 30 }} data={krBarData}>
                                             <PolarGrid stroke="#a3a3a3" strokeDasharray="3 3" className="dark:stroke-white/30" />
                                             <PolarAngleAxis
                                                 dataKey="label_name"
-                                                tick={{ fill: '#8b5cf6', fontSize: 11, fontWeight: 'bold' }}
+                                                tick={{ fill: '#8b5cf6', fontSize: 16, fontWeight: 'bold' }}
                                             />
                                             {/* Y축 범위를 0~100으로 고정하여 비율을 명확히 함 */}
                                             <PolarRadiusAxis

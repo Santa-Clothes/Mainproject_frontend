@@ -64,7 +64,7 @@ const ProductCard = React.memo(({
     // ... 기존 포맷팅 로직
     const similarityScore = (product as RecommendData).similarityScore;
     const formattedScore = typeof similarityScore === 'number'
-        ? `${(similarityScore * 100).toFixed(1)}%`
+        ? `${(Math.abs(similarityScore) * 100).toFixed(1)}%`
         : similarityScore;
 
     const formattedPrice = new Intl.NumberFormat('ko-KR', {
@@ -263,7 +263,7 @@ const ProductCard = React.memo(({
                             <div className="flex items-baseline gap-1.5">
                                 <span className="text-xs font-black uppercase text-neutral-700 dark:text-neutral-300">{displayOriginalStyle}</span>
                                 {originalScore !== undefined && (
-                                    <span className="text-[10px] text-violet-500 font-bold">{(originalScore * 100).toFixed(1)}%</span>
+                                    <span className="text-[10px] text-violet-500 font-bold">{(Math.abs(originalScore) * 100).toFixed(1)}%</span>
                                 )}
                             </div>
                         </div>

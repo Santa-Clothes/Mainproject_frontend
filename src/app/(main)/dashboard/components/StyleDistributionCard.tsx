@@ -51,7 +51,7 @@ const StyleDistributionCard: React.FC<Props> = ({ data, isLoading, error, onRetr
                 <div className="relative w-48 h-48 shrink-0">
                     <PieChart width={192} height={192}>
                         <Pie
-                            data={data.slice(0, 8).map(t => ({ score: t?.count || 0, name: t?.styleName || 'Unknown' }))}
+                            data={data.slice(0, 8).map(t => ({ score: t?.count ? Math.abs(t.count) : 0, name: t?.styleName || 'Unknown' }))}
                             cx="50%"
                             cy="50%"
                             innerRadius={55}

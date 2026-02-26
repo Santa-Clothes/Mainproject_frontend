@@ -27,7 +27,7 @@ const SearchRankCard: React.FC<RankProps> = ({ trends, isLoading, error, onRetry
     return (
         <DashboardCard
             title="검색어 순위"
-            subtitle="Naver Shopping Trends"
+            subtitle="네이버 쇼핑 트렌드"
             isLoading={isLoading}
             error={error}
             onRetry={onRetry}
