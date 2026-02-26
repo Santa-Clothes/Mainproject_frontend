@@ -17,7 +17,7 @@ export default function SelectionPage() {
                 {/* 타이틀 영역 */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
                     <h2 className="text-5xl md:text-6xl font-normal italic tracking-tighter text-neutral-900 dark:text-white">
-                        재고상품 분석 및 추천
+                        보유 상품 기반 추천
                     </h2>
                 </div>
             </div>

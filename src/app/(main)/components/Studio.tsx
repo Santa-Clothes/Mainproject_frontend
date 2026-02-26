@@ -234,6 +234,7 @@ export default function Studio({ mode }: { mode: StudioMode }) {
                 products={results.naverProducts || []}
                 title="외부 상품 추천 목록"
                 showCartButton={true}
+                top1Style={results?.results?.[0]?.topk?.[0]?.label_name}
                 onProductClick={(product: RecommendData) => {
                   if (product.productLink) {
                     window.open(product.productLink, '_blank');

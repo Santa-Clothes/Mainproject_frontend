@@ -185,7 +185,7 @@ export default function Dashboard({
 
         <div className="flex flex-col gap-6">
           <ScatterPlot
-            title={modelMode === '768' ? "스타일 클러스터 (고정밀 768맵)" : "스타일 클러스터"}
+            title="스타일 클러스터"
             subtitle="잠재벡터 2차원 투영"
             description="스타일별로 고차원 제품 특징을 차원축소 알고리즘을 통해 2차원 평면에 압축하여 시각화한 맵입니다."
             bottomTextFormat="총 {count}개의 데이터가 매핑되었습니다."

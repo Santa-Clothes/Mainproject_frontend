@@ -56,4 +56,7 @@ export interface BookmarkData {
   productLink: string,
   title: string,
   saveId: number,
+  savedStyleName?: string,       // 사용자가 북마크를 저장할 때 선택/분석된 스타일
+  originalStyleName?: string,    // 상품이 원래 가지고 있던 스타일
+  originalStyleScore?: number,   // 상품의 원래 스타일 수치(확률 또는 점수)
 }

@@ -194,10 +194,18 @@ export default function BookmarkPage() {
                                     style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}
                                 >
                                     <ProductCard
-                                        product={item}
+                                        product={{
+                                            ...item,
+                                            // 백엔드 API 연동 전 더미 데이터 강제 주입 (랜덤 생성)
+                                            // 실제 API가 완성되면 서버에서 받아온 값으로 자동 대체되도록 설계되어 있습니다.
+                                            savedStyleName: item.savedStyleName || ['casual', 'street', 'natural'][Math.floor(Math.random() * 3)],
+                                            originalStyleName: item.originalStyleName || ['street', 'casual', 'contemporary'][Math.floor(Math.random() * 3)],
+                                            originalStyleScore: item.originalStyleScore || Math.random() * 0.5 + 0.4
+                                        }}
                                         index={idx}
                                         selected={selectedIds.includes(item.productId)}
                                         showCartButton={!isEditMode}
+                                        showStyleLabels={true}
                                         onClick={() => {
                                             if (isEditMode) {
                                                 setSelectedIds(prev =>

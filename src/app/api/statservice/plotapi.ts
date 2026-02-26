@@ -31,7 +31,7 @@ export const getScatterPoints = async (): Promise<ScatterPoint[]> => {
 
         if (!response.ok) {
             console.error(`서버 에러: ${response.status}`);
-            return [];
+            throw new Error(`서버 연결 실패: ${response.status}`);
         }
 
         const data: rawData = await response.json();
@@ -44,8 +44,7 @@ export const getScatterPoints = async (): Promise<ScatterPoint[]> => {
         }));
     } catch (error) {
         console.error("getScatterPoints error:", error);
-        // API가 아직 준비되지 않았을 경우를 대비해 빈 배열 혹은 에러를 던집니다.
-        return [];
+        throw error;
     }
 };
 
@@ -64,7 +63,7 @@ export const getScatter768Points = async (): Promise<ScatterPoint[]> => {
 
         if (!response.ok) {
             console.error(`서버 에러: ${response.status}`);
-            return [];
+            throw new Error(`서버 연결 실패: ${response.status}`);
         }
 
         const data: rawData = await response.json();
@@ -77,6 +76,6 @@ export const getScatter768Points = async (): Promise<ScatterPoint[]> => {
         }));
     } catch (error) {
         console.error("getScatter768Points error:", error);
-        return [];
+        throw error;
     }
 };

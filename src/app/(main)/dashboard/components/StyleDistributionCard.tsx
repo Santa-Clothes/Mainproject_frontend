@@ -44,7 +44,7 @@ const StyleDistributionCard: React.FC<Props> = ({ data, isLoading, error, onRetr
             onRetry={onRetry}
             lgColSpan={2}
             className={`${className} min-h-72`}
-            topRight={`${totalCnt}개`}
+            topRight={`${totalCnt.toLocaleString()}개`}
         >
             <div className="flex flex-col md:flex-row items-center gap-4 h-full">
                 {/* 차트 영역: 왼쪽 배치 */}

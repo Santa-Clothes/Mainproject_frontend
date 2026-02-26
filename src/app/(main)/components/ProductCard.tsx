@@ -7,15 +7,43 @@ import { bookmarkAtom } from "@/jotai/historyJotai";
 import { authUserAtom } from "@/jotai/loginjotai";
 import { saveBookmarkAPI, deleteBookmarkAPI } from "@/app/api/memberservice/bookmarkapi";
 
+const STYLE_KO_DICT: Record<string, string> = {
+    'casual': '캐주얼',
+    'street': '스트릿',
+    'natural': '내추럴',
+    'contemporary': '컨템포러리',
+    'modern': '모던',
+    'formal': '포멀',
+    'classic': '클래식',
+    'romantic': '로맨틱',
+    'sporty': '스포티',
+    'vintage': '빈티지',
+    'chic': '시크',
+    'retro': '레트로',
+    'minimal': '미니멀',
+    'kitsch': '키치',
+    'feminine': '페미닌',
+    'masculine': '매니시',
+    'bohemian': '보헤미안'
+};
+
+const translateStyleName = (name?: string) => {
+    if (!name) return '';
+    const lower = name.toLowerCase();
+    return STYLE_KO_DICT[lower] || name; // 매핑 없으면 원래 문자열 반환 (한글이면 그대로)
+};
+
 interface ProductCardProps {
     product: RecommendData | BookmarkData;
     index?: number;
     selected?: boolean; // 선택 상태 추가
     onClick?: () => void;
     showCartButton?: boolean; // 북마크 버튼 표시 여부
+    showStyleLabels?: boolean; // 북마크 페이지 등에서 저장/원본 스타일 표시 여부
     onCartClickOverride?: (e: React.MouseEvent) => void; // 북마크 버튼 클릭 이벤트 오버라이드
     onAnalyzeClick?: (e: React.MouseEvent) => void; // 분석 시작 버튼 클릭 핸들러
     isAnalyzing?: boolean; // 분석 진행 중 상태
+    top1Style?: string; // AnalysisSection에서 도출된 가장 높은 확률의 스타일명
 }
 
 /**
@@ -26,9 +54,11 @@ const ProductCard = React.memo(({
     index = 0,
     selected = false,
     showCartButton = false,
+    showStyleLabels = false,
     onCartClickOverride,
     onAnalyzeClick,
     isAnalyzing = false,
+    top1Style,
     onClick
 }: ProductCardProps) => {
     // ... 기존 포맷팅 로직
@@ -43,6 +73,14 @@ const ProductCard = React.memo(({
     }).format(product.price || 0);
     const displayImageUrl = product.imageUrl || (product as any).image_url || (product as any).image || '';
     const displayTitle = (product as any).title || (product as any).name || 'Unknown Product';
+
+    // 북마크 데이터 특화 속성 추출 (API 연동 전 더미/구조화용)
+    const savedStyle = (product as BookmarkData).savedStyleName;
+    const originalStyle = (product as BookmarkData).originalStyleName;
+    const originalScore = (product as BookmarkData).originalStyleScore;
+
+    const displaySavedStyle = translateStyleName(savedStyle);
+    const displayOriginalStyle = translateStyleName(originalStyle);
 
     // 북마크 상태 관리
     const [bookmark, setBookmark] = useAtom(bookmarkAtom);
@@ -80,7 +118,7 @@ const ProductCard = React.memo(({
                 }
             } else {
                 // 서버에 저장 시도
-                const success = await saveBookmarkAPI(authUser.accessToken, product.productId);
+                const success = await saveBookmarkAPI(authUser.accessToken, product.productId, top1Style);
                 if (success) {
                     // BookmarkData 규격을 맞추기 위해 임시 객체 생성 (any 타입 활용)
                     const newBookmarkItem: any = {
@@ -128,6 +166,15 @@ const ProductCard = React.memo(({
                         <div className="w-12 h-12 bg-white rounded-full shadow-2xl flex items-center justify-center border-4 border-violet-600 animate-in zoom-in-50 duration-300">
                             <FaCheck size={24} className="text-violet-600" />
                         </div>
+                    </div>
+                )}
+
+                {/* 상단 저장된 스타일 뱃지 (북마크 탭 전용) */}
+                {showStyleLabels && displaySavedStyle && (
+                    <div className="absolute top-4 left-4 z-20 bg-violet-600 border border-white/20 px-3 py-1.5 rounded-full shadow-lg backdrop-blur-md">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-white">
+                            {displaySavedStyle}
+                        </span>
                     </div>
                 )}
 
@@ -204,6 +251,24 @@ const ProductCard = React.memo(({
                 <h4 className={`text-sm font-medium italic tracking-tight transition-all duration-300 truncate text-neutral-900 dark:text-neutral-100 group-hover:translate-x-1`}>
                     {displayTitle}
                 </h4>
+
+                {/* 하단 원본 상품 스타일 및 수치 정보 (북마크 탭 전용) */}
+                {showStyleLabels && displayOriginalStyle && (
+                    <div className="flex items-center gap-2 mt-2 p-2 bg-neutral-50 dark:bg-white/5 rounded-xl border border-neutral-100 dark:border-white/10">
+                        <div className="flex items-center justify-center w-6 h-6 rounded-lg bg-neutral-200 dark:bg-neutral-800 text-neutral-500 text-xs shadow-inner">
+                            <FaCheck />
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-[9px] text-neutral-400 font-bold uppercase tracking-wider">Original Match</span>
+                            <div className="flex items-baseline gap-1.5">
+                                <span className="text-xs font-black uppercase text-neutral-700 dark:text-neutral-300">{displayOriginalStyle}</span>
+                                {originalScore !== undefined && (
+                                    <span className="text-[10px] text-violet-500 font-bold">{(originalScore * 100).toFixed(1)}%</span>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

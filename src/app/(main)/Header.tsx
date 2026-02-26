@@ -10,7 +10,9 @@ import {
   FaMoon,
   FaUser,
   FaCamera,
-  FaMagnifyingGlass
+  FaMagnifyingGlass,
+  FaCloudArrowUp,
+  FaShirt
 } from 'react-icons/fa6';
 import { IoSettingsSharp } from "react-icons/io5";
 
@@ -162,8 +164,8 @@ export default function Header() {
 
   // 네비게이션 아이템 정의
   const navItems = [
-    { id: 'uploadpage', label: '새 이미지 기반 추천', icon: <FaCamera size={18} />, path: '/uploadpage' },
-    { id: 'selectionpage', label: '보유 상품 기반 추천', icon: <FaMagnifyingGlass size={18} />, path: '/selectionpage' },
+    { id: 'uploadpage', label: '이미지 분석 기반 추천', icon: <FaCloudArrowUp size={18} />, path: '/uploadpage' },
+    { id: 'selectionpage', label: '보유 상품 기반 추천', icon: <FaShirt size={18} />, path: '/selectionpage' },
     { id: 'dashboard', label: '대시보드', icon: <FaChartLine size={18} />, path: '/dashboard' },
   ];
 
@@ -218,13 +220,18 @@ export default function Header() {
           <div className="flex items-center px-1 md:px-2 gap-1 md:gap-2">
             {/* 분석 모델 스위치 */}
             <button
-              onClick={() => setModelMode(modelMode === 'normal' ? '768' : 'normal')}
-              className="relative flex items-center h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-white/10 p-0.5 overflow-hidden shadow-inner w-[72px]"
-              title={modelMode === 'normal' ? "기본 분석 모드" : "고정밀(768) 분석 모드"}
+              onClick={() => {
+                setModelMode(modelMode === 'normal' ? '768' : 'normal');
+                setTimeout(() => {
+                  window.location.reload();
+                }, 50);
+              }}
+              className="relative flex items-center h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-white/10 p-0.5 overflow-hidden shadow-inner w-18"
+              title={modelMode === 'normal' ? "기본 분석 모드" : "768 분석 모드"}
             >
               {/* 토글 배경 슬라이더 */}
               <div
-                className={`absolute w-8 h-7 bg-white dark:bg-neutral-600 rounded-full shadow-sm transition-transform duration-300 ease-in-out ${modelMode === 'normal' ? 'translate-x-0' : 'translate-x-[36px]'}`}
+                className={`absolute w-8 h-7 bg-white dark:bg-neutral-600 rounded-full shadow-sm transition-transform duration-300 ease-in-out ${modelMode === 'normal' ? 'translate-x-0' : 'translate-x-9'}`}
               />
 
               <div className="relative z-10 flex w-full justify-between px-2">

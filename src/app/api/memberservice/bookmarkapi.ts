@@ -4,7 +4,7 @@ import { RecommendData } from "@/types/ProductType";
 /**
  * 장바구니 리스트 저장 API
  */
-export const saveBookmarkAPI = async (token: string, productId: string) => {
+export const saveBookmarkAPI = async (token: string, productId: string, styleName?: string) => {
     const reqUrl = `${BASEURL}/api/save-products`;
     try {
         const response = await fetch(reqUrl, {
@@ -13,7 +13,7 @@ export const saveBookmarkAPI = async (token: string, productId: string) => {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`,
             },
-            body: JSON.stringify({ naverProductId: productId }),
+            body: JSON.stringify({ naverProductId: productId, styleName: styleName || '' }),
         });
         return response.ok;
     } catch (error) {
@@ -66,7 +66,6 @@ export const getBookmarkAPI = async (token: string): Promise<BookmarkData[] | nu
         });
         if (!response.ok) return [];
         const data = await response.json();
-        console.log("getBookmarkAPI", data);
 
         if (Array.isArray(data)) {
             return data.map((item: any) => ({

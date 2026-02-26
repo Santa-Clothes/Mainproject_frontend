@@ -13,6 +13,7 @@ interface ResultGridProps {
     products?: RecommendData[] | null; // 추천 상품 리스트
     onProductClick?: (product: RecommendData) => void;
     showCartButton?: boolean; // 장바구니 버튼 표시 여부 제어
+    top1Style?: string; // 가장 높은 확률의 스타일명 전달
 }
 
 /**
@@ -26,6 +27,7 @@ const ResultGrid: React.FC<ResultGridProps> = ({
     isLoading = false,
     products = null,
     showCartButton = true, // 기본적으로 분석 결과에서는 보이도록 설정
+    top1Style,
     onProductClick
 }) => {
     /**
@@ -112,6 +114,7 @@ const ResultGrid: React.FC<ResultGridProps> = ({
                                 product={item}
                                 index={idx}
                                 showCartButton={showCartButton}
+                                top1Style={top1Style}
                                 onClick={() => onProductClick?.(item)}
                             />
                         ))}

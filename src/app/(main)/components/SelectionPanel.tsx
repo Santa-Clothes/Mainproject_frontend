@@ -248,7 +248,7 @@ export default function SelectionPanel({
       <div className="flex items-center justify-between">
         <span className="text-[10px] font-bold text-neutral-900 dark:text-white uppercase tracking-widest">
           Category: <span className="font-extrabold normal-case text-xs text-violet-500">{selectedCat}</span>
-          <span className="ml-2 text-neutral-400 font-normal">({filteredProducts.length} items)</span>
+          <span className="ml-2 text-neutral-400 font-normal">({filteredProducts.length.toLocaleString()} items)</span>
         </span>
         <div className="flex flex-wrap items-center gap-4">
           <div className="px-4 py-2 flex flex-row items-center gap-2.5 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg">

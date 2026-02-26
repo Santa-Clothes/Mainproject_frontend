@@ -230,7 +230,7 @@ export default function ScatterPlot({
 
                 <div className="pt-6 border-t border-gray-100 dark:border-white/5 relative z-10 mt-auto">
                     <p className="text-[12px] font-medium text-gray-500 dark:text-gray-500 uppercase tracking-widest leading-relaxed">
-                        {bottomTextFormat.replace('{count}', data.length.toString())}
+                        {bottomTextFormat.replace('{count}', data.length.toLocaleString())}
                     </p>
                 </div>
             </DashboardCard>

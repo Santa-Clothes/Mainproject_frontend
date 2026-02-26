@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
 import { FaWaveSquare, FaShirt, FaMagnifyingGlass, FaArrowsRotate } from 'react-icons/fa6';
 import { getShoppingTrends } from '@/app/api/statservice/trendapi';
 import SearchRankCard from './SearchRankCard';
@@ -43,17 +43,47 @@ export default function AnalysisSection({ sourceImage, productName, isLoading, b
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-    // [최적화] 데이터 가독성을 위한 스케일링 (useMemo 적용)
+    // [최적화] 레이더 차트를 위해 상위 최대 3개의 항목만 추출하고 비율 보정 (useMemo 적용)
     const krBarData = React.useMemo(() => {
         const activeBarData = (barData && barData.length > 0) ? barData : emptyBarData;
-        const minScore = Math.min(...activeBarData.map(d => d.score));
-        const multiplier = (minScore > 0) ? (1 / minScore) : 1;
 
-        return activeBarData.map((item) => ({
-            ...item,
-            displayScore: item.score * multiplier,
-            label_name: styleName[item.label_name.toLowerCase() as keyof typeof styleName] || item.label_name,
-        }));
+        // 1. 점수 기준으로 내림차순 정렬 후 최대 상위 3개 자르기
+        const top3 = [...activeBarData]
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 3);
+
+        // 2. 레이더 차트는 최소 3개의 점(축)이 있어야 다각형이 그려집니다.
+        // 요소가 1~2개뿐이면 화면 중앙에 선(가끔 짧은 세로선 등)만 보이게 되므로 더미 공간을 추가해 뼈대를 유지합니다.
+        while (top3.length < 3) {
+            top3.push({
+                score: 0,
+                label_id: -Math.random(),
+                label_name: ' ' // 표출되지 않도록 공백 처리
+            });
+        }
+
+        // 3. 점수(비율)에 따른 시각화 보정 (최대 점수 기준으로 10% 단위 그룹핑)
+        const maxScore = top3[0].score > 0 ? top3[0].score : 1;
+
+        return top3.map((item) => {
+            // 패딩된 더미 축은 그대로 0점 부여
+            if (item.score === 0 && item.label_name === ' ') {
+                return { ...item, displayScore: 0, originalScore: 0 };
+            }
+
+            // maxScore에 대한 상대 비율 (0 ~ 1)
+            const ratio = maxScore > 0 ? (item.score / maxScore) : 0;
+            // 10% (0.1) 단위로 버림 처리 (예: 0.95 -> 0.9, 0.42 -> 0.4)
+            // 디자인적으로 최소한의 크기를 보장하기 위해 0.1 이하일 경우에도 최소값 부여
+            const adjustedRatio = Math.max(Math.floor(ratio * 10) * 0.1, 0.1);
+
+            return {
+                ...item,
+                displayScore: adjustedRatio * 100, // 10%, 20% 등 10 단위로 표시하기 위해 100을 곱함
+                originalScore: item.score,
+                label_name: styleName[item.label_name.toLowerCase() as keyof typeof styleName] || item.label_name,
+            };
+        });
     }, [barData]);
 
     // 네이버 검색 트렌드
@@ -203,31 +233,39 @@ export default function AnalysisSection({ sourceImage, productName, isLoading, b
 
                 {/* Right Col: Graphs */}
                 <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-10">
-                    {/* Bar Chart Section */}
-                    <div className="bg-white dark:bg-neutral-900/50 rounded-4xl p-8 border-2 border-neutral-100 dark:border-white/10 shadow-sm space-y-6 aspect-3/4 flex flex-col">
+                    {/* Radar Chart Section */}
+                    <div className="bg-white dark:bg-neutral-900/50 rounded-4xl p-8 border-2 border-neutral-100 dark:border-white/10 shadow-sm space-y-6 aspect-3/4 flex flex-col relative overflow-hidden">
+                        {/* 빛 반사 디자인 효과 */}
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-violet-500/10 dark:bg-violet-500/20 rounded-full blur-[80px] z-0 pointer-events-none" />
                         <div className="relative z-10 space-y-3 shrink-0">
                             <span className="text-[12px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-[0.3em]">스타일 분석 결과</span>
                         </div>
-                        <div className="flex-1 w-full min-h-0 flex items-center justify-center">
+                        <div className="flex-1 w-full min-h-0 flex items-center justify-center relative z-10">
                             {!isMounting && (
                                 (barData && barData.length > 0) ? (
                                     <ResponsiveContainer width="100%" height="100%">
-                                        <BarChart data={krBarData} layout="vertical" margin={{ left: -20, right: 20 }}>
-                                            <XAxis type="number" hide />
-                                            <YAxis dataKey="label_name" type="category" tick={{ fontSize: 9, fontWeight: 700 }} axisLine={false} tickLine={false} width={70} />
-                                            <Tooltip
-                                                contentStyle={{ backgroundColor: '#121212', borderRadius: '12px', border: 'none', fontSize: '10px', color: '#fff' }}
-                                                itemStyle={{ color: '#fff' }}
-                                                cursor={false}
-                                                formatter={() => [null as any, null as any]}
+                                        <RadarChart cx="50%" cy="50%" outerRadius="65%" data={krBarData}>
+                                            <PolarGrid stroke="#a3a3a3" strokeDasharray="3 3" className="dark:stroke-white/30" />
+                                            <PolarAngleAxis
+                                                dataKey="label_name"
+                                                tick={{ fill: '#8b5cf6', fontSize: 11, fontWeight: 'bold' }}
                                             />
-                                            <Bar
+                                            {/* Y축 범위를 0~100으로 고정하여 비율을 명확히 함 */}
+                                            <PolarRadiusAxis
+                                                angle={30}
+                                                domain={[0, 100]}
+                                                tick={false}
+                                                axisLine={false}
+                                            />
+                                            <Radar
+                                                name="Style Score"
                                                 dataKey="displayScore"
-                                                fill="#7c3aed"
-                                                radius={[0, 20, 20, 0]}
-                                                barSize={12}
+                                                stroke="#7c3aed"
+                                                strokeWidth={3}
+                                                fill="#8b5cf6"
+                                                fillOpacity={0.4}
                                             />
-                                        </BarChart>
+                                        </RadarChart>
                                     </ResponsiveContainer>
                                 ) : (
                                     <div className="flex flex-col items-center justify-center gap-3 animate-in fade-in zoom-in-95 duration-500">
