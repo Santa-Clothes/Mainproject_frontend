@@ -24,6 +24,28 @@ interface RankProps {
  * 수치를 배제하고 명칭과 순위 위주의 깔끔한 UI를 제공합니다.
  */
 const SearchRankCard: React.FC<RankProps> = ({ trends, isLoading, error, onRetry, className = "", highlightStyle }) => {
+    const listRef = React.useRef<HTMLDivElement>(null);
+    const highlightedRef = React.useRef<HTMLDivElement>(null);
+
+    React.useEffect(() => {
+        if (highlightedRef.current && listRef.current) {
+            const container = listRef.current;
+            const element = highlightedRef.current;
+
+            // 컨테이너 중앙에 배치하도록 스크롤 위치 계산
+            const elementTop = element.offsetTop;
+            const elementHeight = element.clientHeight;
+            const containerHeight = container.clientHeight;
+
+            const scrollPosition = elementTop - (containerHeight / 2) + (elementHeight / 2);
+
+            container.scrollTo({
+                top: scrollPosition,
+                behavior: 'smooth'
+            });
+        }
+    }, [highlightStyle, trends, isLoading]);
+
     return (
         <DashboardCard
             title="검색어 순위"
@@ -40,7 +62,10 @@ const SearchRankCard: React.FC<RankProps> = ({ trends, isLoading, error, onRetry
             }
         >
             {/* 스크롤 가능한 영역 설정: 부모의 aspect-3/4 높이에 맞게 가득 채움 */}
-            <div className="flex-1 min-h-0 overflow-y-auto pr-2 custom-scrollbar space-y-2 h-full">
+            <div
+                ref={listRef}
+                className="flex-1 min-h-0 overflow-y-auto pr-2 custom-scrollbar space-y-2 h-full"
+            >
                 {/* 분석 완료: 검색 순위 리스트 표시 (수치 제외) */}
                 {trends.map((trend, i) => {
                     const isHighlighted = highlightStyle && trend.style === highlightStyle;
@@ -48,6 +73,7 @@ const SearchRankCard: React.FC<RankProps> = ({ trends, isLoading, error, onRetry
                     return (
                         <div
                             key={i}
+                            ref={isHighlighted ? highlightedRef : null}
                             className={`flex items-center py-3.5 px-5 rounded-2xl border transition-all hover:translate-x-1 group shadow-sm shrink-0 ${isHighlighted
                                 ? "bg-violet-600 border-violet-500 ring-2 ring-violet-400/50 shadow-violet-200 dark:shadow-none"
                                 : "bg-white dark:bg-neutral-900/10 border-neutral-100 dark:border-white/5 hover:border-violet-300 dark:hover:border-violet-800"
