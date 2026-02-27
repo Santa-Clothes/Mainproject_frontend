@@ -169,9 +169,9 @@ export default function Header() {
   };
 
   const navItems = [
-    { id: 'uploadpage', label: '이미지 분석 기반 추천', icon: <FaCloudArrowUp size={18} />, path: '/uploadpage', hoverTextClass: 'hover:text-violet-600 dark:hover:text-violet-400', activeClass: 'bg-violet-600 text-white shadow-lg shadow-violet-500/30' },
-    { id: 'selectionpage', label: '보유 상품 기반 추천', icon: <FaShirt size={18} />, path: '/selectionpage', hoverTextClass: 'hover:text-fuchsia-600 dark:hover:text-fuchsia-400', activeClass: 'bg-fuchsia-600 text-white shadow-lg shadow-fuchsia-500/30' },
-    { id: 'dashboard', label: '대시보드', icon: <FaChartLine size={18} />, path: '/dashboard', hoverTextClass: 'hover:text-purple-600 dark:hover:text-purple-400', activeClass: 'bg-purple-600 text-white shadow-lg shadow-purple-500/30' },
+    { id: 'uploadpage', label: '이미지 분석 기반 추천', icon: <FaCloudArrowUp size={18} />, path: '/uploadpage', hoverTextClass: 'hover:text-violet-900 dark:hover:text-violet-400', activeClass: 'bg-violet-800 text-white shadow-lg shadow-violet-800/30' },
+    { id: 'selectionpage', label: '보유 상품 기반 추천', icon: <FaShirt size={18} />, path: '/selectionpage', hoverTextClass: 'hover:text-violet-600 dark:hover:text-violet-400', activeClass: 'bg-violet-600 text-white shadow-lg shadow-violet-600/30' },
+    { id: 'dashboard', label: '대시보드', icon: <FaChartLine size={18} />, path: '/dashboard', hoverTextClass: 'hover:text-violet-400 dark:hover:text-violet-300', activeClass: 'bg-violet-400 text-white shadow-lg shadow-violet-400/30' },
   ];
 
   return (

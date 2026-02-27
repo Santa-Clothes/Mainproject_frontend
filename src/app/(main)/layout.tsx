@@ -53,7 +53,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             {/* 상단 버튼으로 변경 */}
             <Header />
 
-            <main className="flex-1 w-full max-w-none mx-auto px-4 md:px-8 py-4 pt-24 relative">
+            <main className="flex-1 w-full max-w-7xl mx-auto py-4 pt-24 relative">
                 {children}
             </main>
             <Footer />

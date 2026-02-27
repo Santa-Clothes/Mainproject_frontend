@@ -97,6 +97,15 @@ export default function Dashboard({
   return (
     <div className="space-y-3 pb-6">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-1.5 items-stretch">
+        {/* 우측 영역 (8컬럼): 매출 랭킹 파이프라인 */}
+        <div className="lg:col-span-8">
+          <BestSellersCard
+            initialSales={sales}
+            fetchSalesFn={getSalesRankingByShopAndDate}
+            isLoading={isLoadingSales}
+            className="h-full"
+          />
+        </div>
         {/* 좌측 영역 (4컬럼): 스타일 분포 차트 + 클러스터 맵 스택 */}
         <div className="lg:col-span-4 flex flex-col gap-1.5">
           <StyleDistributionCard
@@ -113,16 +122,6 @@ export default function Dashboard({
             bottomTextFormat="총 {count}개 데이터 매핑"
             className="flex-1"
             fetchDataFn={modelMode === '768' ? getScatter768Points : getScatter512Points}
-          />
-        </div>
-
-        {/* 우측 영역 (8컬럼): 매출 랭킹 파이프라인 */}
-        <div className="lg:col-span-8">
-          <BestSellersCard
-            initialSales={sales}
-            fetchSalesFn={getSalesRankingByShopAndDate}
-            isLoading={isLoadingSales}
-            className="h-full"
           />
         </div>
       </div>

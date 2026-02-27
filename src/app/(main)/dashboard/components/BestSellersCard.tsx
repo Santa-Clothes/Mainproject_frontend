@@ -314,7 +314,7 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
 
                 {/* 2. Content Split by Shop (Columns) */}
                 <div className="flex-1 min-h-50 mt-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-0 gap-y-4 lg:gap-y-0 h-full items-stretch">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-0 gap-y-4 lg:gap-y-0 h-full items-stretch">
 
                         {/* Always Display Total First */}
                         <div className="flex flex-col space-y-1 col-span-1 px-3 min-w-0">
@@ -374,8 +374,8 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
                             })()}
                         </div>
 
-                        {/* Selected Compare Shops (Up to 3 Slots) */}
-                        {Array.from({ length: 3 }).map((_, slotIdx) => {
+                        {/* Selected Compare Shops (Up to 2 Slots) */}
+                        {Array.from({ length: 2 }).map((_, slotIdx) => {
                             const shop = selectedShops[slotIdx];
 
                             // Empty Slot
@@ -410,8 +410,8 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
                             return (
                                 <div key={shop} className={`flex flex-col space-y-1 col-span-1 fade-in px-3 min-w-0 lg:border-l-2 ${slotIdx % 2 === 0 ? 'md:border-l-2' : ''} border-neutral-300 dark:border-white/30`}>
                                     <div className="flex items-center gap-3 h-9 group/header relative">
-                                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-indigo-500/20 dark:border-indigo-500/30 bg-indigo-50/50 dark:bg-indigo-900/20 shadow-sm max-w-[calc(100%-40px)] shrink-0">
-                                            <div className="w-1 h-3 bg-indigo-500 rounded-full"></div>
+                                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-violet-500/20 dark:border-violet-500/30 bg-violet-50/50 dark:bg-violet-900/20 shadow-sm max-w-[calc(100%-40px)] shrink-0">
+                                            <div className="w-1 h-3 bg-violet-500 rounded-full"></div>
                                             <h4 className="text-[14px] font-black text-neutral-900 dark:text-white uppercase tracking-widest truncate">
                                                 {shop}
                                             </h4>
@@ -424,7 +424,7 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
                                             <FaTimes size={8} />
                                         </button>
                                         {isLoadingShopData && (
-                                            <div className="w-3 h-3 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin ml-auto shrink-0"></div>
+                                            <div className="w-3 h-3 rounded-full border-2 border-violet-500 border-t-transparent animate-spin ml-auto shrink-0"></div>
                                         )}
                                     </div>
 
@@ -443,18 +443,18 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
                                                 <div key={item.shortName} className="space-y-0.5 group min-w-0">
                                                     <div className="flex justify-between items-end gap-2 min-w-0">
                                                         <div className="flex items-center gap-1.5 min-w-0 flex-1">
-                                                            <span className="text-[15px] italic text-indigo-600 font-black shrink-0">0{i + 1}</span>
-                                                            <span className="text-[15px] font-black text-black dark:text-white uppercase tracking-tight truncate group-hover:text-indigo-500 transition-colors tooltip flex-1" title={item.shortName}>
+                                                            <span className="text-[15px] italic text-violet-600 font-black shrink-0">0{i + 1}</span>
+                                                            <span className="text-[15px] font-black text-black dark:text-white uppercase tracking-tight truncate group-hover:text-violet-500 transition-colors tooltip flex-1" title={item.shortName}>
                                                                 {item.shortName}
                                                             </span>
                                                         </div>
-                                                        <span className="text-[15px] font-black text-indigo-600 tracking-tighter shrink-0">
+                                                        <span className="text-[15px] font-black text-violet-600 tracking-tighter shrink-0">
                                                             {item.quantity.toLocaleString()}
                                                         </span>
                                                     </div>
-                                                    <div className="h-2.5 w-full bg-indigo-50 dark:bg-white/5 rounded-full overflow-hidden">
+                                                    <div className="h-2.5 w-full bg-violet-50 dark:bg-white/5 rounded-full overflow-hidden">
                                                         <div
-                                                            className="h-full rounded-full transition-all duration-1000 bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.3)]"
+                                                            className="h-full rounded-full transition-all duration-1000 bg-violet-500 shadow-[0_0_8px_rgba(139,92,246,0.3)]"
                                                             style={{ width: `${(item.quantity / maxQ) * 100}%` }}
                                                         ></div>
                                                     </div>

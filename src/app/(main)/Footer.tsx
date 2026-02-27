@@ -22,13 +22,13 @@ export default function Footer() {
           <div className="col-span-1 space-y-6 md:col-span-2">
             <Link href="/" className="group flex flex-col items-start">
               <h2 className="flex items-center gap-2 font-yangjin text-2xl font-black tracking-widest uppercase text-neutral-900 transition-colors group-hover:opacity-80 dark:text-white">
-                <span className="text-yellow-400">Wizard</span> of <span className='text-purple-700'>Ounce</span>
+                <span className="text-yellow-400">WIZARD</span> of <span className='text-purple-700'>OUNCE</span>
               </h2>
               <span className="mt-1.5 text-[8px] font-bold uppercase tracking-[0.5em] text-violet-500 dark:text-violet-600">
                 The AI Fashion Archive
               </span>
             </Link>
-            <p className="max-w-xs font-light text-xs italic leading-relaxed text-neutral-500 dark:text-neutral-400">
+            <p className="max-w-xs font-medium text-[13px] leading-relaxed text-neutral-600 dark:text-neutral-400">
               의류 이미지를 AI로 분석하여 새로운 제품을 추천해주는 서비스 입니다.
             </p>
           </div>
@@ -46,7 +46,7 @@ export default function Footer() {
                 <li key={item.name}>
                   <Link
                     href={item.path}
-                    className="text-[11px] font-light uppercase tracking-widest text-neutral-500 transition-colors hover:text-violet-600 dark:text-neutral-400 dark:hover:text-violet-400"
+                    className="text-[12px] font-medium uppercase tracking-wider text-neutral-600 transition-colors hover:text-violet-600 dark:text-neutral-400 dark:hover:text-violet-400"
                   >
                     {item.name}
                   </Link>
@@ -59,7 +59,7 @@ export default function Footer() {
 
         <div className="flex flex-col items-center justify-between gap-4 border-t-2 border-neutral-200 pt-4 dark:border-white/10 md:flex-row">
           <div className="flex items-center gap-8">
-            <span className="text-[8px] font-bold uppercase tracking-[0.4em] text-neutral-400 dark:text-violet-200/60">
+            <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-neutral-500 dark:text-violet-200/60">
               © 2026 Wizard of Ounce
             </span>
             <div className="flex items-center gap-4">

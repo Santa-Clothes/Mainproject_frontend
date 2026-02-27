@@ -23,10 +23,10 @@ export default function MainPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
 
-        {/* Card 1: Upload Studio (이미지 분석) */}
+        {/* Card 1: Upload Studio (이미지 분석) - 진한 보라 */}
         <Link
           href="/uploadpage"
-          className="relative flex flex-col justify-between overflow-hidden rounded-[3rem] border-2 border-neutral-100 bg-white p-10 dark:border-white/10 dark:bg-neutral-900/50 md:p-14 group shadow-sm transition-all duration-300 hover:border-violet-500/40 hover:shadow-xl hover:-translate-y-1"
+          className="relative flex flex-col justify-between overflow-hidden rounded-[3rem] border-2 border-neutral-100 bg-white p-10 dark:border-white/10 dark:bg-neutral-900/50 md:p-14 group shadow-sm transition-all duration-300 hover:border-violet-800/40 hover:shadow-xl hover:-translate-y-1"
         >
           <div className="relative z-10 h-full flex flex-col justify-end min-h-60">
             <div className="space-y-6">
@@ -37,7 +37,7 @@ export default function MainPage() {
                 </p>
               </div>
               <div className="flex items-center gap-4 text-[10px] sm:text-[11px] font-bold text-neutral-900 dark:text-white uppercase tracking-widest transition-all group-hover:gap-6">
-                분석 시작하기 <FaArrowRight className="text-violet-600 dark:text-violet-400 transition-transform group-hover:translate-x-2" />
+                분석 시작하기 <FaArrowRight className="text-violet-800 dark:text-violet-400 transition-transform group-hover:translate-x-2" />
               </div>
             </div>
           </div>
@@ -47,21 +47,21 @@ export default function MainPage() {
           </div>
         </Link>
 
-        {/* Card 2: Selection Studio (제품 매칭) */}
+        {/* Card 2: Selection Studio (제품 매칭) - 보라 */}
         <Link
           href="/selectionpage"
-          className="relative flex flex-col justify-between overflow-hidden rounded-[3rem] border-2 border-neutral-100 bg-white p-10 dark:border-white/10 dark:bg-neutral-900/50 md:p-14 group shadow-sm transition-all duration-300 hover:border-fuchsia-500/40 hover:shadow-xl hover:-translate-y-1"
+          className="relative flex flex-col justify-between overflow-hidden rounded-[3rem] border-2 border-neutral-100 bg-white p-10 dark:border-white/10 dark:bg-neutral-900/50 md:p-14 group shadow-sm transition-all duration-300 hover:border-violet-600/40 hover:shadow-xl hover:-translate-y-1"
         >
           <div className="relative z-10 h-full flex flex-col justify-end min-h-60">
             <div className="space-y-6">
               <div className="space-y-4">
                 <h3 className="text-4xl md:text-5xl font-normal italic text-neutral-900 dark:text-white tracking-tighter leading-none">보유 상품 <br /> 기반 추천</h3>
-                <p className="text-sm md:text-base text-neutral-500 dark:text-fuchsia-100/60 leading-relaxed font-normal">
+                <p className="text-sm md:text-base text-neutral-500 dark:text-violet-100/60 leading-relaxed font-normal">
                   카테고리별 최고의 제품 중에서 <br /> 당신에게 맞는 스타일을 추천합니다.
                 </p>
               </div>
               <div className="flex items-center gap-4 text-[10px] sm:text-[11px] font-bold text-neutral-900 dark:text-white uppercase tracking-widest transition-all group-hover:gap-6">
-                제품 선택하기 <FaArrowRight className="text-fuchsia-600 dark:text-fuchsia-400 transition-transform group-hover:translate-x-2" />
+                제품 선택하기 <FaArrowRight className="text-violet-600 dark:text-violet-400 transition-transform group-hover:translate-x-2" />
               </div>
             </div>
           </div>
@@ -71,22 +71,22 @@ export default function MainPage() {
           </div>
         </Link>
 
-        {/* Card 3: Analytics Dashboard (분석 대시보드) */}
+        {/* Card 3: Analytics Dashboard (분석 대시보드) - 연한 보라 */}
         <Link
           href="/dashboard"
           suppressHydrationWarning
-          className="relative flex flex-col justify-between overflow-hidden rounded-[3rem] border-2 border-neutral-100 bg-white p-10 dark:border-white/10 dark:bg-neutral-900/50 md:p-14 group shadow-sm transition-all duration-300 hover:border-purple-500/40 hover:shadow-xl hover:-translate-y-1"
+          className="relative flex flex-col justify-between overflow-hidden rounded-[3rem] border-2 border-neutral-100 bg-white p-10 dark:border-white/10 dark:bg-neutral-900/50 md:p-14 group shadow-sm transition-all duration-300 hover:border-violet-400/40 hover:shadow-xl hover:-translate-y-1"
         >
           <div className="relative z-10 h-full flex flex-col justify-end min-h-60">
             <div className="space-y-6">
               <div className="space-y-4">
                 <h3 className="text-4xl md:text-5xl font-normal italic text-neutral-900 dark:text-white tracking-tighter leading-none">대시보드</h3>
-                <p className="text-sm md:text-base text-neutral-500 dark:text-purple-100/60 leading-relaxed font-normal">
+                <p className="text-sm md:text-base text-neutral-500 dark:text-violet-100/60 leading-relaxed font-normal">
                   지점별 매출 통계를 <br /> 시각적으로 확인하세요.
                 </p>
               </div>
               <div className="flex items-center gap-4 text-[10px] sm:text-[11px] font-bold text-neutral-900 dark:text-white uppercase tracking-widest transition-all group-hover:gap-6">
-                데이터 확인하기 <FaArrowRight className="text-purple-600 dark:text-purple-400 transition-transform group-hover:translate-x-2" />
+                데이터 확인하기 <FaArrowRight className="text-violet-400 dark:text-violet-300 transition-transform group-hover:translate-x-2" />
               </div>
             </div>
           </div>

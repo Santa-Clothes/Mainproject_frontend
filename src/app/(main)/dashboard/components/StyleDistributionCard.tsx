@@ -72,17 +72,17 @@ const StyleDistributionCard: React.FC<Props> = ({ data, isLoading, error, onRetr
             onRetry={onRetry}
             lgColSpan={2}
         >
-            <div className="flex items-center gap-2 h-full min-h-0">
+            <div className="flex items-center gap-4 h-full min-h-0">
                 {/* 차트 시각화 영역 (좌측) */}
-                <div className="relative w-40 h-40 shrink-0">
-                    <PieChart width={160} height={160}>
+                <div className="relative w-32 h-32 shrink-0">
+                    <PieChart width={128} height={128}>
                         <Pie
                             data={data.slice(0, 10).map(t => ({ score: t?.count ? Math.abs(t.count) : 0, name: t?.styleName || 'Unknown' }))}
                             cx="50%"
                             cy="50%"
-                            innerRadius={45}
-                            outerRadius={65}
-                            paddingAngle={5}
+                            innerRadius={35}
+                            outerRadius={55}
+                            paddingAngle={4}
                             dataKey="score"
                             nameKey="name"
                             stroke="none"
@@ -109,7 +109,7 @@ const StyleDistributionCard: React.FC<Props> = ({ data, isLoading, error, onRetr
                 </div>
 
                 {/* 범례 텍스트 표시 영역 (우측 그리드) */}
-                <div className="flex-1 grid grid-cols-2 gap-x-2 gap-y-1 py-0.5">
+                <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 py-0.5 auto-cols-min">
                     {data.slice(0, 10).map((item, i) => (
                         <div key={i} className="flex items-center justify-between group px-1.5 py-0.5 rounded-lg hover:bg-neutral-50 dark:hover:bg-white/5 transition-colors">
                             <div className="flex items-center gap-1.5 min-w-0">
