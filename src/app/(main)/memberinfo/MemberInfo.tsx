@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAtom } from 'jotai';
 import { authUserAtom } from '@/jotai/loginjotai';
-import { updateMemberInfoAPI, deleteMemberAPI, updateProfileImg, getUserInfoAPI } from '@/app/api/memberservice/memberapi';
+import { updateMemberInfoAPI, deleteMemberAPI, updateProfileImg } from '@/app/api/memberservice/memberapi';
 import { getShopList, ShopInfo } from '@/app/api/salesservice/salesapi';
 import { useRouter } from 'next/navigation';
 import { FaUser, FaLock, FaTrash, FaCamera, FaCircleCheck, FaTriangleExclamation, FaXmark, FaStore } from 'react-icons/fa6';
@@ -104,7 +104,7 @@ export default function MemberInfo() {
       } else {
         setMessage({ type: 'error', text: 'Failed to update image' });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Error occurred.' });
     } finally {
       setIsSubmitting(false);
@@ -148,7 +148,7 @@ export default function MemberInfo() {
       } else {
         setMessage({ type: 'error', text: 'Failed to update member information.' });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'An unexpected error occurred.' });
     } finally {
       setIsSubmitting(false);
@@ -187,7 +187,7 @@ export default function MemberInfo() {
       } else {
         alert('Withdrawal failed. Please check your credentials.');
       }
-    } catch (error) {
+    } catch {
       alert('Error occurred during withdrawal.');
     } finally {
       setIsSubmitting(false);

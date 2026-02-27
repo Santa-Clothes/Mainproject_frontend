@@ -18,12 +18,12 @@ import { RecommendData, RecommendList } from '@/types/ProductType';
 export type StudioMode = 'imageInput' | 'imageSelection';
 
 /**
- * Studio: AI 기반 스타일 탐색 및 분석의 공통 페이지(컨테이너) 컴포넌트
- * 'Upload Page' (이미지 직접 업로드) 및 'Selection Page' (기존 데이터 탐색) 
- * 두 가지 모드를 mode prop으로 주입받아 처리하며, 분석 완료 시 2-Card 레이아웃으로 상세 보고서와 추천 아이템을 표시합니다.
+ * Studio
+ * AI 스타일 분석의 컨테이너를 담당하며 업로드 형식(mode="imageInput")과
+ * 데이터 탐색 형식(mode="imageSelection")을 구분하여 내부 위젯과 분석 결과 레이아웃을 표출합니다.
  */
 export default function Studio({ mode }: { mode: StudioMode }) {
-  // React 18 Transition을 사용한 매끄러운 상태 전환
+  // 상태 전이 시 UI 끊김을 막기 위한 Transition Hook 적용
   const [isPending, startTransition] = useTransition();
   const pathname = usePathname();
   const router = useRouter();
@@ -41,7 +41,7 @@ export default function Studio({ mode }: { mode: StudioMode }) {
   const [modelMode] = useAtom(modelModeAtom);
   const uploadRef = React.useRef<UploadPanelRef>(null);
 
-  // 1. 브라우저 뒤로가기 / URL 파라미터 감지 (isResultView가 없는 경우 상태 초기화)
+  // 현재 표시 화면 전환(view 파라미터 유무) 감지 및 화면 리셋
   useEffect(() => {
     if (!isResultView) {
       setResults(null);
@@ -50,7 +50,7 @@ export default function Studio({ mode }: { mode: StudioMode }) {
     }
   }, [isResultView, setActiveHistory]);
 
-  // 2. [히스토리 로드 및 결과 표시 처리]
+  // 진입 시 가장 마지막에 조회했던 히스토리 데이터를 활성화 상태로 복원
   useEffect(() => {
     if (isResultView) {
       if (activeHistory) {
@@ -59,7 +59,7 @@ export default function Studio({ mode }: { mode: StudioMode }) {
         setResults(activeHistory.results || null);
         setIsAnalyzing(false);
       } else if (history.length > 0 && !results) {
-        // 새로고침이나 앞으로 가기로 진입 시 가장 최근 결과를 보여줌
+        // 최근 기록 탐색
         const recent = history[0];
         setAnalysisImage(recent.sourceImage);
         setAnalysisName(recent.productName);
@@ -69,7 +69,7 @@ export default function Studio({ mode }: { mode: StudioMode }) {
     }
   }, [activeHistory, isResultView, history, results]);
 
-  // 3. 모델 토글 시 보고 있던 분석 결과 화면 초기화 (새로고침 대체)
+  // 선택 모델(512 <-> 768) 변환을 감지하여 불일치 예방용 캐시 제거 및 화면 리셋
   const prevModelModeRef = React.useRef(modelMode);
 
   useEffect(() => {
@@ -84,14 +84,12 @@ export default function Studio({ mode }: { mode: StudioMode }) {
     }
   }, [modelMode, isResultView, pathname, router, setActiveHistory]);
 
-  /**
-   * 결과 수신 핸들러: 분석이 완료되었을 때 호출
-   */
+  // 분석 완료 후 데이터를 주입받아 표시 상태로 전환
   const handleSearchResult = (data: RecommendList | null) => {
     setResults(data);
     setIsAnalyzing(false);
 
-    // 데이터가 수신된 경우 브라우저 히스토리 추가 빛 URL 업데이트
+    // 분석 완료 시 로컬 스토리지 등에 참조 히스토리 보관 및 주소창 포인터 동기화
     if (data) {
       if (!isResultView) {
         router.push(`${pathname}?view=result`, { scroll: false });
@@ -113,26 +111,20 @@ export default function Studio({ mode }: { mode: StudioMode }) {
     }
   };
 
-  /**
-   * 분석 시작 핸들러: 분석을 위해 이미지가 선택되었을 때 호출
-   */
+  // 이미지 파일이 확정된 순간 분석 대기 화면으로 상태 변경
   const handleAnalysisStart = (imgUrl: string, name?: string) => {
     setAnalysisImage(imgUrl);
     setAnalysisName(name);
     setIsAnalyzing(true);
   };
 
-  /**
-   * 분석 취소 핸들러
-   */
+  // 진행 중이던 요청 폐기 및 초기 화면 복원
   const handleCancelAnalysis = () => {
     setIsAnalyzing(false);
     setResults(null);
   };
 
-  /**
-   * 직접 파일 분석 처리 (AnalysisSection 등에서 호출)
-   */
+  // 파일을 직접적으로 전달받는 AnalysisSection 내 이벤트 핸들링
   const handleFileAnalysis = (file: File) => {
     // 1. 초기 UI 상태 변경 (로딩 시작) - startTransition 외부에 두어 즉시 반영 (React 18 트랜지션 무시 방지)
     setIsAnalyzing(true);
@@ -141,12 +133,12 @@ export default function Studio({ mode }: { mode: StudioMode }) {
     startTransition(async () => {
       try {
 
-        // 2. 이미지 리사이징
+        // 2. 이미지 모바일 통신을 고려하여 경량 프로필 이미지로 리사이징
         const { dataUrl, blob } = await resizeImage(file, 300);
         setAnalysisImage(dataUrl);
         setAnalysisName(file.name);
 
-        // 3. 서버 분석 요청 (선택된 모델에 따라 분기)
+        // 3. 엔진 선택에 따른 비동기 인퍼런스 호출
         const resizedFile = new File([blob], file.name, { type: file.type || 'image/jpeg' });
         const uploadResult: RecommendList = modelMode === '768'
           ? await image768Analyze(resizedFile)
@@ -166,7 +158,7 @@ export default function Studio({ mode }: { mode: StudioMode }) {
     });
   };
 
-  // 분석 타임아웃 처리 (30초)
+  // 장시간 처리 오류(GPU 지연 등)에 대비한 안전 30초 데드라인 설정
   useEffect(() => {
     let timer: NodeJS.Timeout;
     if (isPending || isAnalyzing) {
@@ -180,9 +172,7 @@ export default function Studio({ mode }: { mode: StudioMode }) {
     return () => clearTimeout(timer);
   }, [isPending, isAnalyzing]);
 
-  /**
-   * 초기 화면으로 돌아가기 핸들러
-   */
+  // 히스토리나 분석 화면에서 원본 메뉴로 탈출
   const handleBackToSearch = () => {
     setResults(null);
     setActiveHistory(null);
@@ -194,7 +184,7 @@ export default function Studio({ mode }: { mode: StudioMode }) {
     <div className="space-y-6 lg:space-y-10 max-w-7xl mx-auto w-full px-4 lg:px-0">
       <AnimatePresence mode="wait">
         {results ? (
-          /* [상태 A] 결과 표시 (분석 정보 + 결과 그리드 분리 레이아웃) */
+          /* [뷰 전환 A] 분석이 종료되었고 정상적 응답이 반환된 경우 (보고서 표시 뷰) */
           <motion.div
             key="results"
             initial={{ opacity: 0, scale: 0.98 }}
@@ -254,7 +244,7 @@ export default function Studio({ mode }: { mode: StudioMode }) {
             </div>
           </motion.div>
         ) : (
-          /* [상태 B] 입력 대기 (탐색형 또는 업로드형 패널 노출) */
+          /* [뷰 전환 B] 아직 실행된 적 없는 초기 접근 상태일 경우 (입력 대기 패널 뷰) */
           <motion.div
             key="discovery"
             initial={{ opacity: 0 }}

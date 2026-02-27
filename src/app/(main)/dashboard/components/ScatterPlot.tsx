@@ -1,15 +1,14 @@
 import { useState, useEffect, useMemo } from "react";
 import dynamic from "next/dynamic";
-import { FaArrowsRotate, FaTriangleExclamation, FaExpand } from "react-icons/fa6";
+import { FaArrowsRotate, FaTriangleExclamation } from "react-icons/fa6";
 import { LuChartScatter } from "react-icons/lu";
 import { ScatterPoint } from "@/app/api/statservice/plotapi";
 import { motion, AnimatePresence } from "framer-motion";
 import DashboardCard from "./DashboardCard";
 
 /**
- * react-plotly.js 라이브러리는 내부적으로 window 객체를 사용합니다.
- * Next.js의 서버 사이드 렌더링(SSR) 환경에서는 window가 없으므로 에러가 발생합니다.
- * 이를 방지하기 위해 next/dynamic을 사용하여 클라이언트 사이드에서만 로드하도록 설정합니다.
+ * CSR 전용 Plotly 컴포넌트
+ * SSR 환경에서 window 객체 접근 오류를 방지하기 위해 동적으로 임포트됩니다.
  */
 import type { PlotParams } from "react-plotly.js";
 
@@ -32,7 +31,7 @@ export interface ScatterPlotProps {
 export default function ScatterPlot({
     title = "UMAP Clustering Map",
     subtitle = "Style Projection",
-    description = "해당 모델의 클러스터링 결과를 2차원 평면에 시각화한 맵입니다.",
+    description = "선택된 AI 모델(512/768 차원)의 분석 결과를 2차원 평면에 투영한 스타일 맵입니다.",
     bottomTextFormat = "Visualizing {count} Style Latent vectors.",
     className = "lg:col-span-4",
     fetchDataFn
@@ -43,11 +42,7 @@ export default function ScatterPlot({
     const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
 
     const loadingMessages = [
-        "잠재벡터 2차원 투영중...",
-        /* "비교 분석중...",
-        "스타일 공간 투영중...",
-        "스타일 클러스터링중...",
-        "GPU 렌더링 최적화중..." */
+        "잠재 공간 벡터를 2차원으로 투영 중..."
     ];
 
     const fetchData = async () => {
@@ -55,12 +50,12 @@ export default function ScatterPlot({
             setIsLoading(true);
             setError(null);
 
-            // 15초 타임아웃 설정 (충분한 대기 시간 확보)
+            // 무한 로딩 방지를 위한 20초 타임아웃 설정
             const timeoutPromise = new Promise((_, reject) =>
                 setTimeout(() => reject(new Error('TIMEOUT')), 20000)
             );
 
-            // 실제 데이터 요청과 타임아웃 경합
+            // 데이터 페칭과 타임아웃 간의 레이스 컨디션
             const points = await Promise.race([
                 fetchDataFn(),
                 timeoutPromise
@@ -68,24 +63,17 @@ export default function ScatterPlot({
 
             setData(points);
         } catch (err: any) {
-            console.error("Analysis failed or timed out, using preview mode.");
+            console.error("분석 실패 또는 타임아웃 발생");
 
-            // 타임아웃인지 일반 에러인지에 따라 메시지 분기 가능
+            // 에러 유형에 따른 메시지 렌더링
             const isTimeout = err.message === 'TIMEOUT';
             setError(isTimeout
-                ? `backend connection timed out. Please click reset button.`
-                : `backend offline. Please click reset button.`
+                ? `백엔드 연결 시간이 초과되었습니다. 리셋 버튼을 눌러주세요.`
+                : `백엔드에 연결할 수 없습니다. 리셋 버튼을 눌러주세요.`
             );
 
-            // 데모용 샘플 데이터 생성 (실패 시에도 UI 흐름 유지를 위함)
-            const mockPoints: ScatterPoint[] = Array.from({ length: 0 }, (_, i) => ({
-                xcoord: Math.random() * 20 - 10,
-                ycoord: Math.random() * 20 - 10,
-                productName: `Style Item #${i + 1}`,
-                productId: `mock-${i}`,
-                style: ["Minimalist", "Avant-Garde", "Vintage", "Streetwear", "Luxury"][Math.floor(Math.random() * 5)]
-            }));
-            setData(mockPoints);
+            // 실패 시 빈 배열로 UI 흐름 유지
+            setData([]);
         } finally {
             setIsLoading(false);
         }
@@ -93,10 +81,10 @@ export default function ScatterPlot({
 
     useEffect(() => {
         fetchData();
-        // fetchDataFn이 새로 들어올 때마다(modelMode 변경 시 등) 즉각 재호출되도록 설정
+        // 모델 차원 변경 등 데이터 함수가 변경될 때 재조회
     }, [fetchDataFn]);
 
-    // 로딩 중에만 메시지 변경 타이머 가동 (불필요한 리렌더링 방지)
+    // 불필요한 리렌더링 없이 UI를 활성 상태로 유지하기 위한 로딩 메시지 순환
     useEffect(() => {
         if (!isLoading) return;
 
@@ -106,7 +94,8 @@ export default function ScatterPlot({
         return () => clearInterval(messageTimer);
     }, [isLoading]);
 
-    // 스타일별 확실히 구분되는 원색(Primary Colors) 팔레트 정의
+    // 클러스터 구분성을 극대화하기 위한 고대비 고채도 식별 컬러 팔레트
+    // 안정적인 매핑을 위해 한글과 영문 키를 모두 처리합니다.
     const STYLE_COLORS: Record<string, string> = {
         '캐주얼': '#0000FF',        // Pure Blue
         'casual': '#0000FF',
@@ -130,7 +119,11 @@ export default function ScatterPlot({
         'traditional': '#FFFF00',
     };
 
-    // 동적 색상 생성 함수: 미리 정의된 색상을 우선 사용하고, 없으면 HSL로 생성합니다.
+    /**
+     * 컬러 제너레이터
+     * 1. 사전에 정의된 스타일 목록에 있으면 지정된 색상 반환
+     * 2. 그 외 알 수 없는 스타일의 경우, 문자열 해싱을 통해 일관된 HSL 색상을 동적으로 생성
+     */
     const generateColor = (str: string) => {
         if (STYLE_COLORS[str]) return STYLE_COLORS[str];
         const keyLower = str.toLowerCase();
@@ -141,13 +134,13 @@ export default function ScatterPlot({
             hash = str.charCodeAt(i) + ((hash << 5) - hash);
         }
         const h = Math.abs(hash % 360);
-        return `hsl(${h}, 85%, 60%)`; // 채도를 더 높여서 뚜렷하게
+        return `hsl(${h}, 85%, 60%)`; // 알 수 없는 스타일을 채도가 높은 HSL로 매핑
     };
 
     const plotData = useMemo(() => {
         if (!data || data.length === 0) return [];
 
-        // 데이터 클러스터링 그룹화 (style 기준)
+        // 스타일 카테고리별로 데이터 구분
         const groups = new Map<string, ScatterPoint[]>();
         data.forEach(point => {
             const style = point.style || "Unknown";
@@ -155,16 +148,15 @@ export default function ScatterPlot({
             groups.get(style)?.push(point);
         });
 
-        // 각 그룹을 별도의 Trace로 변환
+        // 그룹화된 데이터를 Plotly 렌더링 규격 배열로 변환
         return Array.from(groups.entries()).map(([style, points]) => {
-            // 미리 정의된 색상이 없으므로, 데이터에 있는 스타일 이름으로 즉석에서 색상 생성
             const color = generateColor(style);
 
             return {
                 x: points.map(d => Number(d.xcoord)),
                 y: points.map(d => Number(d.ycoord)),
-                text: points.map(d => `<b>${d.productName}</b>`), // 툴팁 텍스트 굵게
-                name: `<b>${style}</b>`, // 범례 이름 굵게
+                text: points.map(d => `<b>${d.productName}</b>`),
+                name: `<b>${style}</b>`,
                 mode: 'markers' as const,
                 type: 'scatter' as const,
                 marker: {
@@ -207,7 +199,7 @@ export default function ScatterPlot({
                 }
             >
 
-                {/* 그래프 컨테이너 (축소 상태) */}
+                {/* 축소된 메인 그래프 컨테이너 */}
                 <div className="w-full flex-1 min-h-50 rounded-3xl overflow-hidden border border-neutral-300 dark:border-white/10 bg-gray-50/10 dark:bg-black/20 relative shadow-inner cursor-pointer group" onClick={() => setIsExpanded(true)}>
                     <AnimatePresence>
                         {isLoading && (
@@ -228,10 +220,10 @@ export default function ScatterPlot({
                         )}
                     </AnimatePresence>
 
-                    {/* 최적화: 메인 화면에서는 무거운 Plotly 대신 퍼포먼스 가벼운 CSS 플레이스홀더를 띄웁니다. */}
+                    {/* CSS로 구현된 애니메이션 Placeholder (모달 확장을 유도) */}
                     <div className="w-full h-full min-h-50 relative z-10 flex flex-col items-center justify-center gap-4 py-4 bg-linear-to-b from-transparent to-neutral-100/50 dark:to-white/5 transition-colors">
 
-                        {/* CSS 렌더링 추상 신경망 */}
+                        {/* CSS 추상 신경망 디자인 */}
                         <div className="relative w-32 h-32 flex items-center justify-center">
                             <div className="absolute inset-0 bg-violet-400/20 dark:bg-violet-600/20 rounded-full blur-2xl group-hover:bg-violet-500/40 transition-colors duration-500"></div>
                             <div className="absolute inset-3 bg-indigo-400/20 dark:bg-indigo-600/20 rounded-full blur-xl group-hover:bg-indigo-500/40 transition-colors duration-500 delay-75"></div>
@@ -263,7 +255,7 @@ export default function ScatterPlot({
                 </div>
             </DashboardCard>
 
-            {/* 확장된 모달 뷰 */}
+            {/* 확대된 모달 뷰 */}
             <AnimatePresence>
                 {isExpanded && (
                     <motion.div
@@ -272,7 +264,7 @@ export default function ScatterPlot({
                         exit={{ opacity: 0 }}
                         className="fixed inset-0 z-50 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl overflow-y-auto custom-scrollbar"
                     >
-                        <div className="min-h-full p-4 md:p-16 flex flex-col justify-start max-w-[1600px] mx-auto w-full">
+                        <div className="min-h-full p-4 md:p-16 flex flex-col justify-start max-w-400 mx-auto w-full">
                             <div className="flex justify-between items-start md:items-center mb-8 shrink-0 flex-col md:flex-row gap-6">
                                 <div className="space-y-2">
                                     <span className="text-[10px] font-bold text-violet-500 uppercase tracking-widest">Interactive Mode</span>
@@ -292,7 +284,7 @@ export default function ScatterPlot({
                             </div>
 
                             <div className="w-full flex-1 flex justify-center items-start pb-16">
-                                <div className="w-full max-w-[1200px] aspect-square rounded-3xl border border-neutral-200 dark:border-white/10 overflow-hidden bg-white dark:bg-black/20 shadow-2xl relative p-2 md:p-4">
+                                <div className="w-full max-w-300 aspect-square rounded-3xl border border-neutral-200 dark:border-white/10 overflow-hidden bg-white dark:bg-black/20 shadow-2xl relative p-2 md:p-4">
                                     <Plot
                                         data={plotData}
                                         layout={{
@@ -314,7 +306,7 @@ export default function ScatterPlot({
                                         }}
                                         config={{
                                             displayModeBar: true,
-                                            scrollZoom: true, // 스크롤 줌 활성화
+                                            scrollZoom: true,
                                             responsive: true,
                                         }}
                                         useResizeHandler={true}

@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
-import { FaWaveSquare, FaShirt, FaMagnifyingGlass, FaArrowsRotate } from 'react-icons/fa6';
+import { FaWaveSquare, FaShirt, FaMagnifyingGlass } from 'react-icons/fa6';
 import { getShoppingTrends } from '@/app/api/statservice/trendapi';
 import SearchRankCard from './SearchRankCard';
 import { RadarDataType } from '@/types/ProductType';
@@ -18,7 +18,7 @@ interface AnalysisSectionProps {
     isSelectionMode?: boolean;
 }
 
-// 빈 데이터일 경우를 위한 예외 처리용 변수
+// 빈 데이터가 전달될 경우 차트 렌더링 오류를 방지하기 위한 더미 데이터
 const emptyBarData = [
     { score: 0, label_id: 0, label_name: '데이터 없음' }
 ];
@@ -36,8 +36,9 @@ const styleName = {
     traditional: '트레디셔널',
 }
 /**
- * AnalysisSection: Studio 상단 영역에서, 사용자가 선택/업로드한 원본 이미지를 보여주고
- * 이에 대한 간단한 분석 진행률이나 통계 리포트(차트 포함)를 시각화하는 패널 컴포넌트입니다.
+ * AnalysisSection
+ * 사용자가 선택하거나 업로드한 원본 이미지를 썸네일로 표출하고, 
+ * 모델 분석 진행 상태 및 결과에 대한 레이더 차트, 상관 트렌드 랭킹 통계를 표시합니다.
  */
 export default function AnalysisSection({
     sourceImage,
@@ -51,8 +52,7 @@ export default function AnalysisSection({
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-    // [최적화] 레이더 차트를 위해 전달받은 radarData를 보정
-    // [최적화] 레이더 차트를 위해 전달받은 radarData를 보정
+    // 레이더 차트 수치 정규화 로직 (오분류 그래프 왜곡 방지)
     const krBarData = React.useMemo(() => {
         const top3 = radarData && radarData.length > 0 ? [...radarData] : [];
 
@@ -90,7 +90,7 @@ export default function AnalysisSection({
     const [errorTrends, setErrorTrends] = useState<string | null>(null);
     const [hasAttemptedTrendsFetch, setHasAttemptedTrendsFetch] = useState(false);
 
-    // [최적화] 가장 높은 점수를 가진 스타일 명칭 추출 (useMemo 적용)
+    // 가장 유사도가 높은 최상위 스타일 명 추출
     const highestLabel = React.useMemo(() => {
         if (!krBarData || krBarData.length === 0) return null;
         const sorted = [...krBarData].sort((a, b) => Math.abs(b.originalScore || 0) - Math.abs(a.originalScore || 0));

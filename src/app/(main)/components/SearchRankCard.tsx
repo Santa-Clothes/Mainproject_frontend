@@ -20,8 +20,8 @@ interface RankProps {
 }
 
 /**
- * SearchRankCard: 사용자 검색량 기준 상위 5개 트렌드를 순위 리스트 형태로 표시합니다.
- * 수치를 배제하고 명칭과 순위 위주의 깔끔한 UI를 제공합니다.
+ * SearchRankCard
+ * 검색량 기반 인기 쇼핑 스타일 트렌드를 1위~5위까지의 순위 카드 형태로 표시합니다.
  */
 const SearchRankCard: React.FC<RankProps> = ({ trends, isLoading, error, onRetry, className = "", highlightStyle }) => {
     const listRef = React.useRef<HTMLDivElement>(null);

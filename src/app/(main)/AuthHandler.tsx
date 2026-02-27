@@ -67,8 +67,8 @@ export default function AuthHandler() {
                         <div className="absolute inset-0 rounded-full border-4 border-violet-600 border-t-transparent animate-spin"></div>
                     </div>
                     <div className="flex flex-col items-center gap-2">
-                        <h2 className="text-xl font-serif italic text-neutral-900 dark:text-white">Authenticating</h2>
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.3em]">Neural Interface Syncing...</p>
+                        <h2 className="text-xl font-serif italic text-neutral-900 dark:text-white">인증 진행 중...</h2>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.3em]">서버 동기화 중...</p>
                     </div>
                 </div>
             </div>

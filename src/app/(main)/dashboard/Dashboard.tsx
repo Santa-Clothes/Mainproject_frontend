@@ -2,15 +2,12 @@
 
 import { useState, useEffect } from 'react';
 
-// import SearchRankCard from './components/SearchRankCard';
 import StyleDistributionCard from './components/StyleDistributionCard';
 import BestSellersCard from './components/BestSellersCard';
-// import DashboardCard from './components/DashboardCard';
 import { getInternalStyleCount512, getInternalStyleCount768 } from '@/app/api/productservice/productapi';
 import { getSalesRanking, getSalesRankingByShopAndDate, SalesRankItem } from '@/app/api/salesservice/salesapi';
 import { getScatter512Points, getScatter768Points } from '@/app/api/statservice/plotapi';
 import ScatterPlot from './components/ScatterPlot';
-// import { getInternalProductCount } from '@/app/api/productservice/productapi';
 import { InternalStyleCount } from '@/types/ProductType';
 import { useAtom } from 'jotai';
 import { modelModeAtom } from '@/jotai/modelJotai';
@@ -41,19 +38,19 @@ export default function Dashboard({
   initialData?: any[],
   initialSales?: SalesRankItem[]
 }) {
-  // 전역 분석 모델 모드 상태 
+  // 전역 분석 모델 모드 상태 (512 vs 768)
   const [modelMode] = useAtom(modelModeAtom);
 
 
 
-  //랭킹용
+  // 베스트 셀러 랭킹 상태 관리
   const [sales, setSales] = useState<SalesRankItem[]>(
     initialSales.length > 0 ? initialSales.sort((a, b) => b.saleQuantity - a.saleQuantity).slice(0, 5) : []
   );
   const [isLoadingSales, setIsLoadingSales] = useState(initialSales.length === 0);
   const [errorSales, setErrorSales] = useState<string | null>(null);
 
-  //스타일 비율용도
+  // 스타일 분포 비율 상태 관리
   const [internalStyles, setInternalStyles] = useState<InternalStyleCount[]>([]);
   const [isLoadingInternalStyles, setIsLoadingInternalStyles] = useState(true);
   const [errorInternalStyles, setErrorInternalStyles] = useState<string | null>(null);
@@ -119,7 +116,7 @@ export default function Dashboard({
 
   return (
     <div className="space-y-8 pb-20">
-      {/* Bottom Full Width Block: Best Sellers */}
+      {/* 하단 전체 영역: 매출 랭킹 파이프라인 */}
       <div className="w-full">
         <BestSellersCard
           initialSales={sales}
@@ -128,7 +125,7 @@ export default function Dashboard({
         />
       </div>
 
-      {/* Top Side-by-Side Grid: Strategy / Plot */}
+      {/* 상단 2분할 영역: 통합 스타일 차트 / 클러스터 플롯맵 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
         <div className="flex flex-col gap-6">
           <StyleDistributionCard

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import ProductCard from '../components/ProductCard';
 import { useAtom } from 'jotai';
 import { authUserAtom } from '@/jotai/loginjotai';
-import { FaLayerGroup, FaBookmark, FaTrashCan, FaCheckDouble, FaXmark, FaArrowsRotate } from 'react-icons/fa6';
+import { FaLayerGroup, FaBookmark, FaTrashCan, FaCheckDouble, FaXmark } from 'react-icons/fa6';
 import { useRouter } from 'next/navigation';
 import { getBookmarkAPI, deleteBookmarkAPI } from '@/app/api/memberservice/bookmarkapi';
 import { bookmarkAtom } from '@/jotai/historyJotai';

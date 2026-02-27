@@ -5,7 +5,7 @@ export default function UploadPage() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-12" suppressHydrationWarning>
-      {/* Header Section */}
+      {/* 헤더 부분 */}
       <div className="space-y-4">
         {/* 상단 장식 라인 및 레이블 */}
         <div className="flex items-center gap-4">

@@ -189,7 +189,7 @@ const ProductCard = React.memo(({
                     </div>
                 )}
 
-                {/* Overlay removed as requested to keep brightness consistent */}
+
 
                 {/* 중앙 분석 시작 버튼 (Hover 시 노출) */}
                 {onAnalyzeClick && (

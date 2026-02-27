@@ -8,9 +8,18 @@ import { useEffect, useState } from 'react';
 export default function SignupPage() {
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
+  const [stars, setStars] = useState<React.CSSProperties[]>([]);
 
   useEffect(() => {
     setIsMounted(true);
+    setStars([...Array(30)].map(() => ({
+      top: `${Math.random() * 100}%`,
+      left: `${Math.random() * 100}%`,
+      animationDelay: `${Math.random() * 6}s`,
+      animationDuration: `${3 + Math.random() * 2}s`,
+      opacity: 0.1 + Math.random() * 0.9
+    })));
+
     const savedTheme = localStorage.getItem('atelier_theme');
     if (savedTheme === 'light') {
       setIsDarkMode(false);
@@ -36,9 +45,9 @@ export default function SignupPage() {
   return (
     <main className="relative flex min-h-screen w-full flex-col items-center justify-center bg-background-light dark:bg-background-dark transition-colors duration-700 p-6 overflow-hidden">
 
-      {/* Background Atmospheric Effects (MainLayout과 동기화) */}
+      {/* 배경 분위기 효과 (MainLayout과 동기화) */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        {/* Light Mode: Sunlight effect */}
+        {/* 라이트 모드: 햇빛 효과 */}
         <div
           className="absolute -top-20 -left-20 w-200 h-200 dark:opacity-0 blur-3xl opacity-50"
           style={{
@@ -46,7 +55,7 @@ export default function SignupPage() {
           }}
         />
 
-        {/* Dark Mode: Moonlight effect */}
+        {/* 다크 모드: 달빛 효과 */}
         <div
           className="absolute -top-10 -right-10 w-150 h-150 opacity-0 dark:opacity-100 blur-3xl"
           style={{
@@ -54,19 +63,13 @@ export default function SignupPage() {
           }}
         />
 
-        {/* Dark Mode: Twinkling stars */}
+        {/* 다크 모드: 반짝이는 별 효과 */}
         <div className="absolute inset-0 opacity-0 dark:opacity-100">
-          {isMounted && [...Array(30)].map((_, i) => (
+          {isMounted && stars.map((style, i) => (
             <div
               key={i}
               className="absolute w-1 h-1 bg-white rounded-full animate-pulse"
-              style={{
-                top: `${Math.random() * 100}%`,
-                left: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 6}s`,
-                animationDuration: `${3 + Math.random() * 2}s`,
-                opacity: 0.1 + Math.random() * 0.9
-              }}
+              style={style}
             />
           ))}
         </div>
@@ -100,7 +103,7 @@ export default function SignupPage() {
           className="group flex flex-col items-start gap-1 text-[9px] font-bold uppercase tracking-[0.4em] text-neutral-500 transition-all hover:text-violet-600 dark:text-neutral-500 dark:hover:text-white"
         >
           <span className="opacity-0 transition-all -translate-y-2 group-hover:translate-y-0 group-hover:opacity-100 whitespace-nowrap">
-            Cancel Registry
+            가입 취소하기
           </span>
           <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-neutral-100 bg-white transition-all group-hover:border-violet-500/50 group-hover:bg-violet-500/5 dark:border-white/10 dark:bg-transparent">
             <FaArrowLeft className="text-neutral-400 transition-transform group-hover:-translate-x-1 group-hover:text-violet-600 dark:text-white/40 dark:group-hover:text-violet-400" size={14} />
@@ -113,7 +116,7 @@ export default function SignupPage() {
           <h1 className="font-normal text-5xl italic uppercase tracking-[0.5em] text-neutral-800 dark:text-white">회원가입</h1>
           <div className="flex items-center justify-center gap-3">
             <div className="h-px w-12 bg-violet-300 dark:bg-violet-900/30" />
-            <span className="text-[12px] font-bold uppercase tracking-[0.6em] text-violet-700 dark:text-violet-500">New Curator Application</span>
+            <span className="text-[12px] font-bold uppercase tracking-[0.6em] text-violet-700 dark:text-violet-500">신규 회원 등록</span>
             <div className="h-px w-12 bg-violet-300 dark:bg-violet-900/30" />
           </div>
         </header>

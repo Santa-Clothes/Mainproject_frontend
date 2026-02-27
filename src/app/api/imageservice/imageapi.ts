@@ -1,6 +1,5 @@
 "use server"
 
-import { RecommendData } from "@/types/ProductType";
 
 /**
  * imageapi.ts
@@ -8,7 +7,7 @@ import { RecommendData } from "@/types/ProductType";
  */
 
 const BASEURL = process.env.NEXT_PUBLIC_BACK_API_URL;
-const TESTURL = process.env.NEXT_PUBLIC_FASHION_SEARCH_API;
+
 /**
  * 사용자로부터 전달받은 파일을 이미지 서버로 업로드합니다.
  * 에러 발생 시 throw 대신 null을 반환하여 페이지 멈춤을 방지합니다.

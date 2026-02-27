@@ -11,7 +11,7 @@ export default function Loading() {
 
     return (
         <div className="max-w-7xl mx-auto space-y-12 animate-pulse">
-            {/* Header Skeleton */}
+            {/* 헤더 스켈레톤 */}
             <div className="space-y-4">
                 <div className="flex items-center gap-4">
                     <span className="w-10 h-px bg-black/5 dark:bg-white/5"></span>
@@ -26,7 +26,7 @@ export default function Loading() {
                 </div>
             </div>
 
-            {/* Metrics Grid Skeleton */}
+            {/* 지표 그리드 스켈레톤 */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {skeletonMetrics.map((_, i) => (
                     <div key={i} className="bg-white dark:bg-neutral-900/40 p-8 rounded-[2.5rem] border border-neutral-100 dark:border-white/5 space-y-6">
@@ -43,9 +43,9 @@ export default function Loading() {
                 ))}
             </div>
 
-            {/* Main Charts Area Skeleton */}
+            {/* 메인 차트 영역 스켈레톤 */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                {/* Category Dist Skeleton */}
+                {/* 카테고리 분포 스켈레톤 */}
                 <div className="lg:col-span-2 bg-white dark:bg-neutral-900/40 rounded-[3rem] border border-neutral-100 dark:border-white/5 p-12 space-y-12 shadow-sm">
                     <div className="flex justify-between items-end">
                         <div className="space-y-3">
@@ -67,7 +67,7 @@ export default function Loading() {
                     </div>
                 </div>
 
-                {/* Insight Card Skeleton */}
+                {/* 인사이트 카드 스켈레톤 */}
                 <div className="bg-neutral-900 dark:bg-neutral-900/80 rounded-[3rem] p-12 flex flex-col justify-between space-y-12">
                     <div className="space-y-8">
                         <div className="w-12 h-12 rounded-full bg-neutral-800"></div>
@@ -86,10 +86,10 @@ export default function Loading() {
                 </div>
             </div>
 
-            {/* Loading Message */}
+            {/* 로딩 메시지 */}
             <div className="flex flex-col items-center justify-center py-10 space-y-4">
                 <div className="h-6 w-6 border-2 border-violet-600 border-t-transparent rounded-full animate-spin"></div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400">Synchronizing</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400">데이터 동기화 중...</p>
             </div>
         </div>
     );

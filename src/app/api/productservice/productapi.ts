@@ -224,7 +224,7 @@ export const getInternalStyleCount512 = async () => {
         }
 
         const data = await response.json();
-        console.log("512", data);
+        // console.log("512", data);
         return data;
     } catch (error) {
         console.error("getStyleCount512 error:", error);
@@ -247,7 +247,7 @@ export const getInternalStyleCount768 = async () => {
         }
 
         const data = await response.json();
-        console.log("768", data);
+        // console.log("768", data);
         return data;
     } catch (error) {
         console.error("getStyleCount768 error:", error);

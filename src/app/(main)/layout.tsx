@@ -10,28 +10,29 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             <Suspense fallback={null}>
                 <AuthHandler />
             </Suspense>
-            {/* Background Atmospheric Effects */}
+            {/* 배경 분위기 효과 */}
             <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-                {/* Light Mode: Sunlight effect from top-left corner */}
+                {/* 라이트 모드: 좌측 상단 햇빛 효과 */}
                 <div
-                    className="absolute -top-20 -left-20 w-[800px] h-[800px] dark:opacity-0 blur-3xl"
+                    className="absolute -top-20 -left-20 w-200 h-200 dark:opacity-0 blur-3xl"
                     style={{
                         background: 'radial-gradient(circle at center, rgba(254, 240, 138, 0.5) 0%, rgba(254, 215, 170, 0.3) 40%, transparent 70%)'
                     }}
                 />
-                <div className="absolute top-10 left-10 w-[400px] h-[400px] bg-yellow-100/60 dark:opacity-0 rounded-full blur-[100px]" />
+                <div className="absolute top-10 left-10 w-100 h-100 bg-yellow-100/60 dark:opacity-0 rounded-full blur-[100px]" />
 
-                {/* Dark Mode: Moonlight effect from top-right */}
+                {/* 다크 모드: 우측 상단 달빛 효과 */}
                 <div
-                    className="absolute -top-10 -right-10 w-[600px] h-[600px] opacity-0 dark:opacity-100 blur-3xl"
+                    className="absolute -top-10 -right-10 w-150 h-150 opacity-0 dark:opacity-100 blur-3xl"
                     style={{
                         background: 'radial-gradient(circle at center, rgba(191, 219, 254, 0.15) 0%, rgba(199, 210, 254, 0.08) 40%, transparent 70%)'
                     }}
                 />
-                <div className="absolute top-20 right-20 w-[200px] h-[200px] bg-blue-100/30 opacity-0 dark:opacity-100 rounded-full blur-[80px]" />
+                <div className="absolute top-20 right-20 w-50 h-50 bg-blue-100/30 opacity-0 dark:opacity-100 rounded-full blur-[80px]" />
 
-                {/* Dark Mode: Twinkling stars */}
+                {/* 다크 모드: 반짝이는 별 효과 */}
                 <div className="absolute inset-0 opacity-0 dark:opacity-100">
+                    {/* eslint-disable react-hooks/purity */}
                     {[...Array(50)].map((_, i) => (
                         <div
                             key={i}
@@ -45,6 +46,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                             }}
                         />
                     ))}
+                    {/* eslint-enable react-hooks/purity */}
                 </div>
             </div>
 

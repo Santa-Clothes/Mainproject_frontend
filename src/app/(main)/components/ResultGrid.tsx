@@ -17,8 +17,9 @@ interface ResultGridProps {
 }
 
 /**
- * ResultGrid: AI 스타일 분석(유사도 추천) 결과를 그리드 형태로 나열하여 표시하는 리스트 컴포넌트
- * 분석 대기, 로딩, 완료 상태에 따른 시각적 피드백(Skeleton, Spinner)을 제공합니다.
+ * ResultGrid
+ * AI 스타일 유사도 분석 결과를 상품 그리드 형태로 나열하여 표시하는 리스트 컴포넌트입니다.
+ * 비동기 분석 대기, 로딩 스피너 및 완료 렌더링 상태 처리를 모두 포함합니다.
  */
 const ResultGrid: React.FC<ResultGridProps> = ({
     title = "추천 목록",
@@ -31,8 +32,7 @@ const ResultGrid: React.FC<ResultGridProps> = ({
     onProductClick
 }) => {
     /**
-     * [AI 심리적 시각화 메시지]
-     * 실제 분석 과정(2048차원 벡터 추출 등)을 사용자에게 전문적으로 보여주기 위한 텍스트 리스트
+     * 사용자의 지루함을 방지하기 위해 로딩 모달 내에서 순환 표출되는 분석 로딩 메시지 리스트
      */
     const loadingMessages = [
         "상품의 특징 데이터를 분석 중입니다...",
@@ -43,8 +43,7 @@ const ResultGrid: React.FC<ResultGridProps> = ({
     ];
 
     const [messageIndex, setMessageIndex] = React.useState(0);
-    // console.log("products", products);
-    // 로딩 메시지 순환 타이머
+    // 지정된 간격으로 로딩 메시지 인덱스 순환
     React.useEffect(() => {
         if (!isLoading) {
             setMessageIndex(0);

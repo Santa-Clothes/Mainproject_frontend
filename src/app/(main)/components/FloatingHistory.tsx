@@ -44,7 +44,7 @@ export default function FloatingHistory() {
         <div className={`fixed top-1/2 -translate-y-1/2 z-50 transition-all duration-300 ${isOpen ? 'right-4' : '-right-20'}`}>
             <div className="relative bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl border-2 border-neutral-100 dark:border-white/10 rounded-3xl p-3 shadow-2xl flex flex-col items-center gap-3">
 
-                {/* Toggle Button */}
+                {/* 숨기기/보이기 토글 버튼 */}
                 <button
                     onClick={() => setIsOpen(!isOpen)}
                     className="absolute -left-8 top-1/2 -translate-y-1/2 bg-white dark:bg-neutral-900 border-2 border-neutral-100 dark:border-white/10 w-8 h-12 rounded-l-xl flex items-center justify-center shadow-lg hover:text-violet-600 transition-colors"
@@ -52,7 +52,7 @@ export default function FloatingHistory() {
                     {isOpen ? <FaAngleRight size={14} /> : <FaAngleLeft size={14} />}
                 </button>
 
-                {/* Top Section: Bookmark */}
+                {/* 상단: 북마크 이동 버튼 */}
                 <div className="flex flex-col items-center w-full pb-3 border-b-2 border-dashed border-neutral-100 dark:border-white/10 mb-2">
                     <div
                         title="북마크"
@@ -61,19 +61,19 @@ export default function FloatingHistory() {
                     >
                         <FaBookmark size={18} />
                         {bookmark.length > 0 && (
-                            <div className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] bg-red-500 text-white rounded-full flex items-center justify-center text-[9px] font-bold px-1 ring-2 ring-white dark:ring-neutral-900 shadow-md animate-in zoom-in">
+                            <div className="absolute -top-1.5 -right-1.5 min-w-4.5 h-4.5 bg-red-500 text-white rounded-full flex items-center justify-center text-[9px] font-bold px-1 ring-2 ring-white dark:ring-neutral-900 shadow-md animate-in zoom-in">
                                 {bookmark.length}
                             </div>
                         )}
                     </div>
                 </div>
 
-                {/* Center Section: History Icon */}
+                {/* 중앙: 히스토리 기호 */}
                 <div className="text-violet-400 dark:text-violet-500 mb-2">
                     <FaClockRotateLeft size={16} title="조회기록" />
                 </div>
 
-                {/* Bottom Section: History Items */}
+                {/* 하단: 최근 분석 기록 (최대 3개 표출) */}
                 <div className="flex flex-col gap-3 w-full items-center">
                     {history.length > 0 ? (
                         history.map((item, idx) => (
@@ -81,7 +81,7 @@ export default function FloatingHistory() {
                                 key={item.id}
                                 onClick={() => handleHistoryClick(item)}
                                 className="relative w-12 h-12 rounded-xl overflow-hidden hover:ring-2 hover:ring-violet-500 transition-all group scale-100 active:scale-95 shadow-sm bg-neutral-100 dark:bg-neutral-800"
-                                title={`Recent analysis ${history.length - idx}`}
+                                title={`최근 분석 기록 ${history.length - idx}`}
                             >
                                 <Image
                                     src={(item.sourceImage.startsWith('data:') || item.sourceImage.startsWith('blob:'))

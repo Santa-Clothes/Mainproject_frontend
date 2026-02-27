@@ -19,9 +19,9 @@ interface SelectionPanelProps {
 }
 
 /**
- * SelectionPanel: 기존 데이터베이스 내 카테고리별 상품을 탐색하고, 특정 상품을 선택하여 비슷한 스타일을 검색하는 컴포넌트
- * Explore Catalog 페이지(`/main/selectionpage`)에서 입력 대기 상태로 사용되며,
- * 카테고리 필터링과 무한 스크롤 형태의 상품 탐색을 제공합니다.
+ * SelectionPanel
+ * 미리 설정된 카테고리별 상품 데이터베이스를 탐색하고,
+ * 특정 상품을 선택해 유사 스타일 분석을 시작할 수 있는 탐색 패널 컴포넌트입니다.
  */
 export default function SelectionPanel({
   onResultFound,
@@ -44,13 +44,10 @@ export default function SelectionPanel({
   const selectedCat = searchParams.get('cat') || 'All';
   const selectedProductId = searchParams.get('pid') || null;
 
-  // 프로젝트에서 사용하는 카테고리 목록
-  const categories = /* ['테스트 용 버튼'] //테스트용 임시로 버튼하나만 */
-    ['All', "블라우스", "블라우스나시", "가디건", "코트", "데님", "이너웨어", "자켓", "점퍼", "니트나시", "니트", "레깅스", "원피스", "바지", "스커트", "슬랙스", "세트", "티셔츠나시", "티셔츠", "베스트이너", "베스트", "남방"];
+  // 카테고리 분류 목록
+  const categories = ['All', "블라우스", "블라우스나시", "가디건", "코트", "데님", "이너웨어", "자켓", "점퍼", "니트나시", "니트", "레깅스", "원피스", "바지", "스커트", "슬랙스", "세트", "티셔츠나시", "티셔츠", "베스트이너", "베스트", "남방"];
 
-  /**
-   * 1. 초기 데이터 로드 (컴포넌트 마운트 시 1회 실행)
-   */
+  // 전체 데이터베이스 초도 페칭
   useEffect(() => {
     const initLoad = async () => {
       setIsFetching(true);
@@ -66,16 +63,12 @@ export default function SelectionPanel({
     initLoad();
   }, []);
 
-  /**
-   * 2. 카테고리 변경 시 출력 개수 초기화 (성능 최적화)
-   */
+  // 카테고리 전환 시 화면 표출 개수 초기화
   useEffect(() => {
     setDisplayCount(24);
   }, [selectedCat]);
 
-  /**
-   * 3. 필터링 로직 (메모리 내 전체 결과에서 카테고리 필터링)
-   */
+  // 현재 선택된 카테고리에 맞는 상품 배열 정제
   const filteredProducts = useMemo(() => {
     const results = !selectedCat || selectedCat === 'All'
       ? allProducts
@@ -83,16 +76,12 @@ export default function SelectionPanel({
     return results;
   }, [selectedCat, allProducts]);
 
-  /**
-   * 4. [핵심] 실제 화면에 보일 부분만 슬라이싱하여 렌더링 부하 감소
-   */
+  // DOM 렌더링 부하 방지를 위한 가상 표출 배열 스플라이싱
   const visibleProducts = useMemo(() => {
     return filteredProducts.slice(0, displayCount);
   }, [filteredProducts, displayCount]);
 
-  /**
-   * 5. 무한 스크롤 핸들러 (리스트 바닥 감지 시 렌더링 개수 증가)
-   */
+  // 리스트 스크롤 바닥 도달 시 표출 개수 동적 증가
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
     if (scrollHeight - scrollTop <= clientHeight + 200) {
@@ -104,14 +93,12 @@ export default function SelectionPanel({
 
   const [analyzingTargetId, setAnalyzingTargetId] = useState<string | null>(null);
 
-  /**
-   * 카테고리 선택 처리
-   */
+  // 카테고리 탭 클릭 시 이벤트 처리 및 라우터 매개변수 동기화
   const selectCategory = (cat: string) => {
     if (selectedCat === cat || isFetching) return;
     const params = new URLSearchParams(searchParams.toString());
     params.set('cat', cat);
-    params.delete('pid'); // 카테고리 변경 시 선택 상품 해제
+    params.delete('pid'); // 카테고리 간 전환 시 선택 상태 해제
     router.replace(`?${params.toString()}`, { scroll: false });
 
     setIsFiltering(true);
@@ -119,9 +106,7 @@ export default function SelectionPanel({
     setTimeout(() => setIsFiltering(false), 300);
   };
 
-  /**
-   * 개별 상품 선택 처리
-   */
+  // 단일 상품 클릭 시 분석 대상 지정 프로세스
   const selectProduct = (product: ProductData) => {
     const params = new URLSearchParams(searchParams.toString());
     if (selectedProductId === product.productId) {
@@ -135,17 +120,14 @@ export default function SelectionPanel({
     router.replace(`?${params.toString()}`, { scroll: false });
   };
 
-  /**
-   * [핵심] 특정 상품으로 유사 스타일 검색 시작
-   */
+  // 선택된 대상을 기준으로 스타일 유사 분석을 백엔드에 요청
   const startAnalysis = (product?: ProductData) => {
     const targetId = product?.productId || selectedProductId;
     if (!targetId) return;
 
     setAnalyzingTargetId(targetId);
 
-    // [핵심] startTransition 외부에 배치하여 isAnalyzing 상태 변화가 즉시(Urgent) 반영되도록 함. 
-    // 내부에 두면 React 18의 useTransition 특성상 화면에 로딩 상태가 업데이트되지 않고 무시됩니다.
+    // 트랜지션 블록 외부에서 상태를 즉각 동기화해 React 18 UI 지연 블록 회피
     const targetProduct = product || allProducts.find(p => p.productId === targetId);
     if (targetProduct) {
       const safeImageUrl = targetProduct.imageUrl || (targetProduct as any).image_url || (targetProduct as any).image || '';
@@ -177,9 +159,7 @@ export default function SelectionPanel({
     });
   };
 
-  /**
-   * 필터 및 선택 초기화
-   */
+  // 모든 검색 필터 및 활성화 요소 해제
   const handleReset = () => {
     const params = new URLSearchParams(searchParams.toString());
     params.delete('cat');
@@ -281,7 +261,7 @@ export default function SelectionPanel({
           /* 상품 리스트 노출 */
           <div className="pt-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
             <div className="flex flex-col gap-4 pb-8">
-              {/* 이전 리셋 버튼 위치 (제거됨) */}
+              {/* 상품 목록 */}
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-10 pb-20">
@@ -301,7 +281,7 @@ export default function SelectionPanel({
                       similarityScore: undefined // 탐색 단계이므로 유사도 점수 제외
                     }}
                     index={idx}
-                    // selected={selectedProductId === product.productId} // 이 라인을 제거하여 체크 표시 오버레이 방지
+                    // onAnalyzeClick: Analyze trigger
                     onAnalyzeClick={() => startAnalysis(product)}
                     isAnalyzing={isLoading && analyzingTargetId === product.productId}
                     onClick={() => selectProduct(product)}

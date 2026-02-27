@@ -9,8 +9,6 @@ import {
   FaSun,
   FaMoon,
   FaUser,
-  FaCamera,
-  FaMagnifyingGlass,
   FaCloudArrowUp,
   FaShirt
 } from 'react-icons/fa6';

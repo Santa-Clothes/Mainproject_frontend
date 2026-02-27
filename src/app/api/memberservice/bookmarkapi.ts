@@ -1,5 +1,4 @@
 const BASEURL = process.env.NEXT_PUBLIC_BACK_API_URL;
-import { RecommendData } from "@/types/ProductType";
 
 /**
  * 장바구니 리스트 저장 API

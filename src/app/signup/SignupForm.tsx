@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { FaArrowRight, FaCamera, FaUser } from "react-icons/fa6";
+import { FaArrowRight, FaCamera } from "react-icons/fa6";
 import { useRouter } from "next/navigation";
 import { signupAPI } from "@/app/api/memberservice/memberapi";
 import { useRef, useState } from "react";

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip } from 'recharts';
 import Image from 'next/image';
 import DashboardCard from './DashboardCard';
 import Wizard from '@/assets/wizard.svg';
@@ -16,11 +16,12 @@ interface Props {
 }
 
 /**
- * StyleDistributionCard: 전체 스타일 비중을 도넛 차트(PieChart)로 시각화합니다.
- * Recharts를 사용하여 데이터를 렌더링하며, 상세 범례를 포함합니다.
+ * StyleDistributionCard: 전체 스타일 분포를 파이 차트 형태로 시각화합니다.
+ * ScatterPlot과 동일한 색상 팔레트를 공유하여 컴포넌트 간 시각적 일관성을 유지하며,
+ * API 유연성을 위해 한글 및 영문 키 값을 모두 매핑하여 처리합니다.
  */
 const StyleDistributionCard: React.FC<Props> = ({ data, isLoading, error, onRetry, className = "" }) => {
-    // 스타일별 확실히 구분되는 원색(Primary Colors) 팔레트 정의
+    // 스타일 카테고리별 구분을 명확히 하기 위한 원색 위주의 컬러 매핑
     const STYLE_COLOR_MAP: Record<string, string> = {
         '캐주얼': '#0000FF',        // Pure Blue
         'casual': '#0000FF',
@@ -64,7 +65,7 @@ const StyleDistributionCard: React.FC<Props> = ({ data, isLoading, error, onRetr
             topRight={`${totalCnt.toLocaleString()}개`}
         >
             <div className="flex flex-col md:flex-row items-center gap-4 h-full">
-                {/* 차트 영역: 왼쪽 배치 */}
+                {/* 차트 시각화 영역 (좌측) */}
                 <div className="relative w-48 h-48 shrink-0">
                     <PieChart width={192} height={192}>
                         <Pie
@@ -99,7 +100,7 @@ const StyleDistributionCard: React.FC<Props> = ({ data, isLoading, error, onRetr
                     </div>
                 </div>
 
-                {/* 범례 영역: 오른쪽 그리드 배치*/}
+                {/* 범례 텍스트 표시 영역 (우측 그리드) */}
                 <div className="flex-1 grid grid-cols-2 gap-x-6 gap-y-3">
                     {data.slice(0, 10).map((item, i) => (
                         <div key={i} className="flex items-center justify-between group px-2 py-1 rounded-lg hover:bg-neutral-50 dark:hover:bg-white/5 transition-colors">

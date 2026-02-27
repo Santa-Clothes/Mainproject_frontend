@@ -10,7 +10,7 @@ export default function MainPage() {
   return (
     <div className="max-w-7xl mx-auto space-y-16">
 
-      {/* Header */}
+      {/* 헤더 부분 */}
       <div className="flex flex-col md:flex-row justify-between items-end gap-6 pb-10">
         <div className="space-y-3">
           <div className="flex items-center gap-3">

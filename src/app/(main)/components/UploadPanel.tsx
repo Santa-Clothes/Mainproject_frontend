@@ -126,7 +126,7 @@ const UploadPanel = forwardRef<UploadPanelRef, UploadPanelProps>(({ onResultFoun
     // 2. 서버 전송 및 히스토리용 리사이즈 이미지 생성 (최대 300px)
     const { dataUrl, blob } = await resizeImage(file, 300);
 
-    // 서버 전송용은 Blob을 File 객체로 변환하여 저장
+    // 서버 전송 전 호환성 확보를 위해 Blob 데이터를 File 객체 형식으로 캐스팅
     const resizedFile = new File([blob], file.name, { type: file.type || 'image/jpeg' });
     setSelectedFile(resizedFile);
 
@@ -155,7 +155,7 @@ const UploadPanel = forwardRef<UploadPanelRef, UploadPanelProps>(({ onResultFoun
   };
 
   /**
-   * [핵심] 분석 시작 버튼 클릭 시 서버로 전송 및 추천 리스트 조회
+   * [핵심] 처리 대상 이미지를 서버로 전송하고 스타일 분석 요청 수행
    */
   const handleSearch = () => {
     if (!selectedFile) return;
