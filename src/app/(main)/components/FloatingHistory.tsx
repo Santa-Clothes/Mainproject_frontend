@@ -46,7 +46,7 @@ export default function FloatingHistory() {
     };
 
     return (
-        <div className={`fixed top-1/2 -translate-y-1/2 z-50 transition-all duration-300 ${effectivelyVisible ? 'right-4' : '-right-24'} ${isFullScreen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+        <div className={`fixed top-1/2 -translate-y-1/2 z-50 transition-all duration-300 right-0 ${effectivelyVisible ? '-translate-x-4' : 'translate-x-full'} ${isFullScreen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
             <div className="relative bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl border-2 border-neutral-100 dark:border-white/10 rounded-3xl p-3 shadow-2xl flex flex-col items-center gap-3">
 
                 {/* 숨기기/보이기 토글 버튼 */}
