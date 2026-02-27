@@ -167,30 +167,30 @@ export default function AnalysisSection({
 
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-6">
             {/* 1. Header Area with dynamic title */}
-            <div className="flex flex-col md:flex-row justify-between items-end gap-6 border-b-2 border-neutral-100 dark:border-white/10 pb-8">
-                <div className="space-y-3">
+            <div className="flex flex-col md:flex-row justify-between items-end gap-6 border-b-2 border-neutral-100 dark:border-white/10 pb-6">
+                <div className="space-y-2">
                     <div className="flex items-center gap-2">
                         <span className="text-[11px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-[0.3em] font-sans">스타일 분석 영역</span>
                     </div>
-                    <h3 className="font-bold text-5xl italic tracking-tight text-neutral-900 dark:text-white">
+                    <h3 className="font-bold text-4xl italic tracking-tight text-neutral-900 dark:text-white">
                         {isLoading ? "스타일 분석중..." : `스타일 분석: ${highestLabel || productName || "Reference Item"}`}
                     </h3>
                 </div>
             </div>
 
             {/* 2. Content Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
                 {/* Left Col: Source Image Preview & Input Slot */}
-                <div className="lg:col-span-4 space-y-6">
+                <div className="lg:col-span-4 space-y-4">
                     <div
                         onClick={() => !isSelectionMode && fileInputRef.current?.click()}
                         onDragOver={handleDragOver}
                         onDragLeave={handleDragLeave}
                         onDrop={handleDrop}
-                        className={`aspect-3/4 relative rounded-4xl overflow-hidden border-2 shadow-inner group transition-all duration-300
+                        className={`aspect-3/4 relative rounded-[2.5rem] overflow-hidden border-2 shadow-inner group transition-all duration-300
                             ${!isSelectionMode ? 'cursor-pointer' : ''}
                             ${isDragging ? 'border-violet-500 bg-violet-50/50 scale-[0.98] ring-8 ring-violet-500/10' : 'border-neutral-100 dark:border-white/10 bg-neutral-50/50 dark:bg-neutral-800/50'}
                         `}
@@ -238,9 +238,9 @@ export default function AnalysisSection({
                 </div>
 
                 {/* Right Col: Graphs */}
-                <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-10">
+                <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Radar Chart Section */}
-                    <div className="bg-white dark:bg-neutral-900/50 rounded-4xl p-8 border-2 border-neutral-100 dark:border-white/10 shadow-sm space-y-6 aspect-3/4 flex flex-col relative overflow-hidden">
+                    <div className="bg-white dark:bg-neutral-900/50 rounded-[2.5rem] p-6 border-2 border-neutral-100 dark:border-white/10 shadow-sm space-y-4 aspect-3/4 flex flex-col relative overflow-hidden">
                         {/* 빛 반사 디자인 효과 */}
                         <div className="absolute top-0 right-0 w-64 h-64 bg-violet-500/10 dark:bg-violet-500/20 rounded-full blur-[80px] z-0 pointer-events-none" />
                         <div className="relative z-10 space-y-3 shrink-0">

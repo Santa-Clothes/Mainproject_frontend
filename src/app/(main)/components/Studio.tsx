@@ -192,7 +192,7 @@ export default function Studio({ mode }: { mode: StudioMode }) {
   };
 
   return (
-    <div className="space-y-6 lg:space-y-10 max-w-7xl mx-auto w-full px-4 lg:px-0">
+    <div className="space-y-3 lg:space-y-4 max-w-7xl mx-auto w-full px-4 lg:px-0">
       <AnimatePresence mode="wait">
         {results ? (
           /* [뷰 전환 A] 분석이 종료되었고 정상적 응답이 반환된 경우 (보고서 표시 뷰) */
@@ -202,13 +202,13 @@ export default function Studio({ mode }: { mode: StudioMode }) {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.98 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
-            className="space-y-10 pb-20"
+            className="space-y-4 pb-6"
           >
             {/* Card 1: 분석 보고서 섹션 (DNA Matrix) */}
-            <div className="bg-white dark:bg-neutral-900/50 rounded-4xl lg:rounded-[2.5rem] border-2 border-neutral-100 dark:border-white/10 shadow-xl p-6 lg:p-12">
+            <div className="bg-white dark:bg-neutral-900/50 rounded-4xl lg:rounded-[2.5rem] border-2 border-neutral-100 dark:border-white/10 shadow-xl p-4 md:p-6">
               <button
                 onClick={handleBackToSearch}
-                className="flex items-center gap-2 text-violet-600 font-bold text-xs uppercase tracking-widest hover:underline mb-10 transition-all hover:gap-3"
+                className="flex items-center gap-2 text-violet-600 font-bold text-xs uppercase tracking-widest hover:underline mb-4 transition-all hover:gap-3"
               >
                 ← 뒤로가기
               </button>
@@ -235,7 +235,7 @@ export default function Studio({ mode }: { mode: StudioMode }) {
             </div>
 
             {/* Card 2: 첫 번째 추천 결과(내부 데이터) 그리드 섹션 */}
-            <div className="bg-white dark:bg-neutral-900/50 rounded-4xl lg:rounded-[2.5rem] border-2 border-neutral-100 dark:border-white/10 shadow-xl p-6 lg:p-12 h-200 lg:h-225 flex flex-col">
+            <div className="bg-white dark:bg-neutral-900/50 rounded-4xl lg:rounded-[2.5rem] border-2 border-neutral-100 dark:border-white/10 shadow-xl p-4 md:p-6 h-180 lg:h-200 flex flex-col">
               <ResultGrid
                 isActive={true}
                 isLoading={isPending && isAnalyzing}
@@ -246,7 +246,7 @@ export default function Studio({ mode }: { mode: StudioMode }) {
             </div>
 
             {/* Card 3: 두 번째 추천 결과 그리드 섹션 (추가) */}
-            <div className="bg-white dark:bg-neutral-900/50 rounded-4xl lg:rounded-[2.5rem] border-2 border-neutral-100 dark:border-white/10 shadow-xl p-6 lg:p-12 h-200 lg:h-225 flex flex-col">
+            <div className="bg-white dark:bg-neutral-900/50 rounded-4xl lg:rounded-[2.5rem] border-2 border-neutral-100 dark:border-white/10 shadow-xl p-4 md:p-6 h-180 lg:h-200 flex flex-col">
               <ResultGrid
                 isActive={true}
                 isLoading={isPending && isAnalyzing}

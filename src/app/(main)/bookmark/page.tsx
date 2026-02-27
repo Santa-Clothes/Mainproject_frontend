@@ -118,11 +118,11 @@ export default function BookmarkPage() {
 
     return (
         <div className="max-w-7xl mx-auto w-full px-4 lg:px-0 pt-6 pb-20">
-            <div className="bg-white dark:bg-neutral-900/50 rounded-4xl lg:rounded-[2.5rem] border-2 border-neutral-100 dark:border-white/10 shadow-xl p-6 lg:p-12 min-h-200 flex flex-col">
+            <div className="bg-white dark:bg-neutral-900/50 rounded-4xl lg:rounded-[2.5rem] border-2 border-neutral-100 dark:border-white/10 shadow-xl p-4 md:p-8 min-h-200 flex flex-col">
 
                 {/* 헤더 영역 */}
-                <div className="flex-none flex flex-col md:flex-row justify-between items-end gap-6 border-b-2 border-neutral-100 dark:border-white/10 pb-6 mb-8">
-                    <div className="space-y-2">
+                <div className="flex-none flex flex-col md:flex-row justify-between items-end gap-6 border-b-2 border-neutral-100 dark:border-white/10 pb-4 mb-4">
+                    <div className="space-y-1">
                         <div className="flex items-center gap-2 text-neutral-400 dark:text-neutral-500">
                             <FaLayerGroup size={10} className="text-violet-500" />
                             <span className="text-[9px] font-bold uppercase tracking-widest">Saved Items</span>
@@ -188,7 +188,7 @@ export default function BookmarkPage() {
                             </div>
                         </div>
                     ) : bookmark.length > 0 ? (
-                        <div className="grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-4 pb-12">
+                        <div className="grid grid-cols-1 gap-x-4 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 pb-12">
                             {bookmark.map((item, idx) => (
                                 <div
                                     key={`${item.naverProductId}-${idx}`}

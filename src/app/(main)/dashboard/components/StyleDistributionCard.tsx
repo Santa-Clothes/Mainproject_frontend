@@ -71,20 +71,18 @@ const StyleDistributionCard: React.FC<Props> = ({ data, isLoading, error, onRetr
             error={error}
             onRetry={onRetry}
             lgColSpan={2}
-            className={`${className} min-h-72`}
-            topRight={`${totalCnt.toLocaleString()}개`}
         >
-            <div className="flex flex-col md:flex-row items-center gap-4 h-full">
+            <div className="flex items-center gap-2 h-full min-h-0">
                 {/* 차트 시각화 영역 (좌측) */}
-                <div className="relative w-48 h-48 shrink-0">
-                    <PieChart width={192} height={192}>
+                <div className="relative w-40 h-40 shrink-0">
+                    <PieChart width={160} height={160}>
                         <Pie
-                            data={data.slice(0, 8).map(t => ({ score: t?.count ? Math.abs(t.count) : 0, name: t?.styleName || 'Unknown' }))}
+                            data={data.slice(0, 10).map(t => ({ score: t?.count ? Math.abs(t.count) : 0, name: t?.styleName || 'Unknown' }))}
                             cx="50%"
                             cy="50%"
-                            innerRadius={55}
-                            outerRadius={75}
-                            paddingAngle={6}
+                            innerRadius={45}
+                            outerRadius={65}
+                            paddingAngle={5}
                             dataKey="score"
                             nameKey="name"
                             stroke="none"
@@ -104,27 +102,27 @@ const StyleDistributionCard: React.FC<Props> = ({ data, isLoading, error, onRetr
                         />
                     </PieChart>
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
-                        <div className="relative w-20 h-20 opacity-50">
+                        <div className="relative w-16 h-16 opacity-40">
                             <Image src={Wizard} alt="Style Distribution" fill className="object-contain" />
                         </div>
                     </div>
                 </div>
 
                 {/* 범례 텍스트 표시 영역 (우측 그리드) */}
-                <div className="flex-1 grid grid-cols-2 gap-x-6 gap-y-3">
+                <div className="flex-1 grid grid-cols-2 gap-x-2 gap-y-1 py-0.5">
                     {data.slice(0, 10).map((item, i) => (
-                        <div key={i} className="flex items-center justify-between group px-2 py-1 rounded-lg hover:bg-neutral-50 dark:hover:bg-white/5 transition-colors">
-                            <div className="flex items-center gap-2">
-                                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: getColor(item.styleName || '') }}></div>
-                                <span className="text-[11px] font-bold text-black dark:text-white uppercase tracking-widest truncate max-w-28">
+                        <div key={i} className="flex items-center justify-between group px-1.5 py-0.5 rounded-lg hover:bg-neutral-50 dark:hover:bg-white/5 transition-colors">
+                            <div className="flex items-center gap-1.5 min-w-0">
+                                <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: getColor(item.styleName || '') }}></div>
+                                <span className="text-[10px] font-bold text-black dark:text-white uppercase tracking-wider truncate" title={item.styleName || 'Unknown'}>
                                     {item.styleName || 'Unknown'}
                                 </span>
                             </div>
-                            <span className="text-[10px] font-medium text-gray-400">{((item.count / totalCnt) * 100).toFixed(1)}%</span>
+                            <span className="text-[9px] font-medium text-gray-400 shrink-0 ml-1">{((item.count / totalCnt) * 100).toFixed(1)}%</span>
                         </div>
                     ))}
                 </div>
-                <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-violet-500/5 rounded-full blur-3xl pointer-events-none"></div>
+                <div className="absolute -right-20 -bottom-20 w-48 h-48 bg-violet-500/5 rounded-full blur-3xl pointer-events-none"></div>
             </div>
         </DashboardCard>
     );

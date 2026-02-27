@@ -58,8 +58,8 @@ const ResultGrid: React.FC<ResultGridProps> = ({
     return (
         <div className="flex flex-col h-full min-h-0">
             {/* 1. 고정 헤더 영역: 검색 통계 및 제목 */}
-            <div className="flex-none flex flex-col md:flex-row justify-between items-end gap-6 border-b-2 border-neutral-100 dark:border-white/10 pb-6 mb-8">
-                <div className="space-y-2">
+            <div className="flex-none flex flex-col md:flex-row justify-between items-end gap-6 border-b-2 border-neutral-100 dark:border-white/10 pb-4 mb-4">
+                <div className="space-y-1">
                     <div className="flex items-center gap-2 text-neutral-400 dark:text-neutral-500">
                         <FaLayerGroup size={10} className="text-violet-500" />
                         <span className="text-[12px] font-bold uppercase tracking-widest">{subtitle}</span>
@@ -106,7 +106,7 @@ const ResultGrid: React.FC<ResultGridProps> = ({
                     </div>
                 ) : (isActive || products) && Array.isArray(products) ? (
                     /* [상태 2] 분석 완료 및 상품 리스트 노출 */
-                    <div className="grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-4 pb-12">
+                    <div className="grid grid-cols-1 gap-x-4 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 pb-12">
                         {products.map((item, idx) => (
                             <ProductCard
                                 key={`${item.productId}-${idx}`}

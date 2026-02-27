@@ -13,30 +13,9 @@ import { useAtom } from 'jotai';
 import { modelModeAtom } from '@/jotai/modelJotai';
 
 
-/**
- * DashboardStyleItem: 스타일 분석 결과 데이터의 내부 타입 정의
- */
-interface DashboardStyleItem {
-  value: number;
-  style: string;
-  percentStr: string;
-  score: number;
-  xcoord: number; // t-SNE 시각화를 위한 X 좌표
-  ycoord: number; // t-SNE 시각화를 위한 Y 좌표
-  zcoord: number; // t-SNE 시각화를 위한 Z 좌표
-  productId: string;
-  productName: string;
-}
-
-/**
- * Dashboard Component
- * 서비스의 주요 지표, 스타일 트렌드, 매출 순위 등을 한눈에 보여주는 메인 관제 센터
- */
 export default function Dashboard({
-  initialData = [],
   initialSales = []
 }: {
-  initialData?: any[],
   initialSales?: SalesRankItem[]
 }) {
   // 전역 분석 모델 모드 상태 (512 vs 768)
@@ -116,36 +95,34 @@ export default function Dashboard({
   }, [modelMode]);
 
   return (
-    <div className="space-y-8 pb-20">
-      {/* 하단 전체 영역: 매출 랭킹 파이프라인 */}
-      <div className="w-full">
-        <BestSellersCard
-          initialSales={sales}
-          fetchSalesFn={getSalesRankingByShopAndDate}
-          isLoading={isLoadingSales}
-        />
-      </div>
-
-      {/* 상단 2분할 영역: 통합 스타일 차트 / 클러스터 플롯맵 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
-        <div className="flex flex-col gap-6">
+    <div className="space-y-3 pb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-1.5 items-stretch">
+        {/* 좌측 영역 (4컬럼): 스타일 분포 차트 + 클러스터 맵 스택 */}
+        <div className="lg:col-span-4 flex flex-col gap-1.5">
           <StyleDistributionCard
             data={internalStyles}
             isLoading={isLoadingInternalStyles}
             error={errorInternalStyles}
-            onRetry={() => fetchInternalStyles(true)}
+            onRetry={fetchInternalStyles}
             className="flex-1"
+          />
+          <ScatterPlot
+            title="스타일 클러스터"
+            subtitle="잠재벡터 맵"
+            description="제품 특징을 공간에 압축하여 시각화한 맵입니다."
+            bottomTextFormat="총 {count}개 데이터 매핑"
+            className="flex-1"
+            fetchDataFn={modelMode === '768' ? getScatter768Points : getScatter512Points}
           />
         </div>
 
-        <div className="flex flex-col gap-6">
-          <ScatterPlot
-            title="스타일 클러스터"
-            subtitle="잠재벡터 2차원 투영"
-            description="스타일별로 고차원 제품 특징을 차원축소 알고리즘을 통해 2차원 평면에 압축하여 시각화한 맵입니다."
-            bottomTextFormat="총 {count}개의 데이터가 매핑되었습니다."
-            className="flex-1 h-full"
-            fetchDataFn={modelMode === '768' ? getScatter768Points : getScatter512Points}
+        {/* 우측 영역 (8컬럼): 매출 랭킹 파이프라인 */}
+        <div className="lg:col-span-8">
+          <BestSellersCard
+            initialSales={sales}
+            fetchSalesFn={getSalesRankingByShopAndDate}
+            isLoading={isLoadingSales}
+            className="h-full"
           />
         </div>
       </div>

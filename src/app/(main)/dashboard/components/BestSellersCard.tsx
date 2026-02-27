@@ -200,7 +200,75 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
 
     return (
         <DashboardCard
-            title="판매량 순위"
+            title={
+                <div className="flex flex-col sm:flex-row sm:items-end justify-between w-full gap-4">
+                    <span>판매량 순위</span>
+                    <div className="flex items-end gap-3 shrink-0 h-8">
+                        <span className="text-[12px] text-gray-400 font-bold uppercase tracking-widest hidden xl:block whitespace-nowrap leading-none pb-2">Shop Selection (Max 3)</span>
+                        <div className="relative w-40 xl:w-52">
+                            <input
+                                type="text"
+                                placeholder="지점 검색..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full bg-neutral-100 dark:bg-white/5 border border-neutral-200 dark:border-white/10 rounded-full px-3 h-8 text-[10px] font-bold text-neutral-800 dark:text-white placeholder:text-neutral-400 focus:ring-1 focus:ring-violet-500 outline-none transition-all"
+                            />
+                        </div>
+                        <div className="flex items-center gap-1 bg-white dark:bg-neutral-900 rounded-full border border-neutral-200 dark:border-white/10 p-0.5 shadow-sm transition-all hover:border-violet-300 h-8">
+                            {/* Calendar Icon & Label */}
+                            <div className="flex items-center gap-1 pl-2 pr-1 border-r border-neutral-100 dark:border-white/5 text-neutral-400 shrink-0">
+                                <FaRegCalendarAlt className="text-violet-500" size={10} />
+                                <span className="text-[9px] font-bold uppercase tracking-widest hidden lg:block">기간</span>
+                            </div>
+                            <div
+                                onClick={() => startDateRef.current?.showPicker()}
+                                className="relative px-2 py-1 flex items-center justify-center gap-1 hover:bg-neutral-50 dark:hover:bg-white/5 transition-all cursor-pointer rounded-l-full border-r border-neutral-100 dark:border-white/5 whitespace-nowrap"
+                            >
+                                <span className="text-[9px] font-bold text-violet-600 dark:text-violet-400">
+                                    {formatDateDisplay(startDate) || 'START'}
+                                </span>
+                                <input
+                                    ref={startDateRef}
+                                    type="date"
+                                    value={startDate}
+                                    max={today}
+                                    onChange={(e) => {
+                                        const newStart = e.target.value;
+                                        setStartDate(newStart);
+                                        if (endDate && newStart > endDate) setEndDate('');
+                                    }}
+                                    className="absolute -z-50 opacity-0 pointer-events-none w-0 h-0"
+                                />
+                            </div>
+                            <div
+                                onClick={() => endDateRef.current?.showPicker()}
+                                className="relative px-2 py-1 flex items-center justify-center gap-1 hover:bg-neutral-50 dark:hover:bg-white/5 transition-all cursor-pointer rounded-r-full whitespace-nowrap"
+                            >
+                                <span className="text-[9px] font-bold text-violet-600 dark:text-violet-400">
+                                    {formatDateDisplay(endDate) || 'END'}
+                                </span>
+                                <input
+                                    ref={endDateRef}
+                                    type="date"
+                                    value={endDate}
+                                    min={startDate}
+                                    max={today}
+                                    onChange={(e) => setEndDate(e.target.value)}
+                                    className="absolute -z-50 opacity-0 pointer-events-none w-0 h-0"
+                                />
+                            </div>
+                            {(startDate || endDate) && (
+                                <button
+                                    onClick={() => { setStartDate(''); setEndDate(''); }}
+                                    className="w-5 h-5 flex items-center justify-center text-neutral-400 hover:text-red-500"
+                                >
+                                    <FaTimes size={8} />
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            }
             subtitle="지점별 비교"
             error={error}
             onRetry={() => {
@@ -209,88 +277,10 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
             }}
             className={`${className}`}
         >
-            <div className="flex flex-col h-full space-y-6 pt-2">
+            <div className="flex flex-col h-full space-y-0 pt-2">
 
-                {/* 1. Header with Search and Shop Pills */}
-                <div className="flex flex-col gap-3">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                        <div className="flex items-center gap-4 w-auto max-w-full">
-                            <div className="relative w-full sm:w-64">
-                                <input
-                                    type="text"
-                                    placeholder="지점 검색 (예: 부산)"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="w-full bg-neutral-100 dark:bg-white/5 border border-neutral-200 dark:border-white/10 rounded-full px-4 py-2 text-[11px] font-bold text-neutral-800 dark:text-white placeholder:text-neutral-400 focus:ring-2 focus:ring-violet-500 outline-none transition-all"
-                                />
-                            </div>
-                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest hidden xl:block shrink-0">최대 3개 지점 선택 가능</span>
-                        </div>
-                        <div className="flex items-center gap-4 w-auto sm:ml-auto">
-                            <div className="flex items-center gap-1.5 bg-white dark:bg-neutral-900 rounded-full border border-neutral-200 dark:border-white/10 p-1 shadow-sm w-auto shrink-0 transition-all hover:border-violet-300 dark:hover:border-violet-500/50">
-                                {/* Calendar Icon & Label Wrapper */}
-                                <div className="flex items-center gap-1.5 pl-3 pr-2 border-r border-neutral-100 dark:border-white/5 text-neutral-400 dark:text-neutral-500 shrink-0">
-                                    <FaRegCalendarAlt className="text-violet-500" size={12} />
-                                    <span className="text-[12px] font-bold uppercase tracking-widest hidden lg:block whitespace-nowrap">기간설정</span>
-                                </div>
-
-                                <div
-                                    onClick={() => startDateRef.current?.showPicker()}
-                                    className="relative px-3 py-1 flex items-center justify-center gap-2 hover:bg-neutral-50 dark:hover:bg-white/5 transition-all cursor-pointer rounded-l-full border-r border-neutral-100 dark:border-white/5 whitespace-nowrap"
-                                >
-                                    <span className="text-[10px] font-bold text-violet-600 dark:text-violet-400">
-                                        {formatDateDisplay(startDate) || 'START'}
-                                    </span>
-                                    <input
-                                        ref={startDateRef}
-                                        type="date"
-                                        value={startDate}
-                                        max={today}
-                                        onChange={(e) => {
-                                            const newStart = e.target.value;
-                                            setStartDate(newStart);
-                                            // 시작일이 종료일보다 미래인 경우 종료일 초기화
-                                            if (endDate && newStart > endDate) {
-                                                setEndDate('');
-                                            }
-                                        }}
-                                        className="absolute -z-50 opacity-0 pointer-events-none w-0 h-0"
-                                    />
-                                </div>
-                                <div
-                                    onClick={() => endDateRef.current?.showPicker()}
-                                    className="relative px-3 py-1 flex items-center justify-center gap-2 hover:bg-neutral-50 dark:hover:bg-white/5 transition-all cursor-pointer rounded-r-full whitespace-nowrap"
-                                >
-                                    <span className="text-[10px] font-bold text-violet-600 dark:text-violet-400">
-                                        {formatDateDisplay(endDate) || 'END'}
-                                    </span>
-                                    <input
-                                        ref={endDateRef}
-                                        type="date"
-                                        value={endDate}
-                                        min={startDate}
-                                        max={today}
-                                        onChange={(e) => setEndDate(e.target.value)}
-                                        className="absolute -z-50 opacity-0 pointer-events-none w-0 h-0"
-                                    />
-                                </div>
-
-                                {/* Reset Button */}
-                                {(startDate || endDate) && (
-                                    <button
-                                        onClick={() => {
-                                            setStartDate('');
-                                            setEndDate('');
-                                        }}
-                                        className="flex items-center justify-center w-6 h-6 mr-1 text-neutral-400 hover:text-red-500 hover:bg-neutral-100 dark:hover:bg-white/10 rounded-full transition-all"
-                                        title="기간 초기화"
-                                    >
-                                        <FaTimes size={10} />
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                    </div>
+                {/* 1. Shop Pills (Horizontal Scroller) */}
+                <div className="flex flex-col gap-1 p-1.5 bg-neutral-50/50 dark:bg-neutral-800/20 rounded-2xl border border-neutral-200/60 dark:border-white/10 mb-2 shadow-sm">
 
                     {/* Shops Horizontal Scroller */}
                     <div className="-mx-1 px-1 min-h-10 flex items-center">
@@ -323,21 +313,21 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
                 </div>
 
                 {/* 2. Content Split by Shop (Columns) */}
-                <div className="flex-1 min-h-80">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-0 gap-y-12 lg:gap-y-0 h-full items-stretch">
+                <div className="flex-1 min-h-50 mt-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-0 gap-y-4 lg:gap-y-0 h-full items-stretch">
 
                         {/* Always Display Total First */}
-                        <div className="flex flex-col space-y-6 col-span-1 px-4 md:px-6 lg:px-8 min-w-0">
+                        <div className="flex flex-col space-y-1 col-span-1 px-3 min-w-0">
                             {/* 지점 헤더 */}
-                            <div className="flex items-center gap-3 pb-4">
-                                <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl border-2 border-violet-500/20 dark:border-violet-500/30 bg-violet-50/50 dark:bg-violet-900/20 shadow-sm ring-1 ring-violet-500/10 shrink-0">
-                                    <div className="w-1.5 h-4 bg-violet-500 rounded-full shadow-[0_0_8px_rgba(139,92,246,0.5)]"></div>
-                                    <h4 className="text-sm font-black text-neutral-900 dark:text-white uppercase tracking-widest truncate">
+                            <div className="flex items-center gap-3 h-9">
+                                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-violet-500/20 dark:border-violet-500/30 bg-violet-50/50 dark:bg-violet-900/20 shadow-sm shrink-0">
+                                    <div className="w-1 h-3 bg-violet-500 rounded-full"></div>
+                                    <h4 className="text-[14px] font-black text-neutral-900 dark:text-white uppercase tracking-widest truncate">
                                         전체 지점
                                     </h4>
                                 </div>
                                 {(loadingShops['전체'] || isLoading) && (
-                                    <div className="w-4 h-4 rounded-full border-2 border-violet-500 border-t-transparent animate-spin ml-auto shrink-0"></div>
+                                    <div className="w-3 h-3 rounded-full border-2 border-violet-500 border-t-transparent animate-spin ml-auto shrink-0"></div>
                                 )}
                             </div>
 
@@ -358,21 +348,21 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
                                 );
 
                                 if (items.length > 0) return (
-                                    <div className={`flex flex-col gap-5 ${isLoadingShopData ? 'opacity-50' : ''} min-w-0`}>
+                                    <div className={`flex flex-col gap-3.5 mt-2.5 ${isLoadingShopData ? 'opacity-50' : ''} min-w-0`}>
                                         {items.map((item, i) => (
-                                            <div key={item.shortName} className="space-y-2 group min-w-0">
-                                                <div className="flex justify-between items-end gap-3 min-w-0">
-                                                    <div className="flex items-center gap-2 min-w-0 flex-1">
-                                                        <span className="text-[12px] italic text-violet-600 font-bold shrink-0">0{i + 1}</span>
-                                                        <span className="text-[11px] font-bold text-black dark:text-white uppercase tracking-tight truncate group-hover:text-violet-500 transition-colors tooltip flex-1" title={item.shortName}>
+                                            <div key={item.shortName} className="space-y-0.5 group min-w-0">
+                                                <div className="flex justify-between items-end gap-2 min-w-0">
+                                                    <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                                                        <span className="text-[15px] italic text-violet-600 font-black shrink-0">0{i + 1}</span>
+                                                        <span className="text-[15px] font-black text-black dark:text-white uppercase tracking-tight truncate group-hover:text-violet-500 transition-colors tooltip flex-1" title={item.shortName}>
                                                             {item.shortName}
                                                         </span>
                                                     </div>
-                                                    <span className="text-[12px] font-black text-violet-600 tracking-tighter shrink-0">
+                                                    <span className="text-[15px] font-black text-violet-600 tracking-tighter shrink-0">
                                                         {item.quantity.toLocaleString()}
                                                     </span>
                                                 </div>
-                                                <div className="h-1.5 w-full bg-gray-50 dark:bg-white/5 rounded-full overflow-hidden">
+                                                <div className="h-2.5 w-full bg-gray-50 dark:bg-white/5 rounded-full overflow-hidden">
                                                     <div className="h-full rounded-full transition-all duration-1000 bg-violet-600 shadow-[0_0_8px_rgba(139,92,246,0.3)]" style={{ width: `${(item.quantity / maxQ) * 100}%` }}></div>
                                                 </div>
                                             </div>
@@ -380,7 +370,7 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
                                     </div>
                                 );
 
-                                return <div className="text-xs font-bold text-gray-400 py-8 text-center bg-neutral-50 dark:bg-white/5 rounded-xl border border-dashed border-neutral-200 dark:border-white/10">No data.</div>;
+                                return <div className="text-xs font-bold text-gray-400 py-4 text-center bg-neutral-50 dark:bg-white/5 rounded-xl border border-dashed border-neutral-200 dark:border-white/10">No data.</div>;
                             })()}
                         </div>
 
@@ -391,11 +381,11 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
                             // Empty Slot
                             if (!shop) {
                                 return (
-                                    <div key={`empty-${slotIdx}`} className={`flex flex-col space-y-6 col-span-1 px-4 md:px-6 lg:px-8 min-w-0 lg:border-l ${slotIdx % 2 === 0 ? 'md:border-l' : ''} border-neutral-200 dark:border-white/20`}>
-                                        <div className="flex items-center gap-3 pb-4">
-                                            <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl border border-dashed border-neutral-300 dark:border-white/20 bg-transparent opacity-60 shrink-0">
+                                    <div key={`empty-${slotIdx}`} className={`flex flex-col space-y-1 col-span-1 px-3 min-w-0 lg:border-l-2 ${slotIdx % 2 === 0 ? 'md:border-l-2' : ''} border-neutral-300 dark:border-white/30`}>
+                                        <div className="flex items-center gap-3 h-9">
+                                            <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl border border-dashed border-neutral-300 dark:border-white/20 bg-transparent opacity-60 shrink-0">
                                                 <div className="w-1.5 h-4 bg-neutral-300 dark:bg-neutral-700 rounded-full"></div>
-                                                <h4 className="text-sm font-bold text-neutral-400 dark:text-gray-500 uppercase tracking-widest truncate">
+                                                <h4 className="text-[14px] font-bold text-neutral-400 dark:text-gray-500 uppercase tracking-widest truncate">
                                                     비교 지점 선택
                                                 </h4>
                                             </div>
@@ -418,51 +408,51 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
                             const maxQ = items[0]?.quantity || 1;
 
                             return (
-                                <div key={shop} className={`flex flex-col space-y-6 col-span-1 fade-in px-4 md:px-6 lg:px-8 min-w-0 lg:border-l ${slotIdx % 2 === 0 ? 'md:border-l' : ''} border-neutral-200 dark:border-white/20`}>
-                                    <div className="flex items-center gap-3 pb-4 group/header relative">
-                                        <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl border-2 border-indigo-500/20 dark:border-indigo-500/30 bg-indigo-50/50 dark:bg-indigo-900/20 shadow-sm ring-1 ring-indigo-500/10 max-w-[calc(100%-40px)] shrink-0">
-                                            <div className="w-1.5 h-4 bg-indigo-500 rounded-full shadow-[0_0_8px_rgba(99,102,241,0.5)]"></div>
-                                            <h4 className="text-sm font-black text-neutral-900 dark:text-white uppercase tracking-widest truncate">
+                                <div key={shop} className={`flex flex-col space-y-1 col-span-1 fade-in px-3 min-w-0 lg:border-l-2 ${slotIdx % 2 === 0 ? 'md:border-l-2' : ''} border-neutral-300 dark:border-white/30`}>
+                                    <div className="flex items-center gap-3 h-9 group/header relative">
+                                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-indigo-500/20 dark:border-indigo-500/30 bg-indigo-50/50 dark:bg-indigo-900/20 shadow-sm max-w-[calc(100%-40px)] shrink-0">
+                                            <div className="w-1 h-3 bg-indigo-500 rounded-full"></div>
+                                            <h4 className="text-[14px] font-black text-neutral-900 dark:text-white uppercase tracking-widest truncate">
                                                 {shop}
                                             </h4>
                                         </div>
                                         <button
                                             onClick={() => handleShopToggle(shop)}
-                                            className="absolute right-0 p-1.5 rounded-full text-neutral-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors border border-transparent hover:border-red-100 dark:hover:border-red-900/20 shrink-0"
+                                            className="absolute right-0 p-1 rounded-full text-neutral-400 hover:text-red-500 transition-colors shrink-0"
                                             title="선택 해제"
                                         >
-                                            <FaTimes size={10} />
+                                            <FaTimes size={8} />
                                         </button>
                                         {isLoadingShopData && (
-                                            <div className="w-4 h-4 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin ml-auto shrink-0"></div>
+                                            <div className="w-3 h-3 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin ml-auto shrink-0"></div>
                                         )}
                                     </div>
 
                                     {isLoadingShopData && items.length === 0 ? (
                                         <div className="flex flex-col gap-4">
                                             {[1, 2, 3, 4, 5].map(v => (
-                                                <div key={v} className="flex flex-col gap-2 w-full animate-pulse">
-                                                    <div className="h-4 w-1/3 bg-neutral-200 dark:bg-neutral-800 rounded"></div>
-                                                    <div className="h-1.5 w-full bg-neutral-200 dark:bg-neutral-800 rounded-full"></div>
+                                                <div key={v} className="flex flex-col gap-1.5 w-full animate-pulse">
+                                                    <div className="h-3 w-1/3 bg-neutral-200 dark:bg-neutral-800 rounded"></div>
+                                                    <div className="h-1 w-full bg-neutral-200 dark:bg-neutral-800 rounded-full"></div>
                                                 </div>
                                             ))}
                                         </div>
                                     ) : items.length > 0 ? (
-                                        <div className={`flex flex-col gap-5 ${isLoadingShopData ? 'opacity-50' : ''} min-w-0`}>
+                                        <div className={`flex flex-col gap-3.5 mt-2.5 ${isLoadingShopData ? 'opacity-50' : ''} min-w-0`}>
                                             {items.map((item, i) => (
-                                                <div key={item.shortName} className="space-y-2 group min-w-0">
-                                                    <div className="flex justify-between items-end gap-3 min-w-0">
-                                                        <div className="flex items-center gap-2 min-w-0 flex-1">
-                                                            <span className="text-[12px] italic text-indigo-600 font-bold shrink-0">0{i + 1}</span>
-                                                            <span className="text-[11px] font-bold text-black dark:text-white uppercase tracking-tight truncate group-hover:text-indigo-500 transition-colors tooltip flex-1" title={item.shortName}>
+                                                <div key={item.shortName} className="space-y-0.5 group min-w-0">
+                                                    <div className="flex justify-between items-end gap-2 min-w-0">
+                                                        <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                                                            <span className="text-[15px] italic text-indigo-600 font-black shrink-0">0{i + 1}</span>
+                                                            <span className="text-[15px] font-black text-black dark:text-white uppercase tracking-tight truncate group-hover:text-indigo-500 transition-colors tooltip flex-1" title={item.shortName}>
                                                                 {item.shortName}
                                                             </span>
                                                         </div>
-                                                        <span className="text-[12px] font-black text-indigo-600 tracking-tighter shrink-0">
+                                                        <span className="text-[15px] font-black text-indigo-600 tracking-tighter shrink-0">
                                                             {item.quantity.toLocaleString()}
                                                         </span>
                                                     </div>
-                                                    <div className="h-1.5 w-full bg-indigo-50 dark:bg-white/5 rounded-full overflow-hidden">
+                                                    <div className="h-2.5 w-full bg-indigo-50 dark:bg-white/5 rounded-full overflow-hidden">
                                                         <div
                                                             className="h-full rounded-full transition-all duration-1000 bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.3)]"
                                                             style={{ width: `${(item.quantity / maxQ) * 100}%` }}

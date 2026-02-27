@@ -157,7 +157,7 @@ const ProductCard = React.memo(({
     return (
         <div
             onClick={onClick}
-            className={`group space-y-4 cursor-pointer transition-all`}
+            className={`group space-y-2.5 cursor-pointer transition-all`}
         >
             {/* 1. 이미지 컨테이너 */}
             <div className={`aspect-3/4 overflow-hidden rounded-3xl bg-neutral-50/50 dark:bg-neutral-800/50 border-2 relative shadow-sm transition-all border-neutral-100 dark:border-white/15 group-hover:border-violet-500 group-hover:ring-4 group-hover:ring-violet-500/10`}>

@@ -176,7 +176,7 @@ export default function SelectionPanel({
   };
 
   return (
-    <div className="flex flex-col h-full gap-y-8 overflow-hidden relative p-6 lg:p-12">
+    <div className="flex flex-col h-full gap-y-6 overflow-hidden relative p-4 md:p-8">
       {/* 전체 카드 로딩 오버레이 (초기 진입 시에만) */}
       {isFetching && (
         <div className="absolute inset-x-0 inset-y-0 z-50 flex flex-col items-center justify-center bg-white/70 dark:bg-neutral-900/70 backdrop-blur-md rounded-[inherit]">
@@ -213,7 +213,7 @@ export default function SelectionPanel({
         </div>
       )}
       {/* 1. 고정 영역: 카테고리 칩 및 검색 시작 버튼 */}
-      <div className="flex-none space-y-6">
+      <div className="flex-none space-y-4">
         <div className={`flex flex-wrap justify-center gap-3 transition-all duration-500 ${isFetching ? 'opacity-40 grayscale pointer-events-none' : 'opacity-100'}`}>
           {categories.map(cat => (
             <button
@@ -272,7 +272,7 @@ export default function SelectionPanel({
               {/* 상품 목록 */}
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-10 pb-20">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-x-3 gap-y-8 pb-20">
               {visibleProducts.map((product, idx) => (
                 <div
                   key={`${product.productId}-${idx}`}

@@ -35,7 +35,7 @@ const DashboardCard: React.FC<Props> = ({
     const colSpanClass = lgColSpan === 2 ? 'lg:col-span-2' : lgColSpan === 3 ? 'lg:col-span-3' : '';
 
     return (
-        <div className={`${colSpanClass} bg-white dark:bg-neutral-900/50 rounded-3xl border-2 border-neutral-100 dark:border-white/10 p-7 flex flex-col shadow-sm relative overflow-hidden ${className}`}>
+        <div className={`${colSpanClass} bg-white dark:bg-neutral-900/50 rounded-3xl border-2 border-neutral-100 dark:border-white/10 p-3 md:p-4 flex flex-col shadow-sm relative overflow-hidden ${className}`}>
             {isMetric ? (
                 /* [Metric Mode Header] 소제목과 아이콘만 상단에 고정 */
                 <div className="flex justify-between items-center relative z-10">
@@ -44,12 +44,12 @@ const DashboardCard: React.FC<Props> = ({
                 </div>
             ) : (
                 /* [Standard Mode Header] 소제목 줄에 필터 배치, 제목은 아래로 */
-                <div className="relative z-10 mb-6 space-y-3">
-                    <div className="flex justify-between items-center">
-                        <span className="text-[16px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-[0.3em] font-sans">{subtitle}</span>
+                <div className="relative z-10 mb-1.5">
+                    <div className="flex justify-between items-center mb-0.5">
+                        <span className="text-[12px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-widest font-sans leading-none">{subtitle}</span>
                         {topRight}
                     </div>
-                    <h3 className={`${lgColSpan === 1 ? 'text-3xl' : 'text-5xl'} font-bold italic text-neutral-900 dark:text-white tracking-tight flex items-center gap-3`}>
+                    <h3 className={`${lgColSpan === 1 ? 'text-xl' : 'text-3xl'} font-bold italic text-neutral-900 dark:text-white tracking-tighter flex items-center gap-3 leading-tight`}>
                         {title}
                     </h3>
                 </div>

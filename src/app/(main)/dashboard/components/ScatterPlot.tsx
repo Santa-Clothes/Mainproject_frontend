@@ -200,8 +200,8 @@ export default function ScatterPlot({
                 lgColSpan={2}
                 topRight={
                     <div className="relative group">
-                        <button onClick={fetchData} disabled={isLoading} className="p-3 rounded-full border-2 border-neutral-200 dark:border-white/5 bg-neutral-100 dark:bg-white/5 text-gray-400 hover:text-violet-500 hover:border-2 hover:border-violet-500 flex items-center justify-center transition-all">
-                            <FaArrowsRotate className={isLoading ? 'animate-spin' : ''} />
+                        <button onClick={fetchData} disabled={isLoading} className="p-1 px-2 rounded-full border border-neutral-200 dark:border-white/10 bg-neutral-100 dark:bg-white/5 text-gray-400 hover:text-violet-500 hover:border-violet-500 flex items-center justify-center transition-all h-7">
+                            <FaArrowsRotate className={isLoading ? 'animate-spin' : ''} size={12} />
                         </button>
                         <div className="absolute bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 px-2.5 py-1.5 bg-neutral-800 dark:bg-white text-white dark:text-black text-[9px] font-bold uppercase tracking-widest rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 whitespace-nowrap shadow-lg z-50">
                             RESET
@@ -212,7 +212,7 @@ export default function ScatterPlot({
             >
 
                 {/* 축소된 메인 그래프 컨테이너 */}
-                <div className="w-full flex-1 min-h-50 rounded-3xl overflow-hidden border border-neutral-300 dark:border-white/10 bg-gray-50/10 dark:bg-black/20 relative shadow-inner cursor-pointer group" onClick={() => setIsExpanded(true)}>
+                <div className="w-full h-32 mt-2 rounded-3xl overflow-hidden border border-neutral-300 dark:border-white/10 bg-gray-50/10 dark:bg-black/20 relative shadow-inner cursor-pointer group" onClick={() => setIsExpanded(true)}>
                     <AnimatePresence>
                         {isLoading && (
                             <motion.div
@@ -233,20 +233,19 @@ export default function ScatterPlot({
                     </AnimatePresence>
 
                     {/* CSS로 구현된 애니메이션 Placeholder (모달 확장을 유도) */}
-                    <div className="w-full h-full min-h-50 relative z-10 flex flex-col items-center justify-center gap-4 py-4 bg-linear-to-b from-transparent to-neutral-100/50 dark:to-white/5 transition-colors">
+                    <div className="w-full h-full relative z-10 flex flex-col items-center justify-center py-0 bg-linear-to-b from-transparent to-neutral-100/50 dark:to-white/5 transition-colors">
 
                         {/* CSS 추상 신경망 디자인 */}
-                        <div className="relative w-32 h-32 flex items-center justify-center">
-                            <div className="absolute inset-0 bg-violet-400/20 dark:bg-violet-600/20 rounded-full blur-2xl group-hover:bg-violet-500/40 transition-colors duration-500"></div>
-                            <div className="absolute inset-3 bg-indigo-400/20 dark:bg-indigo-600/20 rounded-full blur-xl group-hover:bg-indigo-500/40 transition-colors duration-500 delay-75"></div>
-                            <div className="absolute inset-8 bg-pink-400/20 dark:bg-pink-600/20 rounded-full blur-md group-hover:bg-pink-500/40 transition-colors duration-500 delay-150"></div>
-
-                            <LuChartScatter className="text-4xl text-violet-600 dark:text-violet-400 relative z-10 group-hover:scale-125 transition-transform duration-500 drop-shadow-lg" />
+                        <div className="relative w-14 h-14 flex items-center justify-center">
+                            <div className="absolute inset-0 bg-violet-400/20 dark:bg-violet-600/20 rounded-full blur-xl group-hover:bg-violet-500/40 transition-colors duration-500"></div>
+                            <div className="absolute inset-2 bg-indigo-400/20 dark:bg-indigo-600/20 rounded-full blur-lg group-hover:bg-indigo-500/40 transition-colors duration-500 delay-75"></div>
+                            <div className="absolute inset-4 bg-pink-400/20 dark:bg-pink-600/20 rounded-full blur-sm group-hover:bg-pink-500/40 transition-colors duration-500 delay-150"></div>
+                            <LuChartScatter className="text-xl text-violet-600 dark:text-violet-400 relative z-10 group-hover:scale-125 transition-transform duration-500 drop-shadow-md" />
                         </div>
 
-                        <div className="text-center space-y-1 z-10">
-                            <h4 className="text-xl font-bold text-neutral-800 dark:text-gray-200">Interactive Map</h4>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 max-w-sm mx-auto leading-relaxed px-4">
+                        <div className="text-center space-y-0 z-10">
+                            <h4 className="text-sm font-bold text-neutral-800 dark:text-gray-200 leading-tight">Interactive Map</h4>
+                            <p className="text-[9px] text-gray-500 dark:text-gray-400 max-w-xs mx-auto leading-none px-4 opacity-80">
                                 {description}
                             </p>
                         </div>
@@ -260,8 +259,8 @@ export default function ScatterPlot({
                     )}
                 </div>
 
-                <div className="pt-6 border-t border-gray-100 dark:border-white/5 relative z-10 mt-auto">
-                    <p className="text-[12px] font-medium text-gray-500 dark:text-gray-500 uppercase tracking-widest leading-relaxed">
+                <div className="pt-3 border-t border-gray-100 dark:border-white/5 relative z-10 mt-auto">
+                    <p className="text-[11px] font-medium text-gray-500 dark:text-gray-500 uppercase tracking-widest leading-relaxed">
                         {bottomTextFormat.replace('{count}', data.length.toLocaleString())}
                     </p>
                 </div>
@@ -269,70 +268,72 @@ export default function ScatterPlot({
 
             {/* 확대된 모달 뷰 */}
             <AnimatePresence>
-                {isExpanded && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl overflow-y-auto custom-scrollbar"
-                    >
-                        <div className="min-h-full p-4 md:p-16 flex flex-col justify-start max-w-400 mx-auto w-full">
-                            <div className="flex justify-between items-start md:items-center mb-8 shrink-0 flex-col md:flex-row gap-6">
-                                <div className="space-y-2">
-                                    <span className="text-[10px] font-bold text-violet-500 uppercase tracking-widest">Interactive Mode</span>
-                                    <div className="flex items-end gap-4">
-                                        <h2 className="text-4xl font-normal italic text-black dark:text-white">Full Scale Analysis</h2>
-                                        <p className="text-[12px] font-bold text-gray-400 dark:text-gray-500 tracking-widest mb-1.5 bg-neutral-100 dark:bg-white/5 px-3 py-1 rounded-full">
-                                            {bottomTextFormat.replace('{count}', data.length.toLocaleString())}
-                                        </p>
+                {
+                    isExpanded && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 z-50 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl overflow-y-auto custom-scrollbar"
+                        >
+                            <div className="min-h-full p-4 md:p-16 flex flex-col justify-start max-w-400 mx-auto w-full">
+                                <div className="flex justify-between items-start md:items-center mb-8 shrink-0 flex-col md:flex-row gap-6">
+                                    <div className="space-y-2">
+                                        <span className="text-[10px] font-bold text-violet-500 uppercase tracking-widest">Interactive Mode</span>
+                                        <div className="flex items-end gap-4">
+                                            <h2 className="text-4xl font-normal italic text-black dark:text-white">Full Scale Analysis</h2>
+                                            <p className="text-[12px] font-bold text-gray-400 dark:text-gray-500 tracking-widest mb-1.5 bg-neutral-100 dark:bg-white/5 px-3 py-1 rounded-full">
+                                                {bottomTextFormat.replace('{count}', data.length.toLocaleString())}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => setIsExpanded(false)}
+                                        className="px-8 py-4 rounded-full bg-black text-white dark:bg-white dark:text-black font-bold uppercase tracking-widest hover:scale-105 transition-transform shrink-0"
+                                    >
+                                        Close View
+                                    </button>
+                                </div>
+
+                                <div className="w-full flex-1 flex justify-center items-start pb-16">
+                                    <div className="w-full max-w-300 aspect-square rounded-3xl border border-neutral-200 dark:border-white/10 overflow-hidden bg-white dark:bg-black/20 shadow-2xl relative p-2 md:p-4">
+                                        <Plot
+                                            data={plotData}
+                                            layout={{
+                                                autosize: true,
+                                                margin: { l: 0, r: 0, b: 0, t: 0 },
+                                                showlegend: true,
+                                                legend: {
+                                                    orientation: 'h',
+                                                    y: 0.05,
+                                                    font: { size: 12, family: 'Inter', color: '#6b7280' },
+                                                    itemsizing: 'constant'
+                                                },
+                                                hovermode: 'closest',
+                                                paper_bgcolor: 'rgba(0,0,0,0)',
+                                                plot_bgcolor: 'rgba(0,0,0,0)',
+                                                scene: {
+                                                    xaxis: { showgrid: true, gridcolor: '#cbd5e1', gridwidth: 1.5, zeroline: true, zerolinecolor: '#94a3b8', zerolinewidth: 2, showticklabels: false, title: '' },
+                                                    yaxis: { showgrid: true, gridcolor: '#cbd5e1', gridwidth: 1.5, zeroline: true, zerolinecolor: '#94a3b8', zerolinewidth: 2, showticklabels: false, title: '' },
+                                                    zaxis: { showgrid: true, gridcolor: '#cbd5e1', gridwidth: 1.5, zeroline: true, zerolinecolor: '#94a3b8', zerolinewidth: 2, showticklabels: false, title: '' },
+                                                    camera: { eye: { x: 1.5, y: 1.5, z: 1.2 } }
+                                                }
+                                            }}
+                                            config={{
+                                                displayModeBar: true,
+                                                scrollZoom: true,
+                                                responsive: true,
+                                            }}
+                                            useResizeHandler={true}
+                                            style={{ width: '100%', height: '100%' }}
+                                        />
                                     </div>
                                 </div>
-                                <button
-                                    onClick={() => setIsExpanded(false)}
-                                    className="px-8 py-4 rounded-full bg-black text-white dark:bg-white dark:text-black font-bold uppercase tracking-widest hover:scale-105 transition-transform shrink-0"
-                                >
-                                    Close View
-                                </button>
                             </div>
-
-                            <div className="w-full flex-1 flex justify-center items-start pb-16">
-                                <div className="w-full max-w-300 aspect-square rounded-3xl border border-neutral-200 dark:border-white/10 overflow-hidden bg-white dark:bg-black/20 shadow-2xl relative p-2 md:p-4">
-                                    <Plot
-                                        data={plotData}
-                                        layout={{
-                                            autosize: true,
-                                            margin: { l: 0, r: 0, b: 0, t: 0 },
-                                            showlegend: true,
-                                            legend: {
-                                                orientation: 'h',
-                                                y: 0.05,
-                                                font: { size: 12, family: 'Inter', color: '#6b7280' },
-                                                itemsizing: 'constant'
-                                            },
-                                            hovermode: 'closest',
-                                            paper_bgcolor: 'rgba(0,0,0,0)',
-                                            plot_bgcolor: 'rgba(0,0,0,0)',
-                                            scene: {
-                                                xaxis: { showgrid: true, gridcolor: '#cbd5e1', gridwidth: 1.5, zeroline: true, zerolinecolor: '#94a3b8', zerolinewidth: 2, showticklabels: false, title: '' },
-                                                yaxis: { showgrid: true, gridcolor: '#cbd5e1', gridwidth: 1.5, zeroline: true, zerolinecolor: '#94a3b8', zerolinewidth: 2, showticklabels: false, title: '' },
-                                                zaxis: { showgrid: true, gridcolor: '#cbd5e1', gridwidth: 1.5, zeroline: true, zerolinecolor: '#94a3b8', zerolinewidth: 2, showticklabels: false, title: '' },
-                                                camera: { eye: { x: 1.5, y: 1.5, z: 1.2 } }
-                                            }
-                                        }}
-                                        config={{
-                                            displayModeBar: true,
-                                            scrollZoom: true,
-                                            responsive: true,
-                                        }}
-                                        useResizeHandler={true}
-                                        style={{ width: '100%', height: '100%' }}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                        </motion.div>
+                    )
+                }
+            </AnimatePresence >
         </>
     );
 }
