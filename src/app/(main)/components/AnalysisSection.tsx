@@ -24,22 +24,42 @@ const emptyBarData = [
 ];
 
 const RADAR_LABEL_DICT: Record<string, string> = {
-    'casual': '캐주얼', 'cas': '캐주얼', '캐쥬얼': '캐주얼',
-    'contemporary': '컨템포러리', 'cnt': '컨템포러리',
-    'ethnic': '에스닉', 'eth': '에스닉',
-    'feminine': '페미닌', 'fem': '페미닌',
-    'genderless': '젠더리스', 'gnl': '젠더리스',
-    'mannish': '매니시', 'man': '매니시', '매니쉬': '매니시',
-    'natural': '내추럴', 'nat': '내추럴', '네추럴': '내추럴',
-    'sporty': '스포츠', 'spt': '스포츠', '스포티': '스포츠',
-    'subculture': '서브컬처', 'sub': '서브컬처', '서브컬쳐': '서브컬처',
-    'traditional': '트레디셔널', 'trd': '트레디셔널', '트래디셔널': '트레디셔널'
+    'casual': '캐주얼', 'casuals': '캐주얼', 'cas': '캐주얼', '캐쥬얼': '캐주얼', '캐주얼': '캐주얼',
+    'contemporary': '컨템포러리', 'contemp': '컨템포러리', 'cnt': '컨템포러리', '컨템포러리': '컨템포러리', '컨탬포러리': '컨템포러리',
+    'ethnic': '에스닉', 'ethnics': '에스닉', 'eth': '에스닉', '에스닉': '에스닉',
+    'feminine': '페미닌', 'fem': '페미닌', '페미닌': '페미닌',
+    'genderless': '젠더리스', 'gnl': '젠더리스', '젠더리스': '젠더리스',
+    'mannish': '매니시', 'man': '매니시', '매니쉬': '매니시', '매니시': '매니시',
+    'natural': '내추럴', 'naturals': '내추럴', 'nat': '내추럴', '네추럴': '내추럴', '내츄럴': '내추럴', '내추럴': '내추럴',
+    'sporty': '스포츠', 'sports': '스포츠', 'sport': '스포츠', 'spt': '스포츠', '스포티': '스포츠', '스포츠': '스포츠',
+    'subculture': '서브컬처', 'subcultures': '서브컬처', 'sub': '서브컬처', '서브컬쳐': '서브컬처', '서브컬처': '서브컬처',
+    'traditional': '트레디셔널', 'tradition': '트레디셔널', 'trd': '트레디셔널', '트래디셔널': '트레디셔널', '트레디셔널': '트레디셔널'
 };
 
 const getRadarLabel = (name?: string) => {
     if (!name) return '분석 결과 없음';
-    const lower = name.toLowerCase().replace(/\s/g, ''); // 공백 무시
-    return RADAR_LABEL_DICT[lower] || name;
+    const lower = name.toLowerCase().replace(/[^a-z0-9가-힣]/g, ''); // 특수문자 및 공백 모두 무시
+
+    // 딕셔너리에 매핑된 값이 있으면 반환
+    if (RADAR_LABEL_DICT[lower]) {
+        return RADAR_LABEL_DICT[lower];
+    }
+
+    // 딕셔너리에 없지만 영어가 포함되어 있다면 어떻게든 한글화 방어 (임시 방어코드)
+    if (/[a-z]/.test(lower)) {
+        if (lower.includes('cas')) return '캐주얼';
+        if (lower.includes('con') || lower.includes('cnt')) return '컨템포러리';
+        if (lower.includes('eth')) return '에스닉';
+        if (lower.includes('fem')) return '페미닌';
+        if (lower.includes('gen') || lower.includes('gnl')) return '젠더리스';
+        if (lower.includes('man')) return '매니시';
+        if (lower.includes('nat')) return '내추럴';
+        if (lower.includes('sport') || lower.includes('spt')) return '스포츠';
+        if (lower.includes('sub')) return '서브컬처';
+        if (lower.includes('trad') || lower.includes('trd')) return '트레디셔널';
+    }
+
+    return name; // 그래도 없으면 그냥 원본 반환
 };
 /**
  * AnalysisSection
