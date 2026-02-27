@@ -1,68 +1,61 @@
-# 📊 프로젝트 명세 보고서 (Project Specification Report)
+# 📊 AI 패션 분석 대시보드 기술 명세 보고서 (Project Technical Report)
 
 **프로젝트명**: Wizard of Ounce (The AI Fashion Archive)
-**작성 일자**: 2026년 2월 27일
+**마지막 업데이트**: 2026년 2월 27일
 
-본 보고서는 어떠한 추측이나 예측을 배제하고, 현재 프론트엔드 작업 폴더(`mainproject_frontend`)에 작성된 소스 코드 파일 시스템과 구현체만을 직관적으로 분석하여 작성한 프로젝트 현황 보고서입니다.
+본 보고서는 `mainproject_frontend` 코드베이스의 실제 구현체와 기술적 의결 사항을 기록한 공식 명세입니다. 일반적인 패러다임을 넘어, 복잡한 비동기 처리와 브라우저 제약 조건을 극복하기 위해 설계된 독자적인 해결 방식들을 중점적으로 설명합니다.
+
+---
+
+## 1. 🏗 시스템 아키텍처 및 데이터 흐름
+
+### 1-1. 비동기 인퍼런스 파이프라인
+사용자가 이미지를 업로드하거나 상품을 선택하면 다음의 정밀한 단계를 거칩니다.
+1. **Normalization**: `canvas API`를 사용하여 업로드된 이미지를 300px로 리사이징하여 통신 트래픽 최적화 (`UploadPanel.tsx`)
+2. **Context Switching**: `modelModeAtom`에 따라 `GCN (512d)` 또는 `CLIP (768d)` 전용 API 엔드포인트로 분기
+3. **Execution ID Tracking**: 각 요청에 고유 ID를 부여하여 사용자가 로딩 중 취소 시 뒷단에서 들어오는 비정상 응답이 화면을 덮어쓰지 않도록 차단 (`analysisIdRef` 패턴)
+
+### 1-2. 데이터 타입 일관성 (SelectionRecommendResult)
+일반 이미지 분석과 특정 상품 기반 분석의 응답 구조 차이를 해결하기 위해 `SelectionRecommendResult` 인터페이스를 별도로 구축했습니다. 이를 통해 `Studio.tsx`는 수신된 데이터의 형태를 식별하여 상이한 레이더 차트 필드(`styles` vs `targetTop1Style`)를 동적으로 매핑합니다.
 
 ---
 
-## 1. 🛠 기술 스택 (Tech Stack)
-소스 코드에 포함된 설정과 패키지를 기반으로 확인된 프론트엔드 기술 환경입니다.
+## 2. 🛡 기술적 도전 과제 및 해결 (Engineering Challenges)
 
-* **프레임워크**: Next.js (App Router 구조 적용)
-* **언어**: TypeScript
-* **스타일링**: Tailwind CSS
-* **상태 관리**: Jotai (전역 상태 및 로컬 스토리지 연동)
-* **데이터 시각화**: Plotly.js (`react-plotly.js`), Recharts
-* **애니메이션 & UI**: Framer Motion, `react-icons`
+### 2-1. 브라우저 스토리지 쿼터 초과 문제 (`QuotaExceededError`)解決
+*   **문제**: 분석 결과(Base64 이미지 + 수백 개의 추천 상품 JSON)가 5MB를 초과하여 `sessionStorage` 저장 시 앱이 크래시되는 현상 발생.
+*   **해결**: `jotai/utils`의 `createJSONStorage`를 커스터마이징한 **`safeSessionStorage`** 래퍼 구현. 
+*   **작동 원리**: `setItem` 시 `try-catch`로 에러를 가로채고, 용량 초과 감지 시 리스트의 가장 오래된 항목들부터 삭제하여 **가장 최신 결과 1개는 반드시 보존**하는 자가 정제 로직 적용.
 
-## 2. 📂 프로젝트 폴더 구조 및 역할
-`src/` 디렉토리를 중심으로 구성된 폴더별 핵심 역할은 다음과 같습니다.
+### 2-2. 스타일 네이밍 컨텍스트 동기화
+*   **문제**: 백엔드 API에서 제공하는 `CAS`, `MAN`, `NAT` 등의 약값과 UI에서 보여야 할 `캐주얼`, `매니시`, `내추럴` 간의 한/영/약어 3단계 동기화 필요.
+*   **해결**: `STYLE_KO_DICT`와 `RADAR_LABEL_DICT`를 통한 중앙 집중형 매퍼 구축. 특히 `AnalysisSection.tsx` 등의 시각화 컴포넌트에서 순환 참조(Circular Dependency)로 인한 HMR 크래시를 방지하기 위해 정적 매핑 로직을 컴포넌트 내부에 로컬화하여 엔진 안정성 확보.
 
-* **`src/app/`**: Next.js App Router 기반의 페이지 및 레이아웃을 담고 있습니다.
-  * `(main)/`: 메인 레이아웃(헤더, 푸터 적용)을 공유하는 내부 서비스 페이지 그룹
-  * `login/` & `signup/`: 다크/라이트 모드 배경 이펙트를 독자적으로 사용하는 인증 관련 클라이언트 컴포넌트 페이지
-  * `api/`: 백엔드 통신을 위한 Fetch API 래퍼 함수들 (`memberapi`, `productapi`, `bookmarkapi`, `salesapi` 등)
-* **`src/components/`**: 재사용 가능한 UI 컴포넌트들
-* **`src/jotai/`**: Jotai를 이용한 전역 상태 선언부 (`loginjotai.ts`, `historyJotai.ts`, `modelJotai.ts` 등)
-* **`src/types/`**: TypeScript 타입 및 인터페이스 명세서 (`AuthTypes.ts`, `ProductType.ts` 등)
-
-## 3. 🎯 핵심 서비스 모듈 (구현 기능)
-코드 베이스 내에 작성된 페이지 뷰와 API 연결 구조를 통해 확인되는 실제 서비스 모듈들입니다.
-
-### 1) 통합 인증 모듈 (Auth & Member)
-* **구현 위치**: `login`, `signup`, `(main)/AuthHandler.tsx`, `memberapi.ts`
-* **기능 요약**: 
-  * 일반 로그인 및 회원가입 폼 제공
-  * OAuth2 기반의 소셜 로그인 (Google, Naver, Kakao) 통신 규격 구현
-  * 클라이언트 측 토큰 생명주기(6시간) 및 인증 인터셉트 처리
-  * 프로필 이미지 업로드(Multipart) 및 수정 기능
-
-### 2) 이미지 분석 기반 추천 (Image Analyze Module)
-* **구현 위치**: `(main)/uploadpage`, `UploadPanel.tsx`
-* **기능 요약**: 
-  * 사용자가 의류 이미지를 드래그 앤 드롭 형태로 업로드하는 스튜디오 환경 제공
-  * 이미지를 백엔드로 전송하여 AI 분석을 거친 뒤 결과를 추천받는 플로우 구현
-
-### 3) 보유 상품 기반 추천 (Inventory Module)
-* **구현 위치**: `(main)/selectionpage`, `SelectionPanel.tsx`
-* **기능 요약**: 
-  * 데이터베이스에 존재하는 카테고리별 최고의 제품 중에서 특정 상품을 선택함
-  * 해당 상품의 속성(스타일)을 기반으로 사용자에게 제품을 매칭해주는 기능 구현
-
-### 4) 시각화 대시보드 (Analytics Module)
-* **구현 위치**: `(main)/dashboard`, `ScatterPlot.tsx`, `dashboard/page.tsx`
-* **기능 요약**: 
-  * 지점(Store)별 매출 통계 현황 데이터를 요청 및 UI로 표시
-  * AI가 분석한 잠재 공간 벡터(Latent Vectors) 데이터들을 HSL 컬러 코드로 분류하여 2차원(WebGL 지원 산점도) 인터랙티브 맵으로 투영하는 시각화 기능 제공
-
-### 5) 사용자 편의 기능 및 인터페이스 세팅
-* **구현 위치**: `Header.tsx`, `layout.tsx`, 글로벌 CSS
-* **기능 요약**:
-  * 라이트 모드(Sunlight)와 다크 모드(Moonlight/Stars)가 전환되는 글로벌 테마 토글
-  * AI 분석 관련 히스토리 및 관심 상품 저장(북마크) 등을 관리하는 내비게이션 바
-  * '768 차원 분석' 여부를 선택할 수 있는 모델 모드 스위치(`modelModeAtom`) 지원
+### 2-3. 상태 관리 및 렌더링 최적화
+*   **Hydration Mismatch**: 라이트/다크 모드의 동적 그래픽(태양/별 효과)이 SSR과 CSR 간의 차이로 에러를 유발하는 것을 `isMounted` 훅 패턴으로 해결.
+*   **Canvas Performance**: 잦은 `getImageData` 호출로 인한 브라우저 성능 경고를 `willReadFrequently: true` 옵션 적용으로 해소.
+*   **Atomic History**: Jotai를 사용하여 `History`와 `ActiveHistory`를 분리, 히스토리 클릭 시 즉각적인 뷰 복구(Zero-delay UI) 달성.
 
 ---
-*해당 문서는 작성 시점까지의 로컬 소스코드(c:\workspace\work_mainproject\mainproject_frontend)에 존재하는 컴포넌트, 경로, 변수명만을 기반으로 작성되었습니다.*
+
+## 3. 🎨 UI/UX 디자인 시스템 명세
+
+### 3-1. 다이내믹 테마 시각화
+*   **Light Mode (Sunlight)**: 따뜻한 태양광 이펙트와 화이트 글래스모피즘(Glassmorphism) 적용.
+*   **Dark Mode (Celestial)**: `Framer Motion`으로 제어되는 반짝이는 동적 별(Twinkling Stars) 이펙트와 바이올렛 포인트 컬러 중심의 딥 다크 테마.
+
+### 3-2. 고도화된 시각화 차트
+*   **Scatter Plot (UMAP)**: 스타일 벡터 공간을 Plotly.js를 이용해 2D 맵으로 시각화. 각 점 호버 시 스타일 정보를 상단에 강조 표시하고 중복 차트를 방지하기 위해 `hovertemplate` 정규화.
+*   **Radar Chart**: AI가 판단한 Top 3 스타일 점수를 5각형 레이더 차트로 시각화하여 스타일의 강점과 약점을 한눈에 파악.
+
+---
+
+## 4. 📂 주요 폴더 구조 및 역할 (Detailed)
+
+- `src/app/api`: 서버 액션이 아닌 정밀 제어가 가능한 Fetch API 서비스 레이어.
+- `src/app/(main)/components`: 상호작용의 핵심인 `Studio` 컨테이너와 하위 패널들.
+- `src/jotai`: 비즈니스 로직과 화면 상태를 연결하는 브릿지.
+- `src/types/ProductType.ts`: 복잡한 추천 결과 물리학을 담은 단일 타입 정의서.
+
+---
+*본 보고서는 2026년 2월 27일 기준 프로젝트 코드베이스의 실제 구현 상태를 바탕으로 작성되었습니다.*

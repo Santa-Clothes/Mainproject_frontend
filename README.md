@@ -1,73 +1,83 @@
-# Fashion Analytic Dashboard (Neural Interface)
+# 🎩 Wizard of Ounce: AI Fashion Archive & Analytics
 
-**Next.js 16**과 **Tailwind CSS 4**를 활용하여 구축된 현대적인 패션 트렌드 분석 및 상품 추천 플랫폼입니다. 이미지 분석 기술을 통해 사용자의 스타일을 파악하고, 시장 데이터와 대조하여 최적화된 상품 정보를 제공합니다.
+**Next.js 16 (App Router)**와 **Tailwind CSS 4**를 기반으로 구축된 고성능 AI 패션 트렌드 분석 및 스타일 큐레이션 플랫폼입니다. 고도화된 머신러닝 인퍼런스를 통해 사용자 이미지를 분석하고, 글로벌 패션 트렌드 데이터와 실시간으로 매칭하여 최적화된 인사이트를 제공합니다.
 
-## 🛠 주요 기술 스택
+---
 
-- **프레임워크**: Next.js 16 (App Router, Turbopack)
-- **언어**: TypeScript
-- **스타일링**: Tailwind CSS 4
-- **상태 관리**: Jotai (Atomic State)
-- **시각화**: 
-  - **Plotly.js**: 고차원 스타일 공간을 2D로 투영한 **UMAP 스타일 맵** 시각화
-  - **Recharts**: 스타일 분포 지표 및 시장 데이터 시각화
-- **애니메이션**: Framer Motion
-- **인터페이스**: React Icons (Fa6 브랜드 아이콘 등)
+## 🛠 Tech Stack (Core Architecture)
 
-## 🚀 핵심 기능
+- **Frontend Framework**: `Next.js 16+` (App Router, Turbopack)
+- **Programming Language**: `TypeScript` (Strictly typed interfaces)
+- **Styling Engine**: `Tailwind CSS 4` (Next-gen utility-first styling)
+- **State Orchestration**: `Jotai` (Atomic state management with Persistence)
+- **Data Visualization**: 
+  - **Plotly.js**: High-dimensional `Style Vector Spaces` projection (UMAP/t-SNE)
+  - **Recharts**: Style distribution analytics & performance metrics
+- **Visual Continuity**: `Framer Motion` (Advanced layout transitions & micro-animations)
+- **Design System**: Custom Glassmorphism UI with Dynamic Theming (Sunlight-Solar / Dark-Celestial)
 
-### 1. 지능형 스타일 분석 (Studio)
-사용자가 제공한 이미지를 바탕으로 패션 스타일을 분석하고 유사 상품을 탐색합니다.
-- **다양한 입력 인터페이스**:
-  - **이미지 직접 업로드**: 드래그 앤 드롭 및 실시간 미리보기를 통한 분석 (최대 10MB 지원)
-  - **카탈로그 상품 선택**: 기존에 등록된 다양한 상품군 중 하나를 선택하여 스타일 탐색
-- **분석 결과 리포트**:
-  - **스타일 분포 차트**: 업로드된 이미지가 어떤 스타일에 해당하는지 비중을 시각화
-  - **트렌드 데이터 대조**: 시장 데이터를 연동하여 현재 스타일의 반응도 확인
-- **사용자 경험(UX) 최적화**:
-  - **결과 페이지 내 즉시 분석**: 분석 결과 화면에서 다른 이미지를 클릭하거나 드래그하여 바로 재분석 가능
-  - **비동기 안전 장치**: 분석 프로세스 중 취소 버튼 제공 및 30초 watchdog 타임아웃 적용
+---
 
-### 2. 분석 대시보드
-패션 시장 데이터를 시각적으로 파악할 수 있는 대시보드입니다.
-- **UMAP 스타일 맵**: 상품의 스타일 벡터를 2D 맵에 투영하여, 상품 간의 스타일 관계를 직관적으로 시각화
-- **통계 지표**: 내부 스타일 데이터 현황 및 분포 확인
-- **시장 데이터 분석**: 스타일별 비중 카드 및 판매량 기반의 상품 랭킹 제공
+## 🚀 Key Engineering Features
 
-### 3. 개인화 기능 및 사용자 설정
-- **북마크 시스템**: 탐색 중 마음에 드는 상품을 저장하고 관리
-- **프로필 관리**: 이미지 및 닉네임 변경 등 개인화된 설정과 소셜 로그인(Google, Naver, Kakao) 통합 관리
-- **반응형 테마**: 사용자 설정에 따른 다크/라이트 모드 지원 및 각 모드에 최적화된 시각적 효과 적용
+### 1. Dual-Core AI Analysis Studio
+사용자의 니즈에 따라 두 가지 방식의 지능형 분석 엔진을 제공합니다.
+- **Image Input Engine (Upload)**: 사용자의 실제 이미지를 직접 분석하여 스타일 가공 및 추천 (최대 10MB 고정밀 업로드 지원)
+- **Catalog Selection Engine (Curation)**: 마스터 데이터베이스 내 검증된 카테고리별 베스트 상품을 선택하여 스타일 전이 및 매칭
+- **Multi-Model Support**: 
+  - **GCN (Gated Convolutional Network)**: 512차원 기반의 빠르고 정확한 계층적 스타일 분석
+  - **CLIP (Contrastive Language-Image Pre-training)**: 768차원 고해상성 인코딩을 통한 텍스트-이미지 교차 정밀 분석
 
-## 📂 프로젝트 구조
+### 2. Universal Style Harmonizer (Intelligent Translation)
+API 응답의 정규화된 스타일 약어와 실제 UI의 사용자 경험 간의 간극을 메우는 지능형 매핑 시스템입니다.
+- **Shortkey System**: `CAS`(Casual), `CNT`(Contemporary), `ETH`(Ethnic) 등 API 최적화 약어 지원
+- **Cross-Lingual Dictionary**: 영어-한글-약어 간 실시간 변환을 통해 대시보드 시각화와 북마크 데이터의 일관성 보장
+
+### 3. Asynchronous Lifecycle Management (Reliability)
+비동기 통신 중 발생할 수 있는 부작용(Side Effect)을 원천 차단하는 견고한 아키텍처를 구현했습니다.
+- **Task-ID Tracker**: 분석 로직에 고유 식별자(Execution ID)를 부여하여, 사용자의 **취소 버튼 클릭 시 이미 진행 중인 API 응답을 자동으로 폐기**하여 화면 전환 오류를 방지합니다.
+- **Timeout Watchdog**: GPU 서버 등의 인퍼런스 지연에 대비한 30초 데드라인 설정으로 브라우저 행(Hang) 현상을 예방합니다.
+
+### 4. Smart Storage Quota Defense (Persistence)
+브라우저의 엄격한 Storage Quota(5MB) 제한을 극복하기 위한 커스텀 저장소 정책을 적용했습니다.
+- **Safe Storage Wrapper**: `QuotaExceededError` 발생 시 즉시 최신 기록 1개만 남기고 이전 데이터를 자동 정제(Purging)하여 앱의 영속성을 보장합니다.
+- **Stale Closure Mitigation**: `useRef`를 활용한 비동기 클로저 캡처 방지 로직으로, 긴 연산 후에도 최신 분석 결과가 유실 없이 히스토리에 기록됩니다.
+
+---
+
+## 📂 System Architecture (Directory Structure)
 
 ```bash
 src/
 ├── app/
-│   ├── api/             # 데이터 통신을 위한 API 서비스 레이어
-│   ├── (main)/          # 대시보드 및 탐색 기능을 포함한 메인 레이아웃 그룹
-│   │   ├── dashboard/   # 마켓 지표 및 UMAP 맵 시각화 대시보드
-│   │   ├── uploadpage/  # 이미지 업로드 기반 스타일 분석
-│   │   ├── selectionpage/ # 상품 선택 기반 스타일 분석
-│   │   └── bookmark/    # 저장된 상품 관리
-│   └── components/      # 페이지 구성용 주요 UI 컴포넌트 (AnalysisSection 등)
-├── components/          # 공용 재사용 UI 컴포넌트
-├── jotai/               # 전역 상태 관리
-└── types/               # TypeScript 타입 정의 및 인터페이스
+│   ├── api/             # API Service Abstraction (member, product, image, sales)
+│   ├── (main)/          # Shared-Layout Application Area
+│   │   ├── dashboard/   # Multi-Dimensional Data Visualization (Plotly-map, Stats)
+│   │   ├── uploadpage/  # Image-to-Style Analysis Core
+│   │   ├── selectionpage/ # Database-driven Product Curation
+│   │   └── memberinfo/  # Profile & Credential Management
+│   └── components/      # UI Atoms & Molecules (Studio, AnalysisSection, ResultGrid)
+├── jotai/               # Global Atoms (State, History, Model-Mode)
+├── types/               # Single Source of Truth for TS Interfaces
+└── assets/              # Static SVG Assets & Brand Icons
 ```
 
-## 📦 시작하기
+---
 
-### 설치 및 실행
-```bash
-# 의존성 패키지 설치
-npm install
+## 💻 Technical Overview (Development)
 
-# 로컬 개발 서버 실행
-npm run dev
+1. **Dependency Setup**:
+   ```bash
+   npm install
+   ```
 
-# 프로덕션 빌드 생성
-npm run build
-```
+2. **Environment Configuration**:
+   `.env.local` 파일에 백엔드 API 엔드포인트 및 OAuth 클라이언트 정보를 설정하십시오.
 
-애플리케이션은 기본적으로 `http://localhost:3000`에서 실행됩니다.
+3. **Runtime**:
+   ```bash
+   npm run dev
+   ```
+
+---
+*© 2026 Wizard of Ounce. Advanced Generative Fashion Analytics.*
