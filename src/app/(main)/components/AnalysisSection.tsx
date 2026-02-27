@@ -24,21 +24,21 @@ const emptyBarData = [
 ];
 
 const RADAR_LABEL_DICT: Record<string, string> = {
-    'casual': '캐주얼', 'cas': '캐주얼',
+    'casual': '캐주얼', 'cas': '캐주얼', '캐쥬얼': '캐주얼',
     'contemporary': '컨템포러리', 'cnt': '컨템포러리',
     'ethnic': '에스닉', 'eth': '에스닉',
     'feminine': '페미닌', 'fem': '페미닌',
     'genderless': '젠더리스', 'gnl': '젠더리스',
-    'mannish': '매니시', 'man': '매니시',
-    'natural': '내추럴', 'nat': '내추럴',
-    'sporty': '스포츠', 'spt': '스포츠',
-    'subculture': '서브컬처', 'sub': '서브컬처',
-    'traditional': '트레디셔널', 'trd': '트레디셔널'
+    'mannish': '매니시', 'man': '매니시', '매니쉬': '매니시',
+    'natural': '내추럴', 'nat': '내추럴', '네추럴': '내추럴',
+    'sporty': '스포츠', 'spt': '스포츠', '스포티': '스포츠',
+    'subculture': '서브컬처', 'sub': '서브컬처', '서브컬쳐': '서브컬처',
+    'traditional': '트레디셔널', 'trd': '트레디셔널', '트래디셔널': '트레디셔널'
 };
 
 const getRadarLabel = (name?: string) => {
     if (!name) return '분석 결과 없음';
-    const lower = name.toLowerCase();
+    const lower = name.toLowerCase().replace(/\s/g, ''); // 공백 무시
     return RADAR_LABEL_DICT[lower] || name;
 };
 /**
@@ -125,6 +125,7 @@ export default function AnalysisSection({
 
             const processedData = result.map((item: any, i: number) => ({
                 ...item,
+                style: getRadarLabel(item.style || ''), // 네이버 트렌드 API 스타일명을 표준 한글명으로 정규화
                 score: item.value !== undefined ? Math.abs(item.value) : 0,
                 value: item.value !== undefined ? Math.abs(item.value) : 0,
                 percentStr: item.percentStr || '0%',
