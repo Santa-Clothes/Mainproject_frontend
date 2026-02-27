@@ -28,7 +28,15 @@
   - **GCN (Gated Convolutional Network)**: 512차원 기반의 빠르고 정확한 계층적 스타일 분석
   - **CLIP (Contrastive Language-Image Pre-training)**: 768차원 고해상성 인코딩을 통한 텍스트-이미지 교차 정밀 분석
 
-### 2. Universal Style Harmonizer (Intelligent Translation)
+### 2. Interactive Analytics Dashboard (Real-time Pipeline)
+지점별 매출 통계와 상품 트렌드를 실시간으로 비교 분석할 수 있는 고성능 대시보드입니다.
+- **Sales Comparison Pipeline**: 최대 2개의 지점을 선택하여 전체 지점 평균과 실시간으로 매출 랭킹 및 수량을 비교 분석하는 인터랙티브 파이프라인.
+- **Unified 3D Visualization**: `ScatterPlot`과 `StyleDistributionCard` 전반에 걸친 10색 고대비/비비드 컬러 팔레트 공유 체계를 구축하여 동일 스타일 = 동일 데이터 직관성 보장. 점들의 뭉침을 방지하기 위한 미세 다크 외곽선 최적화 및 `uirevision` 옵션을 통한 플롯(Plot) 카메라 앵글 일관성 지원.
+- **Zero-Distraction Viewing Mode**: `Jotai`를 이용해 화면을 100% 활용하는 풀스크린 분석 뷰 진입 시, 플로팅 내비게이션 바 등 사이드 UI를 실시간으로 치우는(Auto-pan) 초몰입형 시각화 환경 제공.
+- **Dynamic Grid Architecture**: 화면 크기에 따라 8:4(광폭) 또는 7:5(표준) 비율로 자동 조정되는 지능형 그리드 시스템을 통해 시각적 균형 유지.
+- **Sequential Brand Gradient**: [진한 보라 - 보라 - 연한 보라]로 이어지는 브랜드 시퀀스 컬러를 내비게이션과 카드에 적용하여 직관적인 사용자 흐름(Flow) 구축.
+
+### 3. Universal Style Harmonizer (Intelligent Translation)
 API 응답의 정규화된 스타일 약어와 실제 UI의 사용자 경험 간의 간극을 메우는 지능형 매핑 시스템입니다.
 - **Shortkey System**: `CAS`(Casual), `CNT`(Contemporary), `ETH`(Ethnic) 등 API 최적화 약어 지원
 - **Cross-Lingual Dictionary**: 영어-한글-약어 간 실시간 변환을 통해 대시보드 시각화와 북마크 데이터의 일관성 보장

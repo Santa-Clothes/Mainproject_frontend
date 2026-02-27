@@ -23,36 +23,36 @@ interface Props {
 const StyleDistributionCard: React.FC<Props> = ({ data, isLoading, error, onRetry, className = "" }) => {
     // ScatterPlot과 동일한 깊은 600 계열 컬러 팔레트 동기화
     const STYLE_COLOR_MAP: Record<string, string> = {
-        '캐주얼': '#2563eb',        // Blue-600
-        'casual': '#2563eb',
-        'CAS': '#2563eb',
-        '컨템포러리': '#059669',    // Emerald-600
-        'contemporary': '#059669',
-        'CNT': '#059669',
-        '에스닉': '#d97706',        // Amber-600
-        'ethnic': '#d97706',
-        'ETH': '#d97706',
+        '캐주얼': '#1d4ed8',        // Blue-700
+        'casual': '#1d4ed8',
+        'CAS': '#1d4ed8',
+        '컨템포러리': '#eab308',    // Yellow-500
+        'contemporary': '#eab308',
+        'CNT': '#eab308',
+        '에스닉': '#f97316',        // Orange-500
+        'ethnic': '#f97316',
+        'ETH': '#f97316',
         '페미닌': '#db2777',        // Pink-600
         'feminine': '#db2777',
         'FEM': '#db2777',
-        '젠더리스': '#0284c7',      // Sky-600
-        'genderless': '#0284c7',
-        'GNL': '#0284c7',
-        '매니시': '#4f46e5',        // Indigo-600
-        'mannish': '#4f46e5',
-        'MAN': '#4f46e5',
-        '내추럴': '#65a30d',        // Lime-600
-        'natural': '#65a30d',
-        'NAT': '#65a30d',
-        '스포츠': '#dc2626',        // Red-600
-        'sporty': '#dc2626',
-        'SPT': '#dc2626',
-        '서브컬처': '#9333ea',      // Purple-600
-        'subculture': '#9333ea',
-        'SUB': '#9333ea',
-        '트레디셔널': '#ca8a04',    // Yellow-600
-        'traditional': '#ca8a04',
-        'TRD': '#ca8a04',
+        '젠더리스': '#06b6d4',      // Cyan-500
+        'genderless': '#06b6d4',
+        'GNL': '#06b6d4',
+        '매니시': '#4338ca',        // Deep Indigo
+        'mannish': '#4338ca',
+        'MAN': '#4338ca',
+        '내추럴': '#22c55e',        // Green-500
+        'natural': '#22c55e',
+        'NAT': '#22c55e',
+        '스포츠': '#ef4444',        // Red-500
+        'sporty': '#ef4444',
+        'SPT': '#ef4444',
+        '서브컬처': '#a855f7',      // Purple-500
+        'subculture': '#a855f7',
+        'SUB': '#a855f7',
+        '트레디셔널': '#c2410c',    // Brown/Rust
+        'traditional': '#c2410c',
+        'TRD': '#c2410c',
     };
 
     const getColor = (style: string) => {

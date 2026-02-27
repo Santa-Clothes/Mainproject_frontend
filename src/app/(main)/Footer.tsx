@@ -9,14 +9,14 @@ export default function Footer() {
       2. bg-neutral-100/50: 라이트모드에서 배경 대비를 더 명확히 함
       3. dark:bg-black: 다크모드에서 확실히 더 깊은 검정색으로 분리
     */
-    <footer className="relative border-t-2 border-neutral-200 bg-neutral-100/50 px-8 pt-10 pb-5 text-neutral-900 transition-colors duration-500 dark:border-white/10 dark:bg-black dark:text-white">
+    <footer className="relative border-t-2 border-neutral-200 bg-neutral-100/50 px-8 pt-3 pb-1 text-neutral-900 transition-colors duration-500 dark:border-white/10 dark:bg-black dark:text-white">
 
       {/* Footer Ambient Light: 크기를 줄여 영역 침범 최소화 */}
       <div className="pointer-events-none absolute right-0 bottom-0 h-64 w-64 rounded-full bg-violet-600/5 blur-[100px] dark:bg-violet-600/10" />
 
       <div className="relative z-10 mx-auto max-w-7xl">
         {/* 그리드 간격을 gap-16에서 gap-10으로 줄임 */}
-        <div className="mb-10 grid grid-cols-1 gap-10 md:grid-cols-4">
+        <div className="mb-3 grid grid-cols-1 gap-10 md:grid-cols-4">
 
           {/* Brand Section: col-span-2로 공간 확보 */}
           <div className="col-span-1 space-y-6 md:col-span-2">

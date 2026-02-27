@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { FaArrowsRotate, FaTriangleExclamation } from "react-icons/fa6";
@@ -5,6 +7,8 @@ import { LuChartScatter } from "react-icons/lu";
 import { ScatterPoint } from "@/app/api/statservice/plotapi";
 import { motion, AnimatePresence } from "framer-motion";
 import DashboardCard from "./DashboardCard";
+import { useAtom } from "jotai";
+import { isFullScreenModalOpenAtom } from "@/jotai/uiJotai";
 
 /**
  * CSR 전용 Plotly 컴포넌트
@@ -97,36 +101,36 @@ export default function ScatterPlot({
     // 클러스터 구분성을 극대화하기 위한 고대비 고채도 식별 컬러 팔레트
     // 안정적인 매핑을 위해 한글과 영문 키를 모두 처리합니다.
     const STYLE_COLORS: Record<string, string> = {
-        '캐주얼': '#2563eb',        // Blue-600
-        'casual': '#2563eb',
-        'CAS': '#2563eb',
-        '컨템포러리': '#059669',    // Emerald-600
-        'contemporary': '#059669',
-        'CNT': '#059669',
-        '에스닉': '#d97706',        // Amber-600
-        'ethnic': '#d97706',
-        'ETH': '#d97706',
+        '캐주얼': '#1d4ed8',        // Blue-700
+        'casual': '#1d4ed8',
+        'CAS': '#1d4ed8',
+        '컨템포러리': '#eab308',    // Yellow-500
+        'contemporary': '#eab308',
+        'CNT': '#eab308',
+        '에스닉': '#f97316',        // Orange-500
+        'ethnic': '#f97316',
+        'ETH': '#f97316',
         '페미닌': '#db2777',        // Pink-600
         'feminine': '#db2777',
         'FEM': '#db2777',
-        '젠더리스': '#0284c7',      // Sky-600
-        'genderless': '#0284c7',
-        'GNL': '#0284c7',
-        '매니시': '#4f46e5',        // Indigo-600
-        'mannish': '#4f46e5',
-        'MAN': '#4f46e5',
-        '내추럴': '#65a30d',        // Lime-600
-        'natural': '#65a30d',
-        'NAT': '#65a30d',
-        '스포츠': '#dc2626',        // Red-600
-        'sporty': '#dc2626',
-        'SPT': '#dc2626',
-        '서브컬처': '#9333ea',      // Purple-600
-        'subculture': '#9333ea',
-        'SUB': '#9333ea',
-        '트레디셔널': '#ca8a04',    // Yellow-600
-        'traditional': '#ca8a04',
-        'TRD': '#ca8a04',
+        '젠더리스': '#06b6d4',      // Cyan-500
+        'genderless': '#06b6d4',
+        'GNL': '#06b6d4',
+        '매니시': '#4338ca',        // Deep Indigo (Sophisticated & Strong)
+        'mannish': '#4338ca',
+        'MAN': '#4338ca',
+        '내추럴': '#22c55e',        // Green-500
+        'natural': '#22c55e',
+        'NAT': '#22c55e',
+        '스포츠': '#ef4444',        // Red-500
+        'sporty': '#ef4444',
+        'SPT': '#ef4444',
+        '서브컬처': '#a855f7',      // Purple-500
+        'subculture': '#a855f7',
+        'SUB': '#a855f7',
+        '트레디셔널': '#c2410c',    // Brown/Rust
+        'traditional': '#c2410c',
+        'TRD': '#c2410c',
     };
 
     /**
@@ -173,9 +177,9 @@ export default function ScatterPlot({
                 hovertemplate: `<span style="font-size:16px; color:${color}; font-weight:900;">${style}</span><br><br>%{text}<br>X: %{x:.2f}  Y: %{y:.2f}  Z: %{z:.2f}<extra></extra>`,
                 marker: {
                     color: color,
-                    size: 3,
-                    opacity: 0.85,
-                    line: { color: 'rgba(0, 0, 0, 0.3)', width: 0.5 },
+                    size: 4.5,
+                    opacity: 0.8,
+                    line: { color: 'rgba(0, 0, 0, 0.25)', width: 0.5 },
                 },
                 hoverlabel: {
                     bgcolor: '#171717',
@@ -187,6 +191,13 @@ export default function ScatterPlot({
     }, [data]);
 
     const [isExpanded, setIsExpanded] = useState(false);
+    const [, setIsFullScreen] = useAtom(isFullScreenModalOpenAtom);
+
+    useEffect(() => {
+        setIsFullScreen(isExpanded);
+        // 컴포넌트 언마운트 시 상태 초기화
+        return () => setIsFullScreen(false);
+    }, [isExpanded, setIsFullScreen]);
 
     return (
         <>
@@ -274,29 +285,29 @@ export default function ScatterPlot({
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="fixed inset-0 z-50 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl overflow-y-auto custom-scrollbar"
+                            className="fixed inset-0 z-50 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl overflow-y-auto md:overflow-hidden custom-scrollbar"
                         >
-                            <div className="min-h-full p-4 md:p-16 flex flex-col justify-start max-w-400 mx-auto w-full">
-                                <div className="flex justify-between items-start md:items-center mb-8 shrink-0 flex-col md:flex-row gap-6">
-                                    <div className="space-y-2">
+                            <div className="h-full p-4 md:p-6 flex flex-col max-w-400 mx-auto w-full">
+                                <div className="flex justify-between items-start md:items-center mb-4 shrink-0 flex-col md:flex-row gap-4">
+                                    <div className="space-y-1">
                                         <span className="text-[10px] font-bold text-violet-500 uppercase tracking-widest">Interactive Mode</span>
                                         <div className="flex items-end gap-4">
-                                            <h2 className="text-4xl font-normal italic text-black dark:text-white">Full Scale Analysis</h2>
-                                            <p className="text-[12px] font-bold text-gray-400 dark:text-gray-500 tracking-widest mb-1.5 bg-neutral-100 dark:bg-white/5 px-3 py-1 rounded-full">
+                                            <h2 className="text-2xl md:text-4xl font-normal italic text-black dark:text-white">Full Scale Analysis</h2>
+                                            <p className="text-[10px] md:text-[12px] font-bold text-gray-400 dark:text-gray-500 tracking-widest mb-1 bg-neutral-100 dark:bg-white/5 px-3 py-1 rounded-full">
                                                 {bottomTextFormat.replace('{count}', data.length.toLocaleString())}
                                             </p>
                                         </div>
                                     </div>
                                     <button
                                         onClick={() => setIsExpanded(false)}
-                                        className="px-8 py-4 rounded-full bg-black text-white dark:bg-white dark:text-black font-bold uppercase tracking-widest hover:scale-105 transition-transform shrink-0"
+                                        className="px-6 py-3 md:px-8 md:py-4 rounded-full bg-black text-white dark:bg-white dark:text-black text-xs md:text-sm font-bold uppercase tracking-widest hover:scale-105 transition-transform shrink-0"
                                     >
                                         Close View
                                     </button>
                                 </div>
 
-                                <div className="w-full flex-1 flex justify-center items-start pb-16">
-                                    <div className="w-full max-w-300 aspect-square rounded-3xl border border-neutral-200 dark:border-white/10 overflow-hidden bg-white dark:bg-black/20 shadow-2xl relative p-2 md:p-4">
+                                <div className="w-full flex-1 flex justify-center items-center pb-4 min-h-0">
+                                    <div className="w-full h-full rounded-3xl border border-neutral-200 dark:border-white/10 overflow-hidden bg-white dark:bg-black/20 shadow-2xl relative p-2 md:p-4">
                                         <Plot
                                             data={plotData}
                                             layout={{
@@ -310,6 +321,7 @@ export default function ScatterPlot({
                                                     itemsizing: 'constant'
                                                 },
                                                 hovermode: 'closest',
+                                                uirevision: 'true', // 카메라 상태 유지를 위한 핵심 옵션
                                                 paper_bgcolor: 'rgba(0,0,0,0)',
                                                 plot_bgcolor: 'rgba(0,0,0,0)',
                                                 scene: {

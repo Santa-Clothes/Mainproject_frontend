@@ -13,6 +13,13 @@ import { useAtom } from 'jotai';
 import { modelModeAtom } from '@/jotai/modelJotai';
 
 
+/**
+ * Dashboard: 아카이브 분석 대시보드의 중앙 허브 컴포넌트입니다.
+ * 매출 데이터(BestSellersCard)와 스타일 분석 데이터(StyleDistributionCard, ScatterPlot)를 통합하여 관리하며,
+ * Jotai 전역 상태(modelMode)에 따라 서로 다른 데이터 셋을 동기화합니다.
+ *
+ * @param initialSales - 서버 사이드 혹은 상위에서 미리 불러온 초기 매출 데이터 (SSR 지원용)
+ */
 export default function Dashboard({
   initialSales = []
 }: {
@@ -95,7 +102,7 @@ export default function Dashboard({
   }, [modelMode]);
 
   return (
-    <div className="space-y-3 pb-6">
+    <div className="space-y-2">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-1.5 items-stretch">
         {/* 우측 영역 (8컬럼): 매출 랭킹 파이프라인 */}
         <div className="lg:col-span-8">

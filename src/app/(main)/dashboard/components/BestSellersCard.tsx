@@ -14,11 +14,17 @@ interface Props {
 }
 
 const fetchShopList = async (): Promise<ShopInfo[]> => {
-
     const shopList = await getShopList();
     return shopList;
 };
 
+/**
+ * BestSellersCard: 지점별 베스트셀러 상품 매출 순위를 시각화하는 컴포넌트입니다.
+ * 전체 지점 통계와 최대 2개의 지점을 선택하여 실시간으로 비교할 수 있는 파이프라인 구조를 가집니다.
+ *
+ * @param initialSales - 초기 렌더링 시 대시보드에서 전달받은 전체 지점 판매 데이터
+ * @param fetchSalesFn - 특정 지점 및 기간의 판매 순위를 불러오는 API 함수
+ */
 const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, className = "", isLoading = false }) => {
     const [shopList, setShopList] = React.useState<ShopInfo[]>([]);
     const [isShopListLoading, setIsShopListLoading] = React.useState(true);
@@ -86,8 +92,8 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
         setSelectedShops(prev => {
             if (prev.includes(shop)) return prev.filter(s => s !== shop);
 
-            // 최대 3곳까지만 비교 가능하도록 (총 4컬럼) 오래된 것을 밀어내고 추가
-            if (prev.length >= 3) {
+            // 최대 2곳까지만 비교 가능하도록 (총 3컬럼: 전체 + 비교2) 오래된 것을 밀어내고 추가
+            if (prev.length >= 2) {
                 return [...prev.slice(1), shop];
             }
             return [...prev, shop];
@@ -204,7 +210,7 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
                 <div className="flex flex-col sm:flex-row sm:items-end justify-between w-full gap-4">
                     <span>판매량 순위</span>
                     <div className="flex items-end gap-3 shrink-0 h-8">
-                        <span className="text-[12px] text-gray-400 font-bold uppercase tracking-widest hidden xl:block whitespace-nowrap leading-none pb-2">Shop Selection (Max 3)</span>
+                        <span className="text-[12px] text-gray-400 font-bold uppercase tracking-widest hidden xl:block whitespace-nowrap leading-none pb-2">Shop Selection (Max 2)</span>
                         <div className="relative w-40 xl:w-52">
                             <input
                                 type="text"
@@ -215,7 +221,6 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
                             />
                         </div>
                         <div className="flex items-center gap-1 bg-white dark:bg-neutral-900 rounded-full border border-neutral-200 dark:border-white/10 p-0.5 shadow-sm transition-all hover:border-violet-300 h-8">
-                            {/* Calendar Icon & Label */}
                             <div className="flex items-center gap-1 pl-2 pr-1 border-r border-neutral-100 dark:border-white/5 text-neutral-400 shrink-0">
                                 <FaRegCalendarAlt className="text-violet-500" size={10} />
                                 <span className="text-[9px] font-bold uppercase tracking-widest hidden lg:block">기간</span>
@@ -281,8 +286,6 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
 
                 {/* 1. Shop Pills (Horizontal Scroller) */}
                 <div className="flex flex-col gap-1 p-1.5 bg-neutral-50/50 dark:bg-neutral-800/20 rounded-2xl border border-neutral-200/60 dark:border-white/10 mb-2 shadow-sm">
-
-                    {/* Shops Horizontal Scroller */}
                     <div className="-mx-1 px-1 min-h-10 flex items-center">
                         {isShopListLoading ? (
                             <div className="flex gap-2 w-full animate-pulse overflow-hidden">
@@ -295,25 +298,36 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
                                 {shopList
                                     .filter(s => s.storeName !== '전체')
                                     .filter(s => s.storeName.toLowerCase().includes(searchTerm.toLowerCase()))
-                                    .map((shop) => (
-                                        <button
-                                            key={shop.storeId}
-                                            onClick={() => handleShopToggle(shop.storeName)}
-                                            className={`whitespace-nowrap px-4 py-1.5 rounded-full text-[12px] font-bold tracking-widest uppercase transition-all shrink-0 border
-                                            ${selectedShops.includes(shop.storeName)
-                                                    ? 'bg-violet-600 text-white shadow-md border-transparent'
-                                                    : 'bg-white dark:bg-neutral-900 text-neutral-500 border-neutral-200 dark:border-white/10 hover:border-violet-300 dark:hover:border-violet-500/50'}`}
-                                        >
-                                            {shop.storeName}
-                                        </button>
-                                    ))}
+                                    .map((shop) => {
+                                        const shopIdx = selectedShops.indexOf(shop.storeName);
+                                        const isSelected = shopIdx !== -1;
+
+                                        // 선택된 순서에 따른 색상 정의
+                                        let selectedClass = "bg-violet-600";
+                                        if (shopIdx === 0) selectedClass = "bg-purple-600";
+                                        if (shopIdx === 1) selectedClass = "bg-fuchsia-600";
+
+                                        return (
+                                            <button
+                                                key={shop.storeId}
+                                                onClick={() => handleShopToggle(shop.storeName)}
+                                                className={`whitespace-nowrap px-4 py-1.5 rounded-full text-[12px] font-bold tracking-widest uppercase transition-all shrink-0 border
+                                                ${isSelected
+                                                        ? `${selectedClass} text-white shadow-md border-transparent`
+                                                        : 'bg-white dark:bg-neutral-900 text-neutral-500 border-neutral-200 dark:border-white/10 hover:border-violet-300 dark:hover:border-violet-700'
+                                                    }`}
+                                            >
+                                                {shop.storeName}
+                                            </button>
+                                        );
+                                    })}
                             </div>
                         )}
                     </div>
                 </div>
 
-                {/* 2. Content Split by Shop (Columns) */}
-                <div className="flex-1 min-h-50 mt-4">
+                {/* 2. Content Split by Shop (Columns): 전체 지점 + 선택 지점 매핑 */}
+                <div className="flex-1 min-h-0 mt-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-0 gap-y-4 lg:gap-y-0 h-full items-stretch">
 
                         {/* Always Display Total First */}
@@ -332,11 +346,11 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
                             </div>
 
                             {(() => {
-                                const isLoadingShopData = loadingShops['전체'] || isLoading;
+                                const isLoadingTotal = loadingShops['전체'] || isLoading;
                                 const items = aggregatedDataByShop['전체'] || [];
                                 const maxQ = items[0]?.quantity || 1;
 
-                                if (isLoadingShopData && items.length === 0) return (
+                                if (isLoadingTotal && items.length === 0) return (
                                     <div className="flex flex-col gap-4">
                                         {[1, 2, 3, 4, 5].map(v => (
                                             <div key={v} className="flex flex-col gap-2 w-full animate-pulse">
@@ -348,7 +362,7 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
                                 );
 
                                 if (items.length > 0) return (
-                                    <div className={`flex flex-col gap-3.5 mt-2.5 ${isLoadingShopData ? 'opacity-50' : ''} min-w-0`}>
+                                    <div className={`flex flex-col gap-3.5 mt-2.5 ${isLoadingTotal ? 'opacity-50' : ''} min-w-0`}>
                                         {items.map((item, i) => (
                                             <div key={item.shortName} className="space-y-0.5 group min-w-0">
                                                 <div className="flex justify-between items-end gap-2 min-w-0">
@@ -375,13 +389,35 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
                         </div>
 
                         {/* Selected Compare Shops (Up to 2 Slots) */}
-                        {Array.from({ length: 2 }).map((_, slotIdx) => {
+                        {[0, 1].map((slotIdx) => {
                             const shop = selectedShops[slotIdx];
+                            const theme = slotIdx === 0
+                                ? {
+                                    name: 'purple',
+                                    border: 'border-purple-500/20 dark:border-purple-500/30',
+                                    bg: 'bg-purple-50/50 dark:bg-purple-900/20',
+                                    bullet: 'bg-purple-500',
+                                    text: 'text-purple-600',
+                                    hover: 'group-hover:text-purple-500',
+                                    barBg: 'bg-purple-50',
+                                    bar: 'bg-purple-500',
+                                    shadow: 'shadow-[0_0_8px_rgba(147,51,234,0.3)]'
+                                }
+                                : {
+                                    name: 'fuchsia',
+                                    border: 'border-fuchsia-500/20 dark:border-fuchsia-500/30',
+                                    bg: 'bg-fuchsia-50/50 dark:bg-fuchsia-900/20',
+                                    bullet: 'bg-fuchsia-500',
+                                    text: 'text-fuchsia-600',
+                                    hover: 'group-hover:text-fuchsia-500',
+                                    barBg: 'bg-fuchsia-50',
+                                    bar: 'bg-fuchsia-500',
+                                    shadow: 'shadow-[0_0_8px_rgba(192,38,211,0.3)]'
+                                };
 
-                            // Empty Slot
                             if (!shop) {
                                 return (
-                                    <div key={`empty-${slotIdx}`} className={`flex flex-col space-y-1 col-span-1 px-3 min-w-0 lg:border-l-2 ${slotIdx % 2 === 0 ? 'md:border-l-2' : ''} border-neutral-300 dark:border-white/30`}>
+                                    <div key={`empty-${slotIdx}`} className={`flex flex-col space-y-1 col-span-1 px-3 min-w-0 lg:border-l-2 border-neutral-300 dark:border-white/30`}>
                                         <div className="flex items-center gap-3 h-9">
                                             <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl border border-dashed border-neutral-300 dark:border-white/20 bg-transparent opacity-60 shrink-0">
                                                 <div className="w-1.5 h-4 bg-neutral-300 dark:bg-neutral-700 rounded-full"></div>
@@ -391,27 +427,22 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
                                             </div>
                                         </div>
                                         <div className="flex-1 min-h-50 flex flex-col items-center justify-center text-center p-6 bg-neutral-50 dark:bg-white/5 rounded-xl border border-dashed border-neutral-200 dark:border-white/10">
-                                            <div className="w-10 h-10 mb-3 bg-neutral-100 dark:bg-neutral-800 rounded-full flex items-center justify-center">
-                                                <span className="text-xl text-neutral-300 dark:text-neutral-600">+</span>
-                                            </div>
-                                            <span className="text-[11px] font-bold text-neutral-400 dark:text-neutral-500">
-                                                지점 선택 후 비교
-                                            </span>
+                                            <div className="w-10 h-10 mb-3 bg-neutral-100 dark:bg-neutral-800 rounded-full flex items-center justify-center text-neutral-300 dark:text-neutral-600 text-xl font-bold">+</div>
+                                            <span className="text-[11px] font-bold text-neutral-400 dark:text-neutral-500">지점 선택 후 비교</span>
                                         </div>
                                     </div>
                                 );
                             }
 
-                            // Rendering Selected Shop
-                            const isLoadingShopData = loadingShops[shop];
+                            const isLoadingThisShop = loadingShops[shop];
                             const items = aggregatedDataByShop[shop] || [];
                             const maxQ = items[0]?.quantity || 1;
 
                             return (
-                                <div key={shop} className={`flex flex-col space-y-1 col-span-1 fade-in px-3 min-w-0 lg:border-l-2 ${slotIdx % 2 === 0 ? 'md:border-l-2' : ''} border-neutral-300 dark:border-white/30`}>
+                                <div key={shop} className={`flex flex-col space-y-1 col-span-1 fade-in px-3 min-w-0 lg:border-l-2 border-neutral-300 dark:border-white/30`}>
                                     <div className="flex items-center gap-3 h-9 group/header relative">
-                                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-violet-500/20 dark:border-violet-500/30 bg-violet-50/50 dark:bg-violet-900/20 shadow-sm max-w-[calc(100%-40px)] shrink-0">
-                                            <div className="w-1 h-3 bg-violet-500 rounded-full"></div>
+                                        <div className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border ${theme.border} ${theme.bg} shadow-sm max-w-[calc(100%-40px)] shrink-0`}>
+                                            <div className={`w-1 h-3 ${theme.bullet} rounded-full`}></div>
                                             <h4 className="text-[14px] font-black text-neutral-900 dark:text-white uppercase tracking-widest truncate">
                                                 {shop}
                                             </h4>
@@ -419,17 +450,16 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
                                         <button
                                             onClick={() => handleShopToggle(shop)}
                                             className="absolute right-0 p-1 rounded-full text-neutral-400 hover:text-red-500 transition-colors shrink-0"
-                                            title="선택 해제"
                                         >
-                                            <FaTimes size={8} />
+                                            <FaTimes size={10} />
                                         </button>
-                                        {isLoadingShopData && (
-                                            <div className="w-3 h-3 rounded-full border-2 border-violet-500 border-t-transparent animate-spin ml-auto shrink-0"></div>
+                                        {isLoadingThisShop && (
+                                            <div className={`w-3 h-3 rounded-full border-2 ${theme.text.replace('text-', 'border-')} border-t-transparent animate-spin ml-auto shrink-0`}></div>
                                         )}
                                     </div>
 
-                                    {isLoadingShopData && items.length === 0 ? (
-                                        <div className="flex flex-col gap-4">
+                                    {isLoadingThisShop && items.length === 0 ? (
+                                        <div className="flex flex-col gap-4 mt-4">
                                             {[1, 2, 3, 4, 5].map(v => (
                                                 <div key={v} className="flex flex-col gap-1.5 w-full animate-pulse">
                                                     <div className="h-3 w-1/3 bg-neutral-200 dark:bg-neutral-800 rounded"></div>
@@ -438,23 +468,23 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
                                             ))}
                                         </div>
                                     ) : items.length > 0 ? (
-                                        <div className={`flex flex-col gap-3.5 mt-2.5 ${isLoadingShopData ? 'opacity-50' : ''} min-w-0`}>
+                                        <div className={`flex flex-col gap-3.5 mt-2.5 ${isLoadingThisShop ? 'opacity-50' : ''} min-w-0`}>
                                             {items.map((item, i) => (
                                                 <div key={item.shortName} className="space-y-0.5 group min-w-0">
                                                     <div className="flex justify-between items-end gap-2 min-w-0">
                                                         <div className="flex items-center gap-1.5 min-w-0 flex-1">
-                                                            <span className="text-[15px] italic text-violet-600 font-black shrink-0">0{i + 1}</span>
-                                                            <span className="text-[15px] font-black text-black dark:text-white uppercase tracking-tight truncate group-hover:text-violet-500 transition-colors tooltip flex-1" title={item.shortName}>
+                                                            <span className={`text-[15px] italic ${theme.text} font-black shrink-0`}>0{i + 1}</span>
+                                                            <span className={`text-[15px] font-black text-black dark:text-white uppercase tracking-tight truncate ${theme.hover} transition-colors tooltip flex-1`} title={item.shortName}>
                                                                 {item.shortName}
                                                             </span>
                                                         </div>
-                                                        <span className="text-[15px] font-black text-violet-600 tracking-tighter shrink-0">
+                                                        <span className={`text-[15px] font-black ${theme.text} tracking-tighter shrink-0`}>
                                                             {item.quantity.toLocaleString()}
                                                         </span>
                                                     </div>
-                                                    <div className="h-2.5 w-full bg-violet-50 dark:bg-white/5 rounded-full overflow-hidden">
+                                                    <div className={`h-2.5 w-full ${theme.barBg} dark:bg-white/5 rounded-full overflow-hidden`}>
                                                         <div
-                                                            className="h-full rounded-full transition-all duration-1000 bg-violet-500 shadow-[0_0_8px_rgba(139,92,246,0.3)]"
+                                                            className={`h-full rounded-full transition-all duration-1000 ${theme.bar} ${theme.shadow}`}
                                                             style={{ width: `${(item.quantity / maxQ) * 100}%` }}
                                                         ></div>
                                                     </div>
@@ -462,14 +492,11 @@ const BestSellersCard: React.FC<Props> = ({ initialSales, fetchSalesFn, classNam
                                             ))}
                                         </div>
                                     ) : (
-                                        <div className="text-xs font-bold text-gray-400 py-8 bg-neutral-50 dark:bg-white/5 rounded-xl border border-dashed border-neutral-200 dark:border-white/10 text-center">
-                                            No data for this period.
-                                        </div>
+                                        <div className="text-xs font-bold text-gray-400 py-8 text-center bg-neutral-50 dark:bg-white/5 rounded-xl border border-dashed border-neutral-200 dark:border-white/10">No data.</div>
                                     )}
                                 </div>
                             );
                         })}
-
                     </div>
                 </div>
             </div>

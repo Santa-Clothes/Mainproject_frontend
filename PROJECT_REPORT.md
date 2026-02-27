@@ -44,9 +44,18 @@
 *   **Light Mode (Sunlight)**: 따뜻한 태양광 이펙트와 화이트 글래스모피즘(Glassmorphism) 적용.
 *   **Dark Mode (Celestial)**: `Framer Motion`으로 제어되는 반짝이는 동적 별(Twinkling Stars) 이펙트와 바이올렛 포인트 컬러 중심의 딥 다크 테마.
 
-### 3-2. 고도화된 시각화 차트
-*   **Scatter Plot (UMAP)**: 스타일 벡터 공간을 Plotly.js를 이용해 2D 맵으로 시각화. 각 점 호버 시 스타일 정보를 상단에 강조 표시하고 중복 차트를 방지하기 위해 `hovertemplate` 정규화.
+### 3-2. 고도화된 시각화 차트 및 데이터 가독성
+*   **Unified Scatter Plot & Distribution**: 3D UMAP 모델링(`ScatterPlot`)과 비율 분석(`StyleDistributionCard`) 간의 완벽한 시각적 일관성을 위해, 색상 겹침이 없는 고대비 비비드 레인보우 10색(Deep Indigo, Rose, Amber 등)을 전역 팔레트로 매핑.
+*   **Marker Density Aesthetics**: 점들이 밀집된 구간에서 뭉개지거나 눈이 부신 현상(Glare)을 방지하기 위해 흰색/검은색 두꺼운 테두리 대신 `0.25` 수준의 미세한 다크 아웃라인 적용. 입점 크기(4.5)와 투명도(0.8)를 최적화하여 개별 데이터 포인트의 가시성 확보.
+*   **Camera Angle Persistence**: Plotly.js의 3D 공간 안에서 사용자가 범례(Legend)를 토글할 때 카메라 뷰가 초기화되는 UX 결함을 `uirevision: 'true'` 속성 기반으로 제어하여 상태 유지(State Preservation) 구현.
+*   **BestSellers Pipeline**: [전체 지점 + 비교 슬롯 2개]의 3열 그리드 시스템을 통해 지점 간 실시간 매출 편차 시각화.
 *   **Radar Chart**: AI가 판단한 Top 3 스타일 점수를 5각형 레이더 차트로 시각화하여 스타일의 강점과 약점을 한눈에 파악.
+
+### 3-3. 브랜드 시퀀스 UI 및 레이아웃 최적화
+*   **Zero-Interference Modal View**: 분석 맵을 데스크탑 풀스크린으로 확대할 때, `Jotai`의 `isFullScreenModalOpenAtom` 전역 상태를 구독하여 우측 조작부(`FloatingHistory`)를 화면 밖으로 자동 패닝(Panning)시켜 100%의 시야각 및 몰입감 제공.
+*   **Sequential Color System**: [Violet-800 → 600 → 400]으로 이어지는 보라색 계라데이션을 헤더 네비게이션과 대시보드 메인 카드에 적용하여 서비스의 논리적 흐름을 시각적으로 동기화.
+*   **Responsive Grid Ratio**: 대시보드의 메인(매출)과 사이드(스타일) 영역을 8:4 비율로 재조정하고, 콘텐츠 상단 여백을 극단적으로 줄여 데이터 밀도 극대화.
+*   **Full-Width Sync**: 상단 헤더 바의 규격(`max-w-7xl`)과 하단 메인 콘텐츠의 정렬선을 1:1로 일치시켜 시각적 안정성 확보.
 
 ---
 

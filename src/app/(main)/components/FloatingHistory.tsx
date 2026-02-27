@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useAtom } from 'jotai';
 import { analysisHistoryAtom, activeHistoryAtom, HistoryItem, bookmarkAtom } from '@/jotai/historyJotai';
 import { authUserAtom } from '@/jotai/loginjotai';
+import { isFullScreenModalOpenAtom } from '@/jotai/uiJotai';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { FaClockRotateLeft, FaAngleRight, FaAngleLeft, FaBookmark } from 'react-icons/fa6';
@@ -13,8 +14,12 @@ export default function FloatingHistory() {
     const [bookmark, setBookmark] = useAtom(bookmarkAtom);
     const [authUser] = useAtom(authUserAtom);
     const [, setActiveHistory] = useAtom(activeHistoryAtom);
+    const [isFullScreen] = useAtom(isFullScreenModalOpenAtom);
     const router = useRouter();
     const [isOpen, setIsOpen] = useState(true);
+
+    // 모달이 열려있으면 강제로 숨김 처리
+    const effectivelyVisible = isOpen && !isFullScreen;
 
     const handleHistoryClick = (item: HistoryItem) => {
         // 1. 선택한 히스토리를 active 상태로 만들기
@@ -41,7 +46,7 @@ export default function FloatingHistory() {
     };
 
     return (
-        <div className={`fixed top-1/2 -translate-y-1/2 z-50 transition-all duration-300 ${isOpen ? 'right-4' : '-right-20'}`}>
+        <div className={`fixed top-1/2 -translate-y-1/2 z-50 transition-all duration-300 ${effectivelyVisible ? 'right-4' : '-right-24'} ${isFullScreen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
             <div className="relative bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl border-2 border-neutral-100 dark:border-white/10 rounded-3xl p-3 shadow-2xl flex flex-col items-center gap-3">
 
                 {/* 숨기기/보이기 토글 버튼 */}
