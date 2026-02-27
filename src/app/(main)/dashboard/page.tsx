@@ -9,7 +9,7 @@ export default function DashboardPage() {
       <div className="space-y-4">
         <div className="flex items-center gap-4">
           <span className="w-10 h-px bg-black/10 dark:bg-white/10"></span>
-          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.5em]">Analytics Page</span>
+          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.5em]">Analytics Module</span>
         </div>
         <div className="flex justify-start items-center">
           <h2 className="flex items-center gap-2 text-6xl font-normal tracking-tighter text-gray-900 dark:text-gray-50">

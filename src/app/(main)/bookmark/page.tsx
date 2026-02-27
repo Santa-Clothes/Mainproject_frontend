@@ -198,7 +198,7 @@ export default function BookmarkPage() {
                                         product={{
                                             ...item,
                                             // 서버 API 연동 후에도 값이 없다면 더미 데이터 제공
-                                            userStyle: item.userStyle || (modelMode === 'normal' ? (item.styleTop1_512 || 'casual') : (item.styleTop1_768 || 'casual')),
+                                            userStyle: item.userStyle || (modelMode === '512' ? (item.styleTop1_512 || 'casual') : (item.styleTop1_768 || 'casual')),
                                             styleTop1_512: item.styleTop1_512 || 'casual',
                                             styleScore1_512: item.styleScore1_512 || 0.99,
                                             styleTop1_768: item.styleTop1_768 || 'casual',

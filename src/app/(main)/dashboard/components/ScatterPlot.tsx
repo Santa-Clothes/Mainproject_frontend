@@ -31,7 +31,7 @@ export interface ScatterPlotProps {
 export default function ScatterPlot({
     title = "UMAP Clustering Map",
     subtitle = "Style Projection",
-    description = "선택된 AI 모델(512/768 차원)의 분석 결과를 2차원 평면에 투영한 스타일 맵입니다.",
+    description = "선택된 AI 모델(512/768 차원)의 분석 결과를 3차원 공간에 투영한 스타일 맵입니다.",
     bottomTextFormat = "Visualizing {count} Style Latent vectors.",
     className = "lg:col-span-4",
     fetchDataFn
@@ -42,7 +42,7 @@ export default function ScatterPlot({
     const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
 
     const loadingMessages = [
-        "잠재 공간 벡터를 2차원으로 투영 중..."
+        "잠재 공간 벡터를 3차원으로 투영 중..."
     ];
 
     const fetchData = async () => {
@@ -97,26 +97,36 @@ export default function ScatterPlot({
     // 클러스터 구분성을 극대화하기 위한 고대비 고채도 식별 컬러 팔레트
     // 안정적인 매핑을 위해 한글과 영문 키를 모두 처리합니다.
     const STYLE_COLORS: Record<string, string> = {
-        '캐주얼': '#0000FF',        // Pure Blue
-        'casual': '#0000FF',
-        '컨템포러리': '#00FF00',    // Pure Green
-        'contemporary': '#00FF00',
-        '에스닉': '#FF8000',        // Vivid Orange
-        'ethnic': '#FF8000',
-        '페미닌': '#FF00FF',        // Magenta / Pink
-        'feminine': '#FF00FF',
-        '젠더리스': '#00FFFF',      // Cyan
-        'genderless': '#00FFFF',
-        '매니시': '#800000',        // Maroon / Brown
-        'mannish': '#800000',
-        '내추럴': '#80FF00',        // Lime Green
-        'natural': '#80FF00',
-        '스포츠': '#FF0000',        // Pure Red
-        'sporty': '#FF0000',
-        '서브컬처': '#8000FF',      // Pure Purple
-        'subculture': '#8000FF',
-        '트레디셔널': '#FFFF00',    // Pure Yellow
-        'traditional': '#FFFF00',
+        '캐주얼': '#2563eb',        // Blue-600
+        'casual': '#2563eb',
+        'CAS': '#2563eb',
+        '컨템포러리': '#059669',    // Emerald-600
+        'contemporary': '#059669',
+        'CNT': '#059669',
+        '에스닉': '#d97706',        // Amber-600
+        'ethnic': '#d97706',
+        'ETH': '#d97706',
+        '페미닌': '#db2777',        // Pink-600
+        'feminine': '#db2777',
+        'FEM': '#db2777',
+        '젠더리스': '#0284c7',      // Sky-600
+        'genderless': '#0284c7',
+        'GNL': '#0284c7',
+        '매니시': '#4f46e5',        // Indigo-600
+        'mannish': '#4f46e5',
+        'MAN': '#4f46e5',
+        '내추럴': '#65a30d',        // Lime-600
+        'natural': '#65a30d',
+        'NAT': '#65a30d',
+        '스포츠': '#dc2626',        // Red-600
+        'sporty': '#dc2626',
+        'SPT': '#dc2626',
+        '서브컬처': '#9333ea',      // Purple-600
+        'subculture': '#9333ea',
+        'SUB': '#9333ea',
+        '트레디셔널': '#ca8a04',    // Yellow-600
+        'traditional': '#ca8a04',
+        'TRD': '#ca8a04',
     };
 
     /**
@@ -134,7 +144,7 @@ export default function ScatterPlot({
             hash = str.charCodeAt(i) + ((hash << 5) - hash);
         }
         const h = Math.abs(hash % 360);
-        return `hsl(${h}, 85%, 60%)`; // 알 수 없는 스타일을 채도가 높은 HSL로 매핑
+        return `hsl(${h}, 75%, 45%)`; // 알 수 없는 스타일 컬러를 약간 깊고 진하게 매핑
     };
 
     const plotData = useMemo(() => {
@@ -155,15 +165,17 @@ export default function ScatterPlot({
             return {
                 x: points.map(d => Number(d.xcoord)),
                 y: points.map(d => Number(d.ycoord)),
+                z: points.map(d => Number(d.zcoord)),
                 text: points.map(d => `<b>${d.productName}</b>`),
                 name: `<b>${style}</b>`,
                 mode: 'markers' as const,
-                type: 'scattergl' as const,
+                type: 'scatter3d' as any,
+                hovertemplate: `<span style="font-size:16px; color:${color}; font-weight:900;">${style}</span><br><br>%{text}<br>X: %{x:.2f}  Y: %{y:.2f}  Z: %{z:.2f}<extra></extra>`,
                 marker: {
                     color: color,
-                    size: 8,
-                    opacity: 0.8,
-                    line: { color: 'white', width: 0.5 },
+                    size: 3,
+                    opacity: 0.85,
+                    line: { color: 'rgba(0, 0, 0, 0.3)', width: 0.5 },
                 },
                 hoverlabel: {
                     bgcolor: '#171717',
@@ -289,20 +301,23 @@ export default function ScatterPlot({
                                         data={plotData}
                                         layout={{
                                             autosize: true,
-                                            margin: { l: 60, r: 60, b: 80, t: 60 },
+                                            margin: { l: 0, r: 0, b: 0, t: 0 },
                                             showlegend: true,
                                             legend: {
                                                 orientation: 'h',
-                                                y: -0.15,
-                                                font: { size: 14, family: 'Inter', color: '#6b7280' },
+                                                y: 0.05,
+                                                font: { size: 12, family: 'Inter', color: '#6b7280' },
                                                 itemsizing: 'constant'
                                             },
                                             hovermode: 'closest',
                                             paper_bgcolor: 'rgba(0,0,0,0)',
                                             plot_bgcolor: 'rgba(0,0,0,0)',
-                                            xaxis: { showgrid: true, gridcolor: '#e5e7eb', zeroline: false, showticklabels: true },
-                                            yaxis: { showgrid: true, gridcolor: '#e5e7eb', zeroline: false, showticklabels: true },
-                                            dragmode: 'pan',
+                                            scene: {
+                                                xaxis: { showgrid: true, gridcolor: '#cbd5e1', gridwidth: 1.5, zeroline: true, zerolinecolor: '#94a3b8', zerolinewidth: 2, showticklabels: false, title: '' },
+                                                yaxis: { showgrid: true, gridcolor: '#cbd5e1', gridwidth: 1.5, zeroline: true, zerolinecolor: '#94a3b8', zerolinewidth: 2, showticklabels: false, title: '' },
+                                                zaxis: { showgrid: true, gridcolor: '#cbd5e1', gridwidth: 1.5, zeroline: true, zerolinecolor: '#94a3b8', zerolinewidth: 2, showticklabels: false, title: '' },
+                                                camera: { eye: { x: 1.5, y: 1.5, z: 1.2 } }
+                                            }
                                         }}
                                         config={{
                                             displayModeBar: true,

@@ -23,18 +23,24 @@ const emptyBarData = [
     { score: 0, label_id: 0, label_name: '데이터 없음' }
 ];
 
-const styleName = {
-    casual: '캐주얼',
-    contemporary: '컨템포러리',
-    ethnic: '에스닉',
-    feminine: '페미닌',
-    genderless: '젠더리스',
-    mannish: '매니시',
-    natural: '내추럴',
-    sporty: '스포츠',
-    subculture: '서브컬처',
-    traditional: '트레디셔널',
-}
+const RADAR_LABEL_DICT: Record<string, string> = {
+    'casual': '캐주얼', 'cas': '캐주얼',
+    'contemporary': '컨템포러리', 'cnt': '컨템포러리',
+    'ethnic': '에스닉', 'eth': '에스닉',
+    'feminine': '페미닌', 'fem': '페미닌',
+    'genderless': '젠더리스', 'gnl': '젠더리스',
+    'mannish': '매니시', 'man': '매니시',
+    'natural': '내추럴', 'nat': '내추럴',
+    'sporty': '스포츠', 'spt': '스포츠',
+    'subculture': '서브컬처', 'sub': '서브컬처',
+    'traditional': '트레디셔널', 'trd': '트레디셔널'
+};
+
+const getRadarLabel = (name?: string) => {
+    if (!name) return '분석 결과 없음';
+    const lower = name.toLowerCase();
+    return RADAR_LABEL_DICT[lower] || name;
+};
 /**
  * AnalysisSection
  * 사용자가 선택하거나 업로드한 원본 이미지를 썸네일로 표출하고, 
@@ -79,7 +85,7 @@ export default function AnalysisSection({
                 ...item,
                 displayScore: adjustedRatio * 100,
                 originalScore: absScore,
-                label_name: item.styleName ? (styleName[item.styleName.toLowerCase() as keyof typeof styleName] || item.styleName) : '분석 결과 없음',
+                label_name: getRadarLabel(item.styleName),
             };
         });
     }, [radarData]);

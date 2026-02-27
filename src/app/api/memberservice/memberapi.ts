@@ -128,7 +128,7 @@ export const getUserInfoAPI = async (token: string) => {
         }
 
         const userData = await response.json();
-
+        // console.log("GetUserInfo data:", userData);
         return userData;
     } catch (error) {
         console.error("GetUserInfo Error:", error);

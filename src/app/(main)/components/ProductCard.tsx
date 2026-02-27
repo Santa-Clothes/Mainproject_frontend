@@ -8,30 +8,36 @@ import { authUserAtom } from "@/jotai/loginjotai";
 import { saveBookmarkAPI, deleteBookmarkAPI } from "@/app/api/memberservice/bookmarkapi";
 import { modelModeAtom } from "@/jotai/modelJotai";
 
-const STYLE_KO_DICT: Record<string, string> = {
-    'casual': '캐주얼',
-    'street': '스트릿',
-    'natural': '내추럴',
-    'contemporary': '컨템포러리',
-    'modern': '모던',
-    'formal': '포멀',
-    'classic': '클래식',
-    'romantic': '로맨틱',
-    'sporty': '스포티',
-    'vintage': '빈티지',
-    'chic': '시크',
-    'retro': '레트로',
-    'minimal': '미니멀',
-    'kitsch': '키치',
-    'feminine': '페미닌',
-    'masculine': '매니시',
-    'bohemian': '보헤미안'
+export const STYLE_KO_DICT: Record<string, { short: string, ko: string }> = {
+    'casual': { short: 'CAS', ko: '캐주얼' },
+    'contemporary': { short: 'CNT', ko: '컨템포러리' },
+    'ethnic': { short: 'ETH', ko: '에스닉' },
+    'feminine': { short: 'FEM', ko: '페미닌' },
+    'genderless': { short: 'GNL', ko: '젠더리스' },
+    'mannish': { short: 'MAN', ko: '매니시' },
+    'natural': { short: 'NAT', ko: '내추럴' },
+    'sporty': { short: 'SPT', ko: '스포츠' },
+    'subculture': { short: 'SUB', ko: '서브컬처' },
+    'traditional': { short: 'TRD', ko: '트레디셔널' }
 };
 
-const translateStyleName = (name?: string) => {
+export const translateStyleName = (name?: string, useShort: boolean = false) => {
     if (!name) return '';
     const lower = name.toLowerCase();
-    return STYLE_KO_DICT[lower] || name; // 매핑 없으면 원래 문자열 반환 (한글이면 그대로)
+
+    // 1. 영어 풀네임으로 검색
+    if (STYLE_KO_DICT[lower]) {
+        return useShort ? STYLE_KO_DICT[lower].short : STYLE_KO_DICT[lower].ko;
+    }
+
+    // 2. 이미 약자인지 확인 (예: 'CAS')
+    const foundEntry = Object.values(STYLE_KO_DICT).find(item => item.short.toLowerCase() === lower || item.ko === name);
+    if (foundEntry) {
+        return useShort ? foundEntry.short : foundEntry.ko;
+    }
+
+    // 매핑 없으면 원래 문자열 반환
+    return name;
 };
 
 interface ProductCardProps {
@@ -80,17 +86,17 @@ const ProductCard = React.memo(({
     // 북마크 데이터 특화 속성 추출 (API 연동 전/후 모두 대응)
     const isBookmarkType = 'saveId' in product;
 
-    // 모드(512 vs 768)에 따른 동적 선택. Jotai에서는 'normal'이 512모델의 기본값을 의미함
+    // 모드(512 vs 768)에 따른 동적 선택.
     const savedStyle = isBookmarkType ? (product as BookmarkData).userStyle : undefined;
     const originalStyle = isBookmarkType
-        ? (modelMode === 'normal' ? (product as BookmarkData).styleTop1_512 : (product as BookmarkData).styleTop1_768)
+        ? (modelMode === '512' ? (product as BookmarkData).styleTop1_512 : (product as BookmarkData).styleTop1_768)
         : undefined;
     const originalScore = isBookmarkType
-        ? (modelMode === 'normal' ? (product as BookmarkData).styleScore1_512 : (product as BookmarkData).styleScore1_768)
+        ? (modelMode === '512' ? (product as BookmarkData).styleScore1_512 : (product as BookmarkData).styleScore1_768)
         : undefined;
 
-    const displaySavedStyle = translateStyleName(savedStyle || undefined);
-    const displayOriginalStyle = translateStyleName(originalStyle || undefined);
+    const displaySavedStyle = translateStyleName(savedStyle || undefined, false);
+    const displayOriginalStyle = translateStyleName(originalStyle || undefined, false);
 
     // 북마크 상태 관리
     const [bookmark, setBookmark] = useAtom(bookmarkAtom);
@@ -128,8 +134,9 @@ const ProductCard = React.memo(({
                     alert('삭제에 실패했습니다.');
                 }
             } else {
-                // 서버에 저장 시도
-                const success = await saveBookmarkAPI(authUser.accessToken, currentProductId, top1Style);
+                // 서버에 저장 시도 (약자로 전송)
+                const shortStyle = translateStyleName(top1Style, true);
+                const success = await saveBookmarkAPI(authUser.accessToken, currentProductId, shortStyle);
                 if (success) {
                     // BookmarkData 규격을 맞추기 위해 임시 객체 생성 (any 타입 활용)
                     const newBookmarkItem: any = {
@@ -182,8 +189,8 @@ const ProductCard = React.memo(({
 
                 {/* 상단 저장된 스타일 뱃지 (북마크 탭 전용) */}
                 {showStyleLabels && displaySavedStyle && (
-                    <div className="absolute top-4 left-4 z-20 bg-violet-600 border border-white/20 px-3 py-1.5 rounded-full shadow-lg backdrop-blur-md">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-white">
+                    <div className="absolute top-4 left-4 z-20 bg-violet-600 border border-white/20 px-3 py-1.5 rounded-full shadow-lg backdrop-blur-md flex items-center justify-center">
+                        <span className="text-[12px] font-black uppercase tracking-widest text-white">
                             {displaySavedStyle}
                         </span>
                     </div>

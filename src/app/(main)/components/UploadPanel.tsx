@@ -3,7 +3,7 @@
 import React, { useState, useRef, useImperativeHandle, forwardRef } from 'react';
 import { FaCloudArrowUp, FaXmark, FaMagnifyingGlass, FaCircleInfo, FaFileImage, FaArrowsRotate } from 'react-icons/fa6';
 import Image from 'next/image';
-import { RecommendList } from '@/types/ProductType';
+import { RecommendList512, RecommendResult768 } from '@/types/ProductType';
 import { imageAnalyze, image768Analyze } from '@/app/api/imageservice/imageapi';
 import sampleImg from '@/assets/sample.jpg';
 import { useAtom } from 'jotai';
@@ -39,7 +39,7 @@ export const resizeImage = (file: File, maxSize: number = 300): Promise<{ dataUr
 
         canvas.width = width;
         canvas.height = height;
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
         ctx?.drawImage(img, 0, 0, width, height);
 
         // 1. 미리보기 및 히스토리용 DataURL (JPEG 0.6)
@@ -57,7 +57,7 @@ export const resizeImage = (file: File, maxSize: number = 300): Promise<{ dataUr
 };
 
 interface UploadPanelProps {
-  onResultFound: (results: RecommendList | null) => void;
+  onResultFound: (results: RecommendList512 | RecommendResult768 | null) => void;
   onAnalysisStart: (imgUrl: string, name?: string) => void;
   onAnalysisCancel: () => void;
   isLoading: boolean;
@@ -147,7 +147,10 @@ const UploadPanel = forwardRef<UploadPanelRef, UploadPanelProps>(({ onResultFoun
   /**
    * 업로드된 이미지 취소 및 상태 초기화
    */
+  const searchIdRef = useRef(0);
+
   const handleCancel = () => {
+    searchIdRef.current += 1; // 현재 진행 중인 API 렌더링 스킵
     setPreview(null);
     setSelectedFile(null);
     onAnalysisCancel();
@@ -160,6 +163,8 @@ const UploadPanel = forwardRef<UploadPanelRef, UploadPanelProps>(({ onResultFoun
   const handleSearch = () => {
     if (!selectedFile) return;
 
+    const currentSearchId = ++searchIdRef.current;
+
     if (preview) {
       onAnalysisStart(preview, selectedFile.name);
     }
@@ -170,6 +175,9 @@ const UploadPanel = forwardRef<UploadPanelRef, UploadPanelProps>(({ onResultFoun
         const uploadResult: any = modelMode === '768'
           ? await image768Analyze(selectedFile)
           : await imageAnalyze(selectedFile);
+
+        // 취소 버튼이 눌렸다면 이후 로직(화면 전환)을 무시
+        if (currentSearchId !== searchIdRef.current) return;
 
         if (uploadResult && !Array.isArray(uploadResult)) {
           // 3. API 응답값이 RecommendList 형식(객체)이므로 그대로 전달

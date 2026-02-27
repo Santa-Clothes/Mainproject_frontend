@@ -21,8 +21,8 @@ export default function Footer() {
           {/* Brand Section: col-span-2로 공간 확보 */}
           <div className="col-span-1 space-y-6 md:col-span-2">
             <Link href="/" className="group flex flex-col items-start">
-              <h2 className="font-sans text-xl font-black uppercase tracking-[0.4em] text-neutral-900 transition-colors group-hover:text-violet-600 dark:text-white dark:group-hover:text-violet-400">
-                WIZARD of OUNCE
+              <h2 className="flex items-center gap-2 font-yangjin text-2xl font-black tracking-widest uppercase text-neutral-900 transition-colors group-hover:opacity-80 dark:text-white">
+                <span className="text-yellow-400">Wizard</span> of <span className='text-purple-700'>Ounce</span>
               </h2>
               <span className="mt-1.5 text-[8px] font-bold uppercase tracking-[0.5em] text-violet-500 dark:text-violet-600">
                 The AI Fashion Archive
@@ -38,10 +38,10 @@ export default function Footer() {
             <h4 className="text-[9px] font-bold uppercase tracking-[0.4em] text-violet-600 dark:text-violet-500">System</h4>
             <ul className="space-y-3">
               {[
-                { name: 'Overview', path: '/' },
-                { name: 'Upload Studio', path: '/uploadpage' },
-                { name: 'Selection Studio', path: '/selectionpage' },
-                { name: 'Dashboard', path: '/dashboard' }
+                { name: '프로젝트 개요', path: '/' },
+                { name: '이미지 분석 기반 추천', path: '/uploadpage' },
+                { name: '보유 상품 기반 추천', path: '/selectionpage' },
+                { name: '대시보드', path: '/dashboard' }
               ].map((item) => (
                 <li key={item.name}>
                   <Link
@@ -60,7 +60,7 @@ export default function Footer() {
         <div className="flex flex-col items-center justify-between gap-4 border-t-2 border-neutral-200 pt-4 dark:border-white/10 md:flex-row">
           <div className="flex items-center gap-8">
             <span className="text-[8px] font-bold uppercase tracking-[0.4em] text-neutral-400 dark:text-violet-200/60">
-              © 2026 Santa Clothes
+              © 2026 Wizard of Ounce
             </span>
             <div className="flex items-center gap-4">
               <div className="h-1 w-1 animate-pulse rounded-full bg-violet-600"></div>

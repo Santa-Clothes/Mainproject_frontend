@@ -5,7 +5,8 @@ export interface rawData {
     productNames: string[],
     styles: string[],
     xcoords: number[],
-    ycoords: number[]
+    ycoords: number[],
+    zcoords: number[]
 }
 
 export interface ScatterPoint {
@@ -13,7 +14,8 @@ export interface ScatterPoint {
     productName: string,
     style: string,
     xcoord: number,
-    ycoord: number
+    ycoord: number,
+    zcoord: number
 }
 
 /**
@@ -40,7 +42,8 @@ export const getScatterPoints = async (): Promise<ScatterPoint[]> => {
             productName: data.productNames?.[i] ?? 'Unknown',
             style: data.styles?.[i] ?? 'None',
             xcoord: data.xcoords?.[i] ?? 0,
-            ycoord: data.ycoords?.[i] ?? 0
+            ycoord: data.ycoords?.[i] ?? 0,
+            zcoord: data.zcoords?.[i] ?? 0
         }));
     } catch (error) {
         console.error("getScatterPoints error:", error);
@@ -68,7 +71,8 @@ export const getScatter512Points = async (): Promise<ScatterPoint[]> => {
             productName: data.productNames?.[i] ?? 'Unknown',
             style: data.styles?.[i] ?? 'None',
             xcoord: data.xcoords?.[i] ?? 0,
-            ycoord: data.ycoords?.[i] ?? 0
+            ycoord: data.ycoords?.[i] ?? 0,
+            zcoord: data.zcoords?.[i] ?? 0
         }));
     } catch (error) {
         console.error("getScatter512Points error:", error);
@@ -98,7 +102,8 @@ export const getScatter768Points = async (): Promise<ScatterPoint[]> => {
             productName: data.productNames?.[i] ?? 'Unknown',
             style: data.styles?.[i] ?? 'None',
             xcoord: data.xcoords?.[i] ?? 0,
-            ycoord: data.ycoords?.[i] ?? 0
+            ycoord: data.ycoords?.[i] ?? 0,
+            zcoord: data.zcoords?.[i] ?? 0
         }));
     } catch (error) {
         console.error("getScatter768Points error:", error);

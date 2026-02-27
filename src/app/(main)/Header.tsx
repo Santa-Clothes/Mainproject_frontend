@@ -168,15 +168,14 @@ export default function Header() {
     }
   };
 
-  // 네비게이션 아이템 정의
   const navItems = [
     { id: 'uploadpage', label: '이미지 분석 기반 추천', icon: <FaCloudArrowUp size={18} />, path: '/uploadpage', hoverTextClass: 'hover:text-violet-600 dark:hover:text-violet-400', activeClass: 'bg-violet-600 text-white shadow-lg shadow-violet-500/30' },
-    { id: 'selectionpage', label: '보유 상품 기반 추천', icon: <FaShirt size={18} />, path: '/selectionpage', hoverTextClass: 'hover:text-blue-600 dark:hover:text-blue-400', activeClass: 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' },
-    { id: 'dashboard', label: '대시보드', icon: <FaChartLine size={18} />, path: '/dashboard', hoverTextClass: 'hover:text-emerald-600 dark:hover:text-emerald-400', activeClass: 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/30' },
+    { id: 'selectionpage', label: '보유 상품 기반 추천', icon: <FaShirt size={18} />, path: '/selectionpage', hoverTextClass: 'hover:text-fuchsia-600 dark:hover:text-fuchsia-400', activeClass: 'bg-fuchsia-600 text-white shadow-lg shadow-fuchsia-500/30' },
+    { id: 'dashboard', label: '대시보드', icon: <FaChartLine size={18} />, path: '/dashboard', hoverTextClass: 'hover:text-purple-600 dark:hover:text-purple-400', activeClass: 'bg-purple-600 text-white shadow-lg shadow-purple-500/30' },
   ];
 
   return (
-    <nav className="absolute top-0 left-0 right-0 z-50 px-8 py-6">
+    <nav className="absolute top-0 left-0 right-0 z-50 px-3 sm:px-6 lg:px-8 py-4 lg:py-6">
       <div className="max-w-7xl mx-auto">
         {/* 단일 통합 헤더 바: w-full로 아래 카드들과 길이를 맞춤 */}
         <div className="w-full flex items-center bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl p-1.5 rounded-full border-2 border-neutral-100 dark:border-white/10 shadow-xl transition-all">
@@ -208,7 +207,7 @@ export default function Header() {
                     window.location.href = item.path;
                   }
                 }}
-                className={`px-2.5 sm:px-3 lg:px-4 py-2 rounded-full text-[12px] font-bold uppercase tracking-wider lg:tracking-[0.2em] flex items-center gap-1.5 md:gap-2 transition-all shrink-0 ${pathname === item.path
+                className={`px-2 sm:px-3 lg:px-4 py-2 rounded-full text-[12px] font-bold uppercase tracking-wider lg:tracking-[0.2em] flex items-center gap-1.5 md:gap-2 transition-all shrink-0 ${pathname === item.path
                   ? item.activeClass
                   : `text-gray-500 dark:text-gray-400 bg-transparent hover:bg-neutral-50 dark:hover:bg-white/5 ${item.hoverTextClass}`
                   }`}
@@ -227,25 +226,27 @@ export default function Header() {
             {/* 분석 모델 스위치 */}
             <button
               onClick={() => {
-                setModelMode(modelMode === 'normal' ? '768' : 'normal');
+                setModelMode(modelMode === '512' ? '768' : '512');
               }}
-              className="relative flex items-center h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-white/10 p-0.5 overflow-hidden shadow-inner w-18"
-              title={modelMode === 'normal' ? "기본 분석 모드" : "768 분석 모드"}
+              className="relative flex items-center h-6 w-16 sm:h-8 sm:w-22 rounded-full bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-white/10 p-0.5 sm:p-1 overflow-hidden shadow-inner shrink-0"
+              title={modelMode === '512' ? "gcn_resnet101" : "FashionCLIP"}
             >
               {/* 토글 배경 슬라이더 */}
               <div
-                className={`absolute w-8 h-7 bg-white dark:bg-neutral-600 rounded-full shadow-sm transition-transform duration-300 ease-in-out ${modelMode === 'normal' ? 'translate-x-0' : 'translate-x-9'}`}
+                className={`absolute left-0.5 sm:left-1 top-1/2 -translate-y-1/2 w-7 h-5 sm:w-9.5 sm:h-6 bg-white dark:bg-neutral-600 rounded-full shadow-sm transition-transform duration-300 ease-in-out ${modelMode === '512' ? 'translate-x-0' : 'translate-x-8 sm:translate-x-10'}`}
               />
 
-              <div className="relative z-10 flex w-full justify-between px-2">
-                <FaWandMagicSparkles
-                  size={12}
-                  className={`transition-colors duration-300 ${modelMode === 'normal' ? 'text-violet-600' : 'text-neutral-400 dark:text-neutral-500'}`}
-                />
-                <FaCube
-                  size={12}
-                  className={`transition-colors duration-300 ${modelMode === '768' ? 'text-violet-600' : 'text-neutral-400 dark:text-neutral-500'}`}
-                />
+              <div className="relative z-10 flex w-full h-full items-center justify-between text-[8px] sm:text-[11px] font-black uppercase tracking-wider">
+                <div className="w-1/2 flex justify-center">
+                  <span className={`transition-colors duration-300 ${modelMode === '512' ? 'text-violet-600' : 'text-neutral-400 dark:text-neutral-500'}`}>
+                    GCN
+                  </span>
+                </div>
+                <div className="w-1/2 flex justify-center">
+                  <span className={`transition-colors duration-300 ${modelMode === '768' ? 'text-violet-600' : 'text-neutral-400 dark:text-neutral-500'}`}>
+                    CLIP
+                  </span>
+                </div>
               </div>
             </button>
 
@@ -287,21 +288,27 @@ export default function Header() {
                   </div>
                   <div
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
-                    className="relative w-8 h-8 md:w-9 md:h-9 rounded-full bg-transparent p-0.5 shadow-sm overflow-hidden shrink-0 cursor-pointer hover:ring-2 ring-violet-500 transition-all active:scale-95"
+                    className="relative w-8 h-8 md:w-9 md:h-9 rounded-full bg-violet-50 dark:bg-neutral-800 p-0.5 shadow-sm overflow-hidden shrink-0 cursor-pointer hover:ring-2 ring-violet-500 transition-all active:scale-95 flex items-center justify-center"
                   >
-                    {hasValidUrl ? (
-                      <Image
-                        src={profile.startsWith('data:') ? profile : (profile.includes('?') ? `${profile}&t=${Date.now()}` : `${profile}?t=${Date.now()}`)}
-                        alt="profile"
-                        fill
-                        className="object-cover rounded-full"
-                        unoptimized
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-white">
-                        <FaUser size={12} />
-                      </div>
-                    )}
+                    <FaUser size={12} className="absolute text-neutral-400 fallback-icon" style={{ display: 'none' }} />
+                    <Image
+                      src={hasValidUrl ? (profile.startsWith('data:') ? profile : (profile.includes('?') ? `${profile}&t=${Date.now()}` : `${profile}?t=${Date.now()}`)) : "https://fjoylosbfvojioljibku.supabase.co/storage/v1/object/public/profileimage/default.svg"}
+                      alt="profile"
+                      fill
+                      className="relative z-10 object-cover rounded-full"
+                      unoptimized
+                      onError={(e) => {
+                        const defaultImg = "https://fjoylosbfvojioljibku.supabase.co/storage/v1/object/public/profileimage/default.svg";
+                        if (e.currentTarget.src !== defaultImg) {
+                          e.currentTarget.srcset = "";
+                          e.currentTarget.src = defaultImg;
+                        } else {
+                          e.currentTarget.style.display = "none";
+                          const icon = e.currentTarget.parentElement?.querySelector('.fallback-icon') as HTMLElement;
+                          if (icon) icon.style.display = "block";
+                        }
+                      }}
+                    />
                   </div>
                 </div>
               );
@@ -315,19 +322,27 @@ export default function Header() {
               return (
                 <div
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
-                  className="relative sm:hidden w-8 h-8 rounded-full bg-violet-600 p-0.5 border-2 border-white/20 shadow-sm overflow-hidden flex items-center justify-center cursor-pointer active:scale-90 transition-transform shrink-0"
+                  className="relative sm:hidden w-8 h-8 rounded-full bg-violet-50 dark:bg-neutral-800 p-0.5 border-2 border-neutral-200 dark:border-white/20 shadow-sm overflow-hidden flex items-center justify-center cursor-pointer active:scale-90 transition-transform shrink-0"
                 >
-                  {hasValidUrl ? (
-                    <Image
-                      src={profile.startsWith('data:') ? profile : (profile.includes('?') ? `${profile}&t=${Date.now()}` : `${profile}?t=${Date.now()}`)}
-                      alt="profile"
-                      fill
-                      className="object-cover rounded-full"
-                      unoptimized
-                    />
-                  ) : (
-                    <FaUser size={10} className="text-white" />
-                  )}
+                  <FaUser size={12} className="absolute text-neutral-400 fallback-icon" style={{ display: 'none' }} />
+                  <Image
+                    src={hasValidUrl ? (profile.startsWith('data:') ? profile : (profile.includes('?') ? `${profile}&t=${Date.now()}` : `${profile}?t=${Date.now()}`)) : "https://fjoylosbfvojioljibku.supabase.co/storage/v1/object/public/profileimage/default.svg"}
+                    alt="profile"
+                    fill
+                    className="relative z-10 object-cover rounded-full"
+                    unoptimized
+                    onError={(e) => {
+                      const defaultImg = "https://fjoylosbfvojioljibku.supabase.co/storage/v1/object/public/profileimage/default.svg";
+                      if (e.currentTarget.src !== defaultImg) {
+                        e.currentTarget.srcset = "";
+                        e.currentTarget.src = defaultImg;
+                      } else {
+                        e.currentTarget.style.display = "none";
+                        const icon = e.currentTarget.parentElement?.querySelector('.fallback-icon') as HTMLElement;
+                        if (icon) icon.style.display = "block";
+                      }
+                    }}
+                  />
                 </div>
               );
             })()}

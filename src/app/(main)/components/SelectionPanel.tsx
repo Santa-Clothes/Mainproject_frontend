@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { FaArrowRotateLeft, FaArrowsRotate, FaCheck, FaMagnifyingGlass, FaChartLine, FaCalendarDays, FaShirt } from 'react-icons/fa6';
-import { ProductData, RecommendData, RecommendList } from '@/types/ProductType';
+import { ProductData, RecommendData, RecommendList512, RecommendResult768, SelectionRecommendResult } from '@/types/ProductType';
 import Image from 'next/image';
 import ProductCard from './ProductCard';
 import { getProductList, getRecommendList, getRecommend768List } from '@/app/api/productservice/productapi';
@@ -11,7 +11,7 @@ import { useAtom } from 'jotai';
 import { modelModeAtom } from '@/jotai/modelJotai';
 
 interface SelectionPanelProps {
-  onResultFound: (results: RecommendList | null, category?: string) => void;
+  onResultFound: (results: SelectionRecommendResult | null, category?: string) => void;
   onAnalysisStart: (imgUrl: string, name?: string) => void;
   onAnalysisCancel: () => void;
   isLoading: boolean; // isPending 대신 제어 가능한 isLoading 사용
@@ -32,7 +32,7 @@ export default function SelectionPanel({
 }: SelectionPanelProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [modelMode] = useAtom(modelModeAtom); // 현재 분석 모드 (normal / 768) 가져오기
+  const [modelMode] = useAtom(modelModeAtom); // 현재 분석 모드 (512 / 768) 가져오기
 
   // 상태 관리
   const [isFetching, setIsFetching] = useState(false);  // 전체 데이터 로딩 상태
@@ -120,10 +120,14 @@ export default function SelectionPanel({
     router.replace(`?${params.toString()}`, { scroll: false });
   };
 
+  const analysisIdRef = React.useRef(0);
+
   // 선택된 대상을 기준으로 스타일 유사 분석을 백엔드에 요청
   const startAnalysis = (product?: ProductData) => {
     const targetId = product?.productId || selectedProductId;
     if (!targetId) return;
+
+    const currentAnalysisId = ++analysisIdRef.current;
 
     setAnalyzingTargetId(targetId);
 
@@ -141,6 +145,9 @@ export default function SelectionPanel({
         const result: any = modelMode === '768'
           ? await getRecommend768List(targetId)
           : await getRecommendList(targetId);
+
+        // 취소 버튼이 눌려 ID가 변경됐다면 화면 전환 스킵
+        if (currentAnalysisId !== analysisIdRef.current) return;
 
         if (result && !Array.isArray(result)) {
           console.log("result:", result);
@@ -195,6 +202,7 @@ export default function SelectionPanel({
             <button
               onClick={(e) => {
                 e.stopPropagation();
+                analysisIdRef.current += 1; // 진행 중인 API 스킵
                 onAnalysisCancel();
               }}
               className="mt-4 px-6 py-2.5 bg-white/80 dark:bg-neutral-800/80 backdrop-blur-md border border-neutral-200 dark:border-white/10 rounded-full text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-50 transition-all shadow-xl"
@@ -267,7 +275,7 @@ export default function SelectionPanel({
             <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-10 pb-20">
               {visibleProducts.map((product, idx) => (
                 <div
-                  key={product.productId}
+                  key={`${product.productId}-${idx}`}
                   // 대량 렌더링 성능 최적화 속성 유지
                   style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}
                 >

@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { FaUser, FaLock, FaTrash, FaCamera, FaCircleCheck, FaTriangleExclamation, FaXmark, FaStore } from 'react-icons/fa6';
 import Image from 'next/image';
 
+
 /**
  * MemberInfo: 사용자의 프로필 정보를 확인하고 수정하는 전역 관리 페이지입니다.
  * 프로필 이미지, 닉네임, 비밀번호(로컬전용) 수정 및 회원 탈퇴 기능을 제공합니다.
@@ -222,24 +223,35 @@ export default function MemberInfo() {
             <div className="relative group mx-auto w-48 h-48 lg:w-full lg:h-auto aspect-square rounded-[3rem] overflow-hidden bg-neutral-100 dark:bg-neutral-800 border-4 border-white dark:border-neutral-900 shadow-2xl transition-transform hover:scale-[1.02]">
               {(() => {
                 const isValid = typeof profileImage === 'string' && (profileImage.startsWith('http') || profileImage.startsWith('data:'));
-                return isValid ? (
-                  /* src 뒤에 항상 타임스탬프를 붙여 캐시 방지 (단, data: 미리보기는 제외) */
-                  <Image
-                    src={
-                      profileImage.startsWith('data:')
-                        ? profileImage
-                        : (profileImage.includes('?') ? `${profileImage}&t=${Date.now()}` : `${profileImage}?t=${Date.now()}`)
-                    }
-                    alt="Profile"
-                    fill
-                    priority
-                    unoptimized
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    className="object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-neutral-300">
-                    <FaUser size={60} />
+                return (
+                  <div className="relative w-full h-full flex items-center justify-center bg-violet-50 dark:bg-neutral-800">
+                    <FaUser size={60} className="absolute text-neutral-300 fallback-icon" style={{ display: 'none' }} />
+                    <Image
+                      src={
+                        isValid
+                          ? (profileImage.startsWith('data:')
+                            ? profileImage
+                            : (profileImage.includes('?') ? `${profileImage}&t=${Date.now()}` : `${profileImage}?t=${Date.now()}`))
+                          : "https://fjoylosbfvojioljibku.supabase.co/storage/v1/object/public/profileimage/default.svg"
+                      }
+                      alt="Profile"
+                      fill
+                      priority
+                      unoptimized
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      className="relative z-10 object-cover"
+                      onError={(e) => {
+                        const defaultImg = "https://fjoylosbfvojioljibku.supabase.co/storage/v1/object/public/profileimage/default.svg";
+                        if (e.currentTarget.src !== defaultImg) {
+                          e.currentTarget.srcset = "";
+                          e.currentTarget.src = defaultImg;
+                        } else {
+                          e.currentTarget.style.display = "none";
+                          const icon = e.currentTarget.parentElement?.querySelector('.fallback-icon') as HTMLElement;
+                          if (icon) icon.style.display = "block";
+                        }
+                      }}
+                    />
                   </div>
                 );
               })()}
@@ -273,13 +285,6 @@ export default function MemberInfo() {
             <div className="flex flex-col gap-1">
               <label className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest">인증 방식</label>
               <p className="text-xs font-black text-violet-600 uppercase tracking-wider">{auth.provider || 'LOCAL'}</p>
-            </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest">담당 매장</label>
-              <div className="flex items-center gap-2">
-                <FaStore size={10} className="text-violet-500" />
-                <p className="text-xs font-medium text-neutral-900 dark:text-white truncate">{storeName}</p>
-              </div>
             </div>
           </div>
         </div>

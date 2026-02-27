@@ -1,4 +1,4 @@
 import { atomWithStorage } from 'jotai/utils';
 
-export type ModelMode = 'normal' | '768';
-export const modelModeAtom = atomWithStorage<ModelMode>('modelMode', 'normal');
+export type ModelMode = '512' | '768';
+export const modelModeAtom = atomWithStorage<ModelMode>('modelMode', '512');

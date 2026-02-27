@@ -21,28 +21,38 @@ interface Props {
  * API 유연성을 위해 한글 및 영문 키 값을 모두 매핑하여 처리합니다.
  */
 const StyleDistributionCard: React.FC<Props> = ({ data, isLoading, error, onRetry, className = "" }) => {
-    // 스타일 카테고리별 구분을 명확히 하기 위한 원색 위주의 컬러 매핑
+    // ScatterPlot과 동일한 깊은 600 계열 컬러 팔레트 동기화
     const STYLE_COLOR_MAP: Record<string, string> = {
-        '캐주얼': '#0000FF',        // Pure Blue
-        'casual': '#0000FF',
-        '컨템포러리': '#00FF00',    // Pure Green
-        'contemporary': '#00FF00',
-        '에스닉': '#FF8000',        // Vivid Orange
-        'ethnic': '#FF8000',
-        '페미닌': '#FF00FF',        // Magenta / Pink
-        'feminine': '#FF00FF',
-        '젠더리스': '#00FFFF',      // Cyan
-        'genderless': '#00FFFF',
-        '매니시': '#800000',        // Maroon / Brown
-        'mannish': '#800000',
-        '내추럴': '#80FF00',        // Lime Green
-        'natural': '#80FF00',
-        '스포츠': '#FF0000',        // Pure Red
-        'sporty': '#FF0000',
-        '서브컬처': '#8000FF',      // Pure Purple
-        'subculture': '#8000FF',
-        '트레디셔널': '#FFFF00',    // Pure Yellow
-        'traditional': '#FFFF00',
+        '캐주얼': '#2563eb',        // Blue-600
+        'casual': '#2563eb',
+        'CAS': '#2563eb',
+        '컨템포러리': '#059669',    // Emerald-600
+        'contemporary': '#059669',
+        'CNT': '#059669',
+        '에스닉': '#d97706',        // Amber-600
+        'ethnic': '#d97706',
+        'ETH': '#d97706',
+        '페미닌': '#db2777',        // Pink-600
+        'feminine': '#db2777',
+        'FEM': '#db2777',
+        '젠더리스': '#0284c7',      // Sky-600
+        'genderless': '#0284c7',
+        'GNL': '#0284c7',
+        '매니시': '#4f46e5',        // Indigo-600
+        'mannish': '#4f46e5',
+        'MAN': '#4f46e5',
+        '내추럴': '#65a30d',        // Lime-600
+        'natural': '#65a30d',
+        'NAT': '#65a30d',
+        '스포츠': '#dc2626',        // Red-600
+        'sporty': '#dc2626',
+        'SPT': '#dc2626',
+        '서브컬처': '#9333ea',      // Purple-600
+        'subculture': '#9333ea',
+        'SUB': '#9333ea',
+        '트레디셔널': '#ca8a04',    // Yellow-600
+        'traditional': '#ca8a04',
+        'TRD': '#ca8a04',
     };
 
     const getColor = (style: string) => {

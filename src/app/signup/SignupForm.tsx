@@ -66,11 +66,13 @@ export default function SignupForm() {
     setAuth(null);
 
     try {
+      console.log("selectedFile:", selectedFile);
+
       const result = await signupAPI({
         id: id,
         nickname: nickname,
         password: password,
-        profileImg: selectedFile // 선택하지 않았다면 null 전송
+        profileImg: selectedFile || DEFAULT_IMAGE // 선택하지 않았다면 기본 이미지 URL 전송
       });
       if (result)
         router.push("/login");

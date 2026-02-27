@@ -5,7 +5,7 @@
 
 const BASEURL = process.env.NEXT_PUBLIC_BACK_API_URL;
 
-import { ProductData, RecommendList } from "@/types/ProductType";
+import { ProductData, RecommendList512, RecommendResult768, SelectionRecommendResult } from "@/types/ProductType";
 
 /**
  * 프로젝트 내의 전체 상품 리스트를 가져옵니다.
@@ -44,7 +44,7 @@ export const getProductList = async (): Promise<ProductData[]> => {
  * 특정 상품ID를 기반으로 AI가 분석한 유사 스타일 상품 리스트를 가져옵니다.
  * @param productId 기준이 될 상품 식별자
  */
-export const getRecommendList = async (productId: string): Promise<RecommendList | null> => {
+export const getRecommendList = async (productId: string): Promise<SelectionRecommendResult | null> => {
     try {
         const response = await fetch(`${BASEURL}/api/recommand/${productId}`, {
             method: 'GET',
@@ -58,7 +58,7 @@ export const getRecommendList = async (productId: string): Promise<RecommendList
             return null;
         }
 
-        const data: RecommendList = await response.json();
+        const data: SelectionRecommendResult = await response.json();
 
         // [매핑] 네이버 상품의 경우 naverProductId를 productId로 통일하여 프론트 규격 준수
         if (data.naverProducts) {
@@ -79,7 +79,7 @@ export const getRecommendList = async (productId: string): Promise<RecommendList
  * 특정 상품ID를 기반으로 AI가 분석한 유사 스타일 상품 리스트를 가져옵니다 (768 차원).
  * @param productId 기준이 될 상품 식별자
  */
-export const getRecommend768List = async (productId: string): Promise<RecommendList | null> => {
+export const getRecommend768List = async (productId: string): Promise<SelectionRecommendResult | null> => {
     try {
         const response = await fetch(`${BASEURL}/api/recommand/768/${productId}`, {
             method: 'GET',
@@ -93,7 +93,7 @@ export const getRecommend768List = async (productId: string): Promise<RecommendL
             return null;
         }
 
-        const data: RecommendList = await response.json();
+        const data: SelectionRecommendResult = await response.json();
 
         // [매핑] 네이버 상품의 경우 naverProductId를 productId로 통일하여 프론트 규격 준수
         if (data.naverProducts) {

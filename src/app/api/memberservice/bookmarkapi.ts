@@ -5,7 +5,7 @@ const BASEURL = process.env.NEXT_PUBLIC_BACK_API_URL;
  */
 export const saveBookmarkAPI = async (token: string, productId: string, styleName?: string) => {
     // console.log("saveBookmarkAPI productId:", productId);
-    // console.log("saveBookmarkAPI styleName:", styleName);
+    console.log("saveBookmarkAPI styleName:", styleName);
     const reqUrl = `${BASEURL}/api/save-products`;
     try {
         const response = await fetch(reqUrl, {
@@ -65,7 +65,7 @@ export const getBookmarkAPI = async (token: string): Promise<BookmarkData[] | nu
         });
         if (!response.ok) return [];
         const data = await response.json();
-        console.log("getBookmarkAPI data:", data);
+        // console.log("getBookmarkAPI data:", data);
 
         if (Array.isArray(data)) {
             return data.map((item: any) => ({

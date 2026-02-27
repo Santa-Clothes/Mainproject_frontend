@@ -13,7 +13,7 @@ import AnalysisSection from './AnalysisSection';
 import { imageAnalyze, image768Analyze } from '@/app/api/imageservice/imageapi';
 import { modelModeAtom } from '@/jotai/modelJotai';
 
-import { RecommendData, RecommendList } from '@/types/ProductType';
+import { RecommendData, RecommendList512, RecommendResult768, SelectionRecommendResult } from '@/types/ProductType';
 
 export type StudioMode = 'imageInput' | 'imageSelection';
 
@@ -31,10 +31,14 @@ export default function Studio({ mode }: { mode: StudioMode }) {
   const isResultView = searchParams.get('view') === 'result';
 
   // [상태 관리]
-  const [results, setResults] = useState<RecommendList | null>(null); // 분석 결과 리스트
+  const [results, setResults] = useState<RecommendList512 | RecommendResult768 | SelectionRecommendResult | null>(null); // 분석 결과 리스트
   const [analysisImage, setAnalysisImage] = useState<string | null>(null); // 현재 분석 대상 이미지
   const [analysisName, setAnalysisName] = useState<string | undefined>(undefined); // 현재 분석 대상 상품명
   const [isAnalyzing, setIsAnalyzing] = useState(false); // 분석 중 로딩 상태
+
+  // 비동기 콜백 캡처 방지용 Ref (최신 이미지/이름 기억)
+  const analysisImageRef = React.useRef<string | null>(null);
+  const analysisNameRef = React.useRef<string | undefined>(undefined);
 
   const [history, setHistory] = useAtom(analysisHistoryAtom);
   const [activeHistory, setActiveHistory] = useAtom(activeHistoryAtom);
@@ -85,7 +89,7 @@ export default function Studio({ mode }: { mode: StudioMode }) {
   }, [modelMode, isResultView, pathname, router, setActiveHistory]);
 
   // 분석 완료 후 데이터를 주입받아 표시 상태로 전환
-  const handleSearchResult = (data: RecommendList | null) => {
+  const handleSearchResult = (data: RecommendList512 | RecommendResult768 | SelectionRecommendResult | null) => {
     setResults(data);
     setIsAnalyzing(false);
 
@@ -95,13 +99,16 @@ export default function Studio({ mode }: { mode: StudioMode }) {
         router.push(`${pathname}?view=result`, { scroll: false });
       }
 
-      if (analysisImage) {
+      const imgToSave = analysisImageRef.current || analysisImage;
+      const nameToSave = analysisNameRef.current || analysisName;
+
+      if (imgToSave) {
         setHistory((prev) => {
           const newItem: HistoryItem = {
             id: Date.now().toString(),
             type: mode,
-            sourceImage: analysisImage,
-            productName: analysisName,
+            sourceImage: imgToSave,
+            productName: nameToSave,
             timestamp: Date.now(),
             results: data,
           };
@@ -113,6 +120,8 @@ export default function Studio({ mode }: { mode: StudioMode }) {
 
   // 이미지 파일이 확정된 순간 분석 대기 화면으로 상태 변경
   const handleAnalysisStart = (imgUrl: string, name?: string) => {
+    analysisImageRef.current = imgUrl;
+    analysisNameRef.current = name;
     setAnalysisImage(imgUrl);
     setAnalysisName(name);
     setIsAnalyzing(true);
@@ -135,12 +144,14 @@ export default function Studio({ mode }: { mode: StudioMode }) {
 
         // 2. 이미지 모바일 통신을 고려하여 경량 프로필 이미지로 리사이징
         const { dataUrl, blob } = await resizeImage(file, 300);
+        analysisImageRef.current = dataUrl;
+        analysisNameRef.current = file.name;
         setAnalysisImage(dataUrl);
         setAnalysisName(file.name);
 
         // 3. 엔진 선택에 따른 비동기 인퍼런스 호출
         const resizedFile = new File([blob], file.name, { type: file.type || 'image/jpeg' });
-        const uploadResult: RecommendList = modelMode === '768'
+        const uploadResult = modelMode === '768'
           ? await image768Analyze(resizedFile)
           : await imageAnalyze(resizedFile);
 
@@ -205,11 +216,19 @@ export default function Studio({ mode }: { mode: StudioMode }) {
                 sourceImage={analysisImage}
                 productName={analysisName}
                 isLoading={isAnalyzing}
-                radarData={[
-                  { styleName: results?.targetTop1Style || '', score: results?.targetTop1Score || 0 },
-                  { styleName: results?.targetTop2Style || '', score: results?.targetTop2Score || 0 },
-                  { styleName: results?.targetTop3Style || '', score: results?.targetTop3Score || 0 },
-                ].filter(s => s.styleName)}
+                radarData={
+                  (results && 'styles' in results)
+                    ? results.styles.map(s => ({ styleName: s.style, score: s.score }))
+                    : (results && 'targetTop1Style' in results)
+                      ? [
+                        { styleName: results.targetTop1Style, score: results.targetTop1Score },
+                        { styleName: results.targetTop2Style, score: results.targetTop2Score },
+                        { styleName: results.targetTop3Style, score: results.targetTop3Score }
+                      ]
+                      : (results as RecommendList512)?.results?.[0]?.topk
+                        ? (results as RecommendList512).results[0].topk.slice(0, 3).map(s => ({ styleName: s.label_name, score: s.score }))
+                        : []
+                }
                 isSelectionMode={mode === 'imageSelection'}
                 onImageUpload={handleFileAnalysis}
               />
@@ -234,7 +253,13 @@ export default function Studio({ mode }: { mode: StudioMode }) {
                 products={results.naverProducts || []}
                 title="외부 상품 추천 목록"
                 showCartButton={true}
-                top1Style={results?.targetTop1Style}
+                top1Style={
+                  results && 'styles' in results
+                    ? results.styles?.[0]?.style
+                    : results && 'targetTop1Style' in results
+                      ? results.targetTop1Style
+                      : (results as RecommendList512)?.results?.[0]?.topk?.[0]?.label_name
+                }
                 onProductClick={(product: RecommendData) => {
                   if (product.productLink) {
                     window.open(product.productLink, '_blank');

@@ -95,7 +95,7 @@ const SearchRankCard: React.FC<RankProps> = ({ trends, isLoading, error, onRetry
                                 </div>
                                 {isHighlighted && (
                                     <div className="shrink-0 bg-white/20 px-2 py-0.5 rounded-full ml-1">
-                                        <span className="text-[8px] font-black text-white uppercase tracking-tighter italic">Match</span>
+                                        <span className="text-[12px] font-black text-white uppercase tracking-tighter italic flex items-center justify-center p-1">Match</span>
                                     </div>
                                 )}
                             </div>

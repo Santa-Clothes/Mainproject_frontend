@@ -23,6 +23,7 @@ interface DashboardStyleItem {
   score: number;
   xcoord: number; // t-SNE 시각화를 위한 X 좌표
   ycoord: number; // t-SNE 시각화를 위한 Y 좌표
+  zcoord: number; // t-SNE 시각화를 위한 Z 좌표
   productId: string;
   productName: string;
 }

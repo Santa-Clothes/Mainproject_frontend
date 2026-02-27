@@ -109,7 +109,7 @@ const ResultGrid: React.FC<ResultGridProps> = ({
                     <div className="grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-4 pb-12">
                         {products.map((item, idx) => (
                             <ProductCard
-                                key={item.productId}
+                                key={`${item.productId}-${idx}`}
                                 product={item}
                                 index={idx}
                                 showCartButton={showCartButton}
