@@ -7,9 +7,6 @@ import { useRef, useState } from "react";
 import { useSetAtom } from "jotai";
 import { authUserAtom } from "@/jotai/loginjotai";
 import Image from "next/image";
-import { getShopList, ShopInfo } from "@/app/api/salesservice/salesapi";
-import { FaStore } from "react-icons/fa6";
-import { useEffect } from "react";
 
 export default function SignupForm() {
   const setAuth = useSetAtom(authUserAtom);
@@ -25,18 +22,7 @@ export default function SignupForm() {
   const userIdRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
   const nicknameRef = useRef<HTMLInputElement>(null);
-  const [shops, setShops] = useState<ShopInfo[]>([]);
-  const [selectedStoreId, setSelectedStoreId] = useState<string>("");
 
-  // 매장 목록 로드
-  useEffect(() => {
-    const fetchShops = async () => {
-      const list = await getShopList();
-      setShops(list);
-      if (list.length > 0) setSelectedStoreId(list[0].storeId);
-    };
-    fetchShops();
-  }, []);
 
   // 프로필 이미지 변경 핸들러
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -84,7 +70,6 @@ export default function SignupForm() {
         id: id,
         nickname: nickname,
         password: password,
-        storeId: selectedStoreId,
         profileImg: selectedFile // 선택하지 않았다면 null 전송
       });
       if (result)
@@ -182,28 +167,7 @@ export default function SignupForm() {
             />
           </div>
 
-          {/* 매장 선택 */}
-          <div className="group relative border-b-2 border-neutral-200 py-3 transition-all duration-500 focus-within:border-violet-500 dark:border-white/10">
-            <label className="absolute -top-6 left-0 text-[12px] font-bold uppercase tracking-[0.3em] text-neutral-500 transition-colors group-focus-within:text-violet-600 dark:group-focus-within:text-violet-400 flex items-center gap-2">
-              <FaStore size={10} /> 담당 매장
-            </label>
-            <select
-              value={selectedStoreId}
-              onChange={(e) => setSelectedStoreId(e.target.value)}
-              className="w-full border-none bg-transparent py-2 text-sm font-light tracking-[0.3em] text-neutral-900 outline-none dark:text-white appearance-none cursor-pointer"
-              required
-            >
-              <option value="" disabled className="text-neutral-500">Select Store</option>
-              {shops.map((shop) => (
-                <option key={shop.storeId} value={shop.storeId} className="text-black bg-white dark:bg-neutral-900 dark:text-white">
-                  {shop.storeName}
-                </option>
-              ))}
-            </select>
-            <div className="absolute right-0 bottom-5 pointer-events-none text-neutral-400 group-hover:text-violet-500 transition-colors">
-              <FaArrowRight className="rotate-90 scale-75" />
-            </div>
-          </div>
+
         </div>
 
         <div className="flex flex-col gap-5">

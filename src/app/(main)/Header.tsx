@@ -43,7 +43,7 @@ export default function Header() {
 
   // [상태 관리]
   const [isProfileOpen, setIsProfileOpen] = useState(false); // 프로필 드롭다운 열림 여부
-  const [isScrolled, setIsScrolled] = useState(false); // 스크롤 발생 여부 (UI 변화 트리거)
+
   const [isDarkMode, setIsDarkMode] = useState(false); // 다크 모드 활성화 여부
   const [isMounted, setIsMounted] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
@@ -116,9 +116,8 @@ export default function Header() {
     }
   }, [isMounted, authInfo, setAuthInfo, router]);
 
-  // 전역 클릭 및 스크롤 이벤트 리스너 등록
+  // 전역 클릭 이벤트 리스너 등록
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20);
     const handleClickOutside = (event: MouseEvent) => {
       // 프로필 영역 외부 클릭 시 드롭다운 닫기
       if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
@@ -126,10 +125,8 @@ export default function Header() {
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
-      window.removeEventListener('scroll', handleScroll);
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);

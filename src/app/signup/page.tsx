@@ -103,7 +103,7 @@ export default function SignupPage() {
           className="group flex flex-col items-start gap-1 text-[9px] font-bold uppercase tracking-[0.4em] text-neutral-500 transition-all hover:text-violet-600 dark:text-neutral-500 dark:hover:text-white"
         >
           <span className="opacity-0 transition-all -translate-y-2 group-hover:translate-y-0 group-hover:opacity-100 whitespace-nowrap">
-            가입 취소하기
+            돌아가기
           </span>
           <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-neutral-100 bg-white transition-all group-hover:border-violet-500/50 group-hover:bg-violet-500/5 dark:border-white/10 dark:bg-transparent">
             <FaArrowLeft className="text-neutral-400 transition-transform group-hover:-translate-x-1 group-hover:text-violet-600 dark:text-white/40 dark:group-hover:text-violet-400" size={14} />
