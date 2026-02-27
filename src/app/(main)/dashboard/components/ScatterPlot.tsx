@@ -158,7 +158,7 @@ export default function ScatterPlot({
                 text: points.map(d => `<b>${d.productName}</b>`),
                 name: `<b>${style}</b>`,
                 mode: 'markers' as const,
-                type: 'scatter' as const,
+                type: 'scattergl' as const,
                 marker: {
                     color: color,
                     size: 8,

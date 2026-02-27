@@ -51,7 +51,8 @@ export default function LoginForm() {
           name: result.name,
           profile: result.profile,
           success: result.success,
-          provider: 'local'
+          provider: 'local',
+          expiresAt: Date.now() + 6 * 60 * 60 * 1000 // 6시간 후 만료
         });
         router.push("/");
       } else {

@@ -6,6 +6,7 @@ export interface AuthUser {
     success: boolean;
     provider?: string; // local, google, kakao, naver 등
     storeId?: string;
+    expiresAt?: number; // 토큰 만료 시간 (밀리초)
 }
 
 export interface JoinRequest {

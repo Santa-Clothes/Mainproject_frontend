@@ -38,7 +38,8 @@ export default function AuthHandler() {
                             name: userInfo.name || "",
                             profile: userInfo.profile || "",
                             success: true,
-                            provider: userInfo.provider || 'social'
+                            provider: userInfo.provider || 'social',
+                            expiresAt: Date.now() + 6 * 60 * 60 * 1000 // 6시간 후 만료
                         });
 
                         // 주소창에서 토큰을 지우기 위해 쿼리 없이 현재 경로로 이동

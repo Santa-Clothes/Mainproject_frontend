@@ -81,9 +81,20 @@ export default function Header() {
     }
   }, [isMounted, authInfo, setBookmark]);
 
-  // 세션 유효성 검증 (Header에서 전역적으로 인가 실패 체크)
+  // 세션 유효성 검증 및 로컬 시간 만료(6시간) 체크
   useEffect(() => {
     if (isMounted && authInfo) {
+      // 프론트엔드 자체 만료 시간 방어 로직 (6시간 제한)
+      if (authInfo.expiresAt && Date.now() > authInfo.expiresAt) {
+        setAuthInfo(null);
+        setBookmark([]);
+        setHistory([]);
+        setActiveHistory(null);
+        alert('로그인 유효 시간(6시간)이 만료되었습니다. 다시 로그인해주세요.');
+        router.push('/login');
+        return; // 하위의 백엔드 검증 로직 실행 방지
+      }
+
       const verifySession = async () => {
         const currentToken = authInfo?.accessToken;
         if (!currentToken) return;
